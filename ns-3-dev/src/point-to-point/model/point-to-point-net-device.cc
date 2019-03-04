@@ -737,7 +737,7 @@ Ptr<Packet> PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE:
     // zlib struct
     uint32_t size = packet->GetSize();
     uint8_t compressed_data[size];
-    uint8_t uncompressed_data[size];
+    uint8_t uncompressed_data[size]; //TODO these two values shouldn't be the same yeah?
     packet->CopyData(compressed_data, size);
     z_stream infstream;
     infstream.zalloc = Z_NULL;
