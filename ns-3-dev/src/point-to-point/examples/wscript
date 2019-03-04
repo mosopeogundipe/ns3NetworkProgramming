@@ -1,0 +1,11 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+    if not bld.env['ENABLE_EXAMPLES']:
+        return;
+
+    obj = bld.create_ns3_program('main-attribute-value', ['network', 'point-to-point'])
+    obj.source = 'main-attribute-value.cc'
+    obj.env.append_value("CXXFLAGS", "-I/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/include")
+    obj.env.append_value("LINKFLAGS", ["-L/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/lib"])
+    obj.env.append_value("LIB", ["z"])
