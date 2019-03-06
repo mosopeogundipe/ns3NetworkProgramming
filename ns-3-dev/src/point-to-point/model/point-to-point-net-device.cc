@@ -694,12 +694,14 @@ Ptr<Packet> PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE:
     secondary_data.SetProtocol(0x0021);
     packet->AddHeader (secondary_data); //appending original protocol number to original data
 
+    
     //Compress packet data using LZS compression
     uint32_t size = packet->GetSize();
     uint8_t raw_data[size];
     //vector<uint8_t> raw_data
     uint8_t compressed_data[size];
     packet->CopyData(raw_data, size);
+
     z_stream defstream;
     defstream.zalloc = Z_NULL;
     defstream.zfree = Z_NULL;
@@ -755,18 +757,25 @@ Ptr<Packet> PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE:
     inflateEnd(&infstream);
     //End of LZS decompression for packet
 
-    //Add decompressed data to packet, then add the header
-    result = Create<Packet> (uncompressed_data, sizeof(compressed_data));
     //remove "0x0021" from decompressed data
-    std::vector<char> protocolTobyteArray = GetArrayofByte(0x0021);
-    result ->RemoveAtStart(protocolTobyteArray.size());
+    //"0x0021" is always in indices 0 & 1 of uncompressed data
+    //Taking the indices higher than 2 means removing "0x0021"
+    uint8_t packet_data[(int)sizeof(uncompressed_data) - 2];
+    int index = 0;
+    for(int i=2; i<(int)sizeof(uncompressed_data); i++){
+      packet_data[index] = uncompressed_data[i];
+      index++;
+    }
+
+    //Create new packet with data -- where appended protocol has been removed
+    result = Create<Packet> (packet_data, sizeof(packet_data));
     //Add "0x0021" as header to complete re-creation of original packet sent
     header.SetProtocol (0x0021);
     result->AddHeader (header);
     return result;
  } 
 
-  std::vector<char> PointToPointNetDevice::GetArrayofByte(uint16_t number){//HINT.SOPE: Network Programming Project 1
+std::vector<char> PointToPointNetDevice::GetArrayofByte(uint16_t number){//HINT.SOPE: Network Programming Project 1
     std::vector<char> chars;
     char* a_begin = reinterpret_cast<char*>(&number);
     char* a_end = a_begin +4;
