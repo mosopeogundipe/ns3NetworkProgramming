@@ -157,6 +157,15 @@ public:
   std::vector<char> GetArrayofByte(uint16_t number);
   // The remaining methods are documented in ns3::NetDevice*
 
+	//TODO custom functions
+	void TurnOnCompress();
+	void TurnOffCompress();
+	bool IsCompressing();
+	//TODO variables
+
+	// boolean about whether or not we are compressing
+	bool weAreCompressing;
+
   virtual void SetIfIndex (const uint32_t index);
   virtual uint32_t GetIfIndex (void) const;
 
@@ -287,6 +296,14 @@ private:
    * It calls also the linkChange callback.
    */
   void NotifyLinkUp (void);
+
+	//TODO variables
+	/**
+	* Variables to contain the protocol numbers for compression
+	* and decompression.
+	*/
+	//uint16_t compProtocol = 0x4021;
+	//uint16_t compEthProto = 0x4200;
 
   /**
    * Enumeration of the states of the transmit machine of the net device.

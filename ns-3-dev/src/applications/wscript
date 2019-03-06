@@ -18,8 +18,6 @@ def build(bld):
         'model/request-response-server.cc',
         'model/p2p-server.cc',
         'model/p2p-client.cc',
-	'model/CompressionDetectionClient.cc',
-	'model/CompressionDetectionServer.cc',
         'model/application-packet-probe.cc',
         'model/three-gpp-http-client.cc',
         'model/three-gpp-http-server.cc',
@@ -31,7 +29,6 @@ def build(bld):
         'helper/udp-client-server-helper.cc',
         'helper/request-response-helper.cc',
         'helper/p2p-helper.cc',
-	'helper/CompressionDetectionClientServerHelper.cc',
         'helper/udp-echo-helper.cc',
         'helper/three-gpp-http-helper.cc',
         ]
@@ -59,8 +56,6 @@ def build(bld):
         'model/request-response-server.h',
         'model/p2p-server.h',
         'model/p2p-client.h',
-	'model/CompressionDetectionServer.h',
-	'model/CompressionDetectionClient.h',
         'model/application-packet-probe.h',
         'model/three-gpp-http-client.h',
         'model/three-gpp-http-server.h',
@@ -73,9 +68,9 @@ def build(bld):
         'helper/request-response-helper.h',
         'helper/udp-echo-helper.h',
         'helper/p2p-helper.h',
-        'helper/three-gpp-http-helper.h'
+        'helper/three-gpp-http-helper.h',
         ]
-    
+
     if (bld.env['ENABLE_EXAMPLES']):
         bld.recurse('examples')
 

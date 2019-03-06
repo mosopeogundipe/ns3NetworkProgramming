@@ -15,6 +15,8 @@
 	
 */
 #include "CompressionDetectionClientServerHelper.h"
+#include "ns3/CompressionDetectionClient.h"
+#include "ns3/CompressionDetectionServer.h"
 #include "ns3/udp-server.h"
 #include "ns3/udp-client.h"
 #include "ns3/udp-trace-client.h"
@@ -56,7 +58,7 @@ CompressionDetectionServerHelper::Install (NodeContainer c)
 	return apps;
 }
  
-Ptr<CompressionDetectionServer>
+Ptr<CompressionDetectionServerServer>
 CompressionDetectionServerHelper::GetServer (void)
 {
 	return m_server;

@@ -23,6 +23,8 @@
 #include "ns3/ipv4-address.h"
 #include "ns3/udp-server.h"
 #include "ns3/udp-client.h"
+#include "ns3/CompressionDetectionServer.h"
+#include "ns3/CompressionDetectionClient.h"
 
 
 namespace ns3 {
@@ -37,7 +39,7 @@ namespace ns3 {
    
     ApplicationContainer Install (NodeContainer c);
    
-    Ptr<UdpServer> GetServer (void);
+    Ptr<CompressionDetectionServer> GetServer (void);
   private:
     ObjectFactory m_factory; 
     Ptr<UdpServer> m_server; 

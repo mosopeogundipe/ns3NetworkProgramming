@@ -28,9 +28,9 @@
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
 #include "packet-loss-counter.h"
-
 #include "seq-ts-header.h"
 #include "udp-server.h"
+#include "CompressionDetectionServer.h"
 
 namespace ns3 {
 

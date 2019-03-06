@@ -31,10 +31,16 @@
 #include "ns3/socket-factory.h"
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
-#include "CompressionDetectionClient.h"
+#include "ns3/CompressionDetectionServer.h"
+#include "ns3/CompressionDetectionClient.h"
 #include "seq-ts-header.h"
+#include "udp-client.h"
 #include <cstdlib>
 #include <cstdio>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <fstream>
  
 namespace ns3 {
  
@@ -236,7 +242,7 @@ namespace ns3 {
 				//not const enough
         unsigned char buffer[1100];
         int fd = open("/dev/random", O_RDONLY);
-        read(fd, &buffer[0], 1100);
+        instream::read(fd, &buffer[0], 1100);
         close(fd);
 
 		uint8_t buffer
