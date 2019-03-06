@@ -35,6 +35,7 @@
 #include "seq-ts-header.h"
 #include <cstdlib>
 #include <cstdio>
+#include <istream>
  
 namespace ns3 {
  
