@@ -3,54 +3,54 @@
 def build(bld):
     obj = bld.create_ns3_program('icmpv6-redirect', ['csma', 'internet', 'internet-apps'])
     obj.source = 'icmpv6-redirect.cc'
-    obj.env.append_value("CXXFLAGS", "-I/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/include")
-    obj.env.append_value("LINKFLAGS", ["-L/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/lib"])
+    obj.env.append_value("CXXFLAGS", "-I/Documents/cs621/ns-3-dev/src/zlib-1.2.11/include")
+    obj.env.append_value("LINKFLAGS", ["-L/Documents/cs621/ns-3-dev/src/zlib-1.2.11/lib"])
     obj.env.append_value("LIB", ["z"])
 
     obj = bld.create_ns3_program('ping6', ['csma', 'internet', 'internet-apps'])
     obj.source = 'ping6.cc'
-    obj.env.append_value("CXXFLAGS", "-I/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/include")
-    obj.env.append_value("LINKFLAGS", ["-L/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/lib"])
+    obj.env.append_value("CXXFLAGS", "-I/Documents/cs621/ns-3-dev/src/zlib-1.2.11/include")
+    obj.env.append_value("LINKFLAGS", ["-L/Documents/cs621/ns-3-dev/src/zlib-1.2.11/lib"])
     obj.env.append_value("LIB", ["z"])
 
     obj = bld.create_ns3_program('radvd', ['csma', 'internet', 'internet-apps'])
     obj.source = 'radvd.cc'
-    obj.env.append_value("CXXFLAGS", "-I/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/include")
-    obj.env.append_value("LINKFLAGS", ["-L/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/lib"])
+    obj.env.append_value("CXXFLAGS", "-I/Documents/cs621/ns-3-dev/src/zlib-1.2.11/include")
+    obj.env.append_value("LINKFLAGS", ["-L/Documents/cs621/ns-3-dev/src/zlib-1.2.11/lib"])
     obj.env.append_value("LIB", ["z"])
 
     obj = bld.create_ns3_program('radvd-two-prefix', ['csma', 'internet', 'internet-apps'])
     obj.source = 'radvd-two-prefix.cc'
-    obj.env.append_value("CXXFLAGS", "-I/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/include")
-    obj.env.append_value("LINKFLAGS", ["-L/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/lib"])
+    obj.env.append_value("CXXFLAGS", "-I/Documents/cs621/ns-3-dev/src/zlib-1.2.11/include")
+    obj.env.append_value("LINKFLAGS", ["-L/Documents/cs621/ns-3-dev/src/zlib-1.2.11/lib"])
     obj.env.append_value("LIB", ["z"])
 
     obj = bld.create_ns3_program('test-ipv6', ['point-to-point', 'internet'])
     obj.source = 'test-ipv6.cc'
-    obj.env.append_value("CXXFLAGS", "-I/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/include")
-    obj.env.append_value("LINKFLAGS", ["-L/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/lib"])
+    obj.env.append_value("CXXFLAGS", "-I/Documents/cs621/ns-3-dev/src/zlib-1.2.11/include")
+    obj.env.append_value("LINKFLAGS", ["-L/Documents/cs621/ns-3-dev/src/zlib-1.2.11/lib"])
     obj.env.append_value("LIB", ["z"])
 
     obj = bld.create_ns3_program('fragmentation-ipv6', ['csma', 'internet', 'internet-apps'])
     obj.source = 'fragmentation-ipv6.cc'
-    obj.env.append_value("CXXFLAGS", "-I/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/include")
-    obj.env.append_value("LINKFLAGS", ["-L/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/lib"])
+    obj.env.append_value("CXXFLAGS", "-I/Documents/cs621/ns-3-dev/src/zlib-1.2.11/include")
+    obj.env.append_value("LINKFLAGS", ["-L/Documents/cs621/ns-3-dev/src/zlib-1.2.11/lib"])
     obj.env.append_value("LIB", ["z"])
     
     obj = bld.create_ns3_program('fragmentation-ipv6-two-MTU', ['csma', 'internet', 'internet-apps'])
     obj.source = 'fragmentation-ipv6-two-MTU.cc'
-    obj.env.append_value("CXXFLAGS", "-I/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/include")
-    obj.env.append_value("LINKFLAGS", ["-L/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/lib"])
+    obj.env.append_value("CXXFLAGS", "-I/Documents/cs621/ns-3-dev/src/zlib-1.2.11/include")
+    obj.env.append_value("LINKFLAGS", ["-L/Documents/cs621/ns-3-dev/src/zlib-1.2.11/lib"])
     obj.env.append_value("LIB", ["z"])
 
     obj = bld.create_ns3_program('loose-routing-ipv6', ['csma', 'internet', 'internet-apps'])
     obj.source = 'loose-routing-ipv6.cc'
-    obj.env.append_value("CXXFLAGS", "-I/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/include")
-    obj.env.append_value("LINKFLAGS", ["-L/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/lib"])
+    obj.env.append_value("CXXFLAGS", "-I/Documents/cs621/ns-3-dev/src/zlib-1.2.11/include")
+    obj.env.append_value("LINKFLAGS", ["-L/Documents/cs621/ns-3-dev/src/zlib-1.2.11/lib"])
     obj.env.append_value("LIB", ["z"])
 
     obj = bld.create_ns3_program('wsn-ping6', ['lr-wpan', 'internet', 'sixlowpan', 'mobility', 'internet-apps'])
     obj.source = 'wsn-ping6.cc'
-    obj.env.append_value("CXXFLAGS", "-I/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/include")
-    obj.env.append_value("LINKFLAGS", ["-L/ns-3-allinone/ns-3-dev/src/zlib-1.2.11/lib"])
+    obj.env.append_value("CXXFLAGS", "-I/Documents/cs621/ns-3-dev/src/zlib-1.2.11/include")
+    obj.env.append_value("LINKFLAGS", ["-L/Documents/cs621/ns-3-dev/src/zlib-1.2.11/lib"])
     obj.env.append_value("LIB", ["z"])

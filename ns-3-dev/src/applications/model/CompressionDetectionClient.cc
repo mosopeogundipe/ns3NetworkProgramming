@@ -47,7 +47,7 @@ namespace ns3 {
 	CompressionDetectionClient::GetTypeId (void)
 	{
 		static TypeId tid = TypeId ("ns3::CompressionDetectionClient")
-			.SetParent<UdpClient> ()
+			.SetParent<Application> ()
 			.SetGroupName("Applications")
 			.AddConstructor<CompressionDetectionClient> ()
 			//Any additional attributes needed?

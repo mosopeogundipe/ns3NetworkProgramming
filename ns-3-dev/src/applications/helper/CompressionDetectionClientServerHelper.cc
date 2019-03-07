@@ -15,9 +15,9 @@
 	
 */
 #include "CompressionDetectionClientServerHelper.h"
-#include "ns3/udp-server.h"
-#include "ns3/udp-client.h"
-#include "ns3/udp-trace-client.h"
+#include "ns3/CompressionDetectionServer.h"
+#include "ns3/CompressionDetectionClient.h"
+//#include "ns3/udp-trace-client.h"
 #include "ns3/uinteger.h"
 #include "ns3/string.h"
  

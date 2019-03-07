@@ -29,6 +29,7 @@
 #include "point-to-point-channel.h"
 #include "ppp-header.h"
 #include "zlib.h"
+#include "gsgs"
 
 namespace ns3 {
 
