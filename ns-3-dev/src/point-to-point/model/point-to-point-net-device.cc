@@ -756,8 +756,10 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     //Add decompressed data to packet, then add the header
     result = Create<Packet> (uncompressed_data, sizeof(compressed_data));
     //remove "0x4021" from decompressed data
-    std::vector<char> protocolTobyteArray = GetArrayofByte(0x4021);
-    result ->RemoveAtStart(protocolTobyteArray.size());
+
+		//Shit's broken yo
+		//std::vector<char> protocolTobyteArray = GetArrayofByte(0x4021);
+    //result ->RemoveAtStart(protocolTobyteArray.size());
     //Add "0x0021" as header to complete re-creation of original packet sent
     header.SetProtocol (0x0021);
     result->AddHeader (header);

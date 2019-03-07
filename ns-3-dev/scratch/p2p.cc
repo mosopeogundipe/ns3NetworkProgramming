@@ -27,7 +27,7 @@ main (int argc, char *argv[])
 	uint8_t outerLinkSpeed = 8;
 	bool enableCompression = false;
 	bool enableGlobalCompression = false;
-	std::string fill = "hello there"; // will be set by app, 
+	std::string fill = "praise jesus"; // will be set by app, 
 																			//have here for testing
 
   Time interPacketInterval = Seconds (1.);
