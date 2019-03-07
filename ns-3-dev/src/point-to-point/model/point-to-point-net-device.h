@@ -297,13 +297,14 @@ private:
    */
   void NotifyLinkUp (void);
 
+	void PopulateProtocolList (void);
+
 	//TODO variables
-	/**
-	* Variables to contain the protocol numbers for compression
-	* and decompression.
+	/*
+	* This will contain all of the protocols that we can compress
 	*/
-	//uint16_t compProtocol = 0x4021;
-	//uint16_t compEthProto = 0x4200;
+	uint16_t *compressionProtocols;
+	std::string configFile;
 
   /**
    * Enumeration of the states of the transmit machine of the net device.

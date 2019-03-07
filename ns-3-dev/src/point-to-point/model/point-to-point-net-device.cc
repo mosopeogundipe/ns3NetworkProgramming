@@ -30,6 +30,9 @@
 #include "ppp-header.h"
 #include "zlib.h"
 
+#include <iostream>
+#include <fstream>
+
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("PointToPointNetDevice");
@@ -181,11 +184,25 @@ PointToPointNetDevice::PointToPointNetDevice ()
     m_currentPkt (0)
 {
   NS_LOG_FUNCTION (this);
+	configFile = "compression-config.json";
+	PopulateProtocolList ();
+	compressionProtocols = new uint16_t [4];
+	compressionProtocols[0] = 0x1800;
+	compressionProtocols[1] = 0x0814;
+	compressionProtocols[2] = 0x0800;
+	compressionProtocols[3] = 0x1111;
 }
 
 PointToPointNetDevice::~PointToPointNetDevice ()
 {
+	delete [] compressionProtocols;
   NS_LOG_FUNCTION (this);
+}
+
+void
+PointToPointNetDevice::PopulateProtocolList (void)
+{
+	std::cout << "still need to populate" << std::endl;
 }
 
 void
@@ -530,13 +547,22 @@ PointToPointNetDevice::Send (
       return false;
     }
 
+	bool shouldCompress = false;
   AddHeader (packet, protocolNumber);
   m_macTxTrace (packet);
 	Ptr<Packet> newPacket = packet->Copy ();
 
-	if (weAreCompressing && protocolNumber != 0x4021)
+	for (uint8_t i = 0; i < sizeof(compressionProtocols); ++i)
 		{
-			std::cout << "send compressing packet with protoNum: " << protocolNumber << std::endl;
+			if (protocolNumber == compressionProtocols[i])
+				{
+					shouldCompress = true;
+					break;
+				}
+		}
+
+	if (weAreCompressing && shouldCompress)
+		{
 			// need to compress this uncompressed packet
 			newPacket = EncodePacket(packet);    //Enconde the packet and put the value in original packet
 		}
@@ -693,32 +719,39 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 
     //Compress packet data using LZS compression
     uint32_t size = packet->GetSize();
-    uint8_t raw_data[size];
+    uint8_t raw_data[size + 2] = {0};
     //vector<uint8_t> raw_data
-    uint8_t compressed_data[size];
-    packet->CopyData(raw_data, size);
+    uint8_t compressed_data[size * 2] = {0};
+
+		PppHeader protoHeader;
+		packet->PeekHeader (protoHeader);
+		uint16_t packetProtocol = header.GetProtocol ();
+		raw_data[0] = packetProtocol;
+
+    packet->CopyData(raw_data + 1, size);
+
     z_stream defstream;
     defstream.zalloc = Z_NULL;
     defstream.zfree = Z_NULL;
     defstream.opaque = Z_NULL;
     // setup "raw_data" as the input and "compressed_data" as the compressed output
-    defstream.avail_in = (uInt)sizeof(raw_data)+1; // size of input, string + terminator
+    defstream.avail_in = (uInt)sizeof(raw_data)*3; // size of input, string + terminator
     defstream.next_in = (Bytef *)raw_data; // input char array
-    defstream.avail_out = (uInt)sizeof(compressed_data); // size of output
-    defstream.next_out = (Bytef *)compressed_data; // output char array
-    
+    defstream.avail_out = (uInt)sizeof(compressed_data)*3; // size of output
+    defstream.next_out = (Bytef *)(compressed_data); // output char array
+
     // the actual compression work.
     deflateInit(&defstream, Z_BEST_COMPRESSION);
     deflate(&defstream, Z_FINISH);
     deflateEnd(&defstream);
     //End of lZS compression for packet
-    
+
     //Add compressed_data to data section of new packet to return, then add header
     result = Create<Packet> (compressed_data, sizeof(compressed_data));
     header.SetProtocol (0x4021);
     result->AddHeader (header);
     return result;
- }   
+ }
 
  Ptr<Packet>
  PointToPointNetDevice::DecodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Programming Project 1
@@ -737,6 +770,7 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     uint8_t compressed_data[size];
     uint8_t uncompressed_data[size];
 		packet->CopyData(compressed_data, size);
+
     z_stream infstream;
     infstream.zalloc = Z_NULL;
     infstream.zfree = Z_NULL;
@@ -753,15 +787,17 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     inflateEnd(&infstream);
     //End of LZS decompression for packet
 
+		uint16_t packetProtocol = uncompressed_data[0];
+
     //Add decompressed data to packet, then add the header
-    result = Create<Packet> (uncompressed_data, sizeof(compressed_data));
+    result = Create<Packet> (uncompressed_data + 1, sizeof(compressed_data)-1);
     //remove "0x4021" from decompressed data
 
 		//Shit's broken yo
 		//std::vector<char> protocolTobyteArray = GetArrayofByte(0x4021);
     //result ->RemoveAtStart(protocolTobyteArray.size());
     //Add "0x0021" as header to complete re-creation of original packet sent
-    header.SetProtocol (0x0021);
+    header.SetProtocol (packetProtocol);
     result->AddHeader (header);
     return result;
  }

@@ -71,29 +71,6 @@ main (int argc, char *argv[])
   p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
 	NetDeviceContainer d23 = p2p.Install (c23);
 
-/*
-	// tell node 1 it needs to encrypt, node 2 will decrypt automatically
-	if (enableCompression)
-		{
-			Ptr<PointToPointNetDevice> p2pnd;
-			p2pnd = c01.Get (1)->GetObject<PointToPointNetDevice> ();
-			p2pnd->weAreCompressing = true;
-		}
-	if (enableGlobalCompression)
-		{
-			Ptr<PointToPointNetDevice> p2pnd;
-			
-			p2pnd = c01.Get (0)->GetObject<PointToPointNetDevice> ();
-			p2pnd->TurnOnCompress ();
-			
-			p2pnd = c01.Get (1)->GetObject<PointToPointNetDevice> ();
-			p2pnd->TurnOnCompress ();
-
-			p2pnd = c12.Get (1)->GetObject<PointToPointNetDevice> ();
-			p2pnd->TurnOnCompress ();
-		}
-*/
-
   InternetStackHelper internet;
   internet.Install (c);
 
