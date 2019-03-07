@@ -168,8 +168,8 @@ namespace ns3 {
 		Address from;
 		Address localAddress;
 
-		Time head= Time::Time();
-		Time tail= Time::Time();
+		Time head= Time();
+		Time tail= Time();
 		
 		while ((packet = socket->RecvFrom (from)))
 			{

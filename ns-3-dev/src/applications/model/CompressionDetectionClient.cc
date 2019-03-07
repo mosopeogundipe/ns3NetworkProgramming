@@ -35,8 +35,7 @@
 #include "seq-ts-header.h"
 #include <cstdlib>
 #include <cstdio>
-#include <istream>
-#include <fnctl.h> 
+#include <fstream> 
 
 namespace ns3 {
  
@@ -237,11 +236,11 @@ namespace ns3 {
 				//unsigned char is not the same as uint8_t
 				//not const enough
         unsigned char buffer[1100];
-        int fd = open("/dev/random", O_RDONLY);
-        read(fd, &buffer[0], 1100);
-        close(fd);
+				std::fstream fs ("/dev/random", std::fstream::in | std::fstream::binary);
+        fs.read( (char*)&buffer[0], 1100);
+        fs.close();
 
-		uint8_t buffer
+		//uint8_t buffer;
 		NS_LOG_FUNCTION (this);
 		NS_ASSERT (m_sendTrain2.IsExpired ());
 		SeqTsHeader seqTs;
