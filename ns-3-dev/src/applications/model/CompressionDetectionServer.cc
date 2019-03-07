@@ -30,7 +30,7 @@
 #include "packet-loss-counter.h"
 
 #include "seq-ts-header.h"
-#include "udp-server.h"
+#include "CompressionDetectionServer.h"
 
 namespace ns3 {
 
