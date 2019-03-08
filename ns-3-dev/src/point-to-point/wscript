@@ -24,6 +24,7 @@ def build(bld):
         'model/point-to-point-remote-channel.h',
         'model/ppp-header.h',
         'helper/point-to-point-helper.h',
+	'../zlib-1.2.11/zconf.h',
         '../zlib-1.2.11/zlib.h',
         ]
 

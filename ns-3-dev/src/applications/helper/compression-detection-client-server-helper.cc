@@ -14,10 +14,9 @@
 	Todo:
 	
 */
-#include "CompressionDetectionClientServerHelper.h"
-#include "ns3/CompressionDetectionServer.h"
-#include "ns3/CompressionDetectionClient.h"
-//#include "ns3/udp-trace-client.h"
+#include "compression-detection-client-server-helper.h"
+#include "ns3/compression-detection-server.h"
+#include "ns3/compression-detection-client.h"
 #include "ns3/uinteger.h"
 #include "ns3/string.h"
  

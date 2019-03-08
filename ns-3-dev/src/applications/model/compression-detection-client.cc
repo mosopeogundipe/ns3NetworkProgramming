@@ -31,7 +31,7 @@
 #include "ns3/socket-factory.h"
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
-#include "CompressionDetectionClient.h"
+#include "compression-detection-client.h"
 #include "seq-ts-header.h"
 #include <cstdlib>
 #include <cstdio>

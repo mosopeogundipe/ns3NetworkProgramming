@@ -18,8 +18,8 @@
   
 */
  
- #ifndef COMPRESSIONDETECTIONSERVER_H
- #define COMPRESSIONDETECTIONSERVER_H
+ #ifndef COMPRESSION_DETECTION_SERVER_H
+ #define COMPRESSION_DETECTION_SERVER_H
  
  #include "ns3/udp-server.h"
  #include "ns3/event-id.h"
