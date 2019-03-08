@@ -150,6 +150,8 @@ public:
    */
   NetDeviceContainer Install (std::string aNode, std::string bNode);
 
+
+	void SetCompress (bool comp);
 private:
   /**
    * \brief Enable pcap output the indicated net device.
@@ -185,6 +187,8 @@ private:
   ObjectFactory m_channelFactory;       //!< Channel Factory
   ObjectFactory m_remoteChannelFactory; //!< Remote Channel Factory
   ObjectFactory m_deviceFactory;        //!< Device Factory
+
+	bool compress;
 };
 
 } // namespace ns3

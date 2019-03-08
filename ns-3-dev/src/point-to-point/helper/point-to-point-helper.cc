@@ -45,6 +45,7 @@ PointToPointHelper::PointToPointHelper ()
   m_deviceFactory.SetTypeId ("ns3::PointToPointNetDevice");
   m_channelFactory.SetTypeId ("ns3::PointToPointChannel");
   m_remoteChannelFactory.SetTypeId ("ns3::PointToPointRemoteChannel");
+	compress = false;
 }
 
 void 
@@ -224,7 +225,13 @@ PointToPointHelper::Install (NodeContainer c)
   return Install (c.Get (0), c.Get (1));
 }
 
-NetDeviceContainer 
+void
+PointToPointHelper::SetCompress (bool comp)
+{
+	compress = comp;
+}
+
+NetDeviceContainer
 PointToPointHelper::Install (Ptr<Node> a, Ptr<Node> b)
 {
   NetDeviceContainer container;
@@ -239,6 +246,12 @@ PointToPointHelper::Install (Ptr<Node> a, Ptr<Node> b)
   b->AddDevice (devB);
   Ptr<Queue<Packet> > queueB = m_queueFactory.Create<Queue<Packet> > ();
   devB->SetQueue (queueB);
+
+	if (compress)
+		{
+			devA->TurnOnCompress ();
+		}
+
   // Aggregate NetDeviceQueueInterface objects
   Ptr<NetDeviceQueueInterface> ndqiA = CreateObject<NetDeviceQueueInterface> ();
   ndqiA->GetTxQueue (0)->ConnectQueueTraces (queueA);

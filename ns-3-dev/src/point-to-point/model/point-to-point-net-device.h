@@ -158,6 +158,15 @@ public:
 
   // The remaining methods are documented in ns3::NetDevice*
 
+	//TODO custom functions
+	void TurnOnCompress();
+	void TurnOffCompress();
+	bool IsCompressing();
+	//TODO variables
+
+	// boolean about whether or not we are compressing
+	bool weAreCompressing;
+
   virtual void SetIfIndex (const uint32_t index);
   virtual uint32_t GetIfIndex (void) const;
 
@@ -288,6 +297,15 @@ private:
    * It calls also the linkChange callback.
    */
   void NotifyLinkUp (void);
+
+	void PopulateProtocolList (void);
+
+	//TODO variables
+	/*
+	* This will contain all of the protocols that we can compress
+	*/
+	uint16_t *compressionProtocols;
+	std::string configFile;
 
   /**
    * Enumeration of the states of the transmit machine of the net device.

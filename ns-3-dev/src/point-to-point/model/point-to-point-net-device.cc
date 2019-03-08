@@ -30,6 +30,9 @@
 #include "ppp-header.h"
 #include "zlib.h"
 
+#include <iostream>
+#include <fstream>
+
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("PointToPointNetDevice");
@@ -181,11 +184,25 @@ PointToPointNetDevice::PointToPointNetDevice ()
     m_currentPkt (0)
 {
   NS_LOG_FUNCTION (this);
+	configFile = "compression-config.json";
+	PopulateProtocolList ();
+	compressionProtocols = new uint16_t [4];
+	compressionProtocols[0] = 0x1800;
+	compressionProtocols[1] = 0x0814;
+	compressionProtocols[2] = 0x0800;
+	compressionProtocols[3] = 0x1111;
 }
 
 PointToPointNetDevice::~PointToPointNetDevice ()
 {
+	delete [] compressionProtocols;
   NS_LOG_FUNCTION (this);
+}
+
+void
+PointToPointNetDevice::PopulateProtocolList (void)
+{
+	std::cout << "still need to populate" << std::endl;
 }
 
 void
@@ -333,19 +350,19 @@ void
 PointToPointNetDevice::Receive (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
-  uint16_t protocol = 0;
 
+	uint16_t protocol = 0;
   if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) ) 
     {
-      // 
+      //
       // If we have an error model and it indicates that it is time to lose a
       // corrupted packet, don't forward this packet up, let it go.
       //
       m_phyRxDropTrace (packet);
     }
-  else 
+  else
     {
-      // 
+			//
       // Hit the trace hooks.  All of these hooks are in the same place in this 
       // device because it is so simple, but this is not usually the case in
       // more complicated devices.
@@ -354,33 +371,34 @@ PointToPointNetDevice::Receive (Ptr<Packet> packet)
       m_promiscSnifferTrace (packet);
       m_phyRxEndTrace (packet);
 
-      //
-      // Trace sinks will expect complete packets, not packets without some of the
-      // headers.
-      //
-      //HINT.SOPE: Adding Decode to receive packet method
-      Ptr<Packet> originalPacket = packet->Copy ();
-      Ptr<Packet> modified_packet;  
-      modified_packet = packet;
-      modified_packet = DecodePacket(modified_packet);    //Enconde the packet and put the value in original packet that is being referenced
-      packet = modified_packet;
-       //HINT.SOPE: Any changes made in modified_packet should appear in packet object
+      // Trace sinks will expect complete packets, not packets without some of the headers.
+			Ptr<Packet> originalPacket = packet->Copy ();
+			Ptr<Packet> updatedPacket = packet->Copy ();
+
+			PppHeader header;
+			packet->PeekHeader (header);
+			protocol = header.GetProtocol ();
+			if (!weAreCompressing && protocol == 0x4021)
+				{
+					updatedPacket = DecodePacket (updatedPacket);
+				}
+
       //
       // Strip off the point-to-point protocol header and forward this packet
       // up the protocol stack.  Since this is a simple point-to-point link,
       // there is no difference in what the promisc callback sees and what the
       // normal receive callback sees.
       //
-      ProcessHeader (packet, protocol);
+      ProcessHeader (updatedPacket, protocol);
 
       if (!m_promiscCallback.IsNull ())
         {
-          m_macPromiscRxTrace (originalPacket);
-          m_promiscCallback (this, packet, protocol, GetRemote (), GetAddress (), NetDevice::PACKET_HOST);
+          m_macPromiscRxTrace (updatedPacket);
+          m_promiscCallback (this, updatedPacket, protocol, GetRemote (), GetAddress (), NetDevice::PACKET_HOST);
         }
 
       m_macRxTrace (originalPacket);
-      m_rxCallback (this, packet, protocol, GetRemote ());
+      m_rxCallback (this, updatedPacket, protocol, GetRemote ());
     }
 }
 
@@ -529,34 +547,40 @@ PointToPointNetDevice::Send (
       return false;
     }
 
-  //
-  // Stick a point to point protocol header on the packet in preparation for
-  // shoving it out the door.
-  //
-  //AddHeader (packet, protocolNumber);  HINT.SOPE: commented this as it will be done in EncodePacket() function
-  Ptr<Packet> modified_packet;
-  //modified_packet = packet
-  modified_packet = packet;
-  modified_packet = EncodePacket(modified_packet);    //Enconde the packet and put the value in original packet
-  packet = modified_packet;
-  //HINT.SOPE: Any changes made in modified_packet should appear in packet object
-
+	bool shouldCompress = false;
+  AddHeader (packet, protocolNumber);
   m_macTxTrace (packet);
+	Ptr<Packet> newPacket = packet->Copy ();
+
+	for (uint8_t i = 0; i < sizeof(compressionProtocols); ++i)
+		{
+			if (protocolNumber == compressionProtocols[i])
+				{
+					shouldCompress = true;
+					break;
+				}
+		}
+
+	if (weAreCompressing && shouldCompress)
+		{
+			// need to compress this uncompressed packet
+			newPacket = EncodePacket(packet);    //Enconde the packet and put the value in original packet
+		}
 
   //
   // We should enqueue and dequeue the packet to hit the tracing hooks.
   //
-  if (m_queue->Enqueue (packet))
+  if (m_queue->Enqueue (newPacket))
     {
       //
       // If the channel is ready for transition we send the packet right now
       // 
       if (m_txMachineState == READY)
         {
-          packet = m_queue->Dequeue ();
-          m_snifferTrace (packet);
-          m_promiscSnifferTrace (packet);
-          bool ret = TransmitStart (packet);
+          newPacket = m_queue->Dequeue ();
+          m_snifferTrace (newPacket);
+          m_promiscSnifferTrace (newPacket);
+          bool ret = TransmitStart (newPacket);
           return ret;
         }
       return true;
@@ -665,6 +689,7 @@ PointToPointNetDevice::PppToEther (uint16_t proto)
     {
     case 0x0021: return 0x0800;   //IPv4
     case 0x0057: return 0x86DD;   //IPv6
+		case 0x4021: return 0x4200;		//Compression
     default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
     }
   return 0;
@@ -678,54 +703,61 @@ PointToPointNetDevice::EtherToPpp (uint16_t proto)
     {
     case 0x0800: return 0x0021;   //IPv4
     case 0x86DD: return 0x0057;   //IPv6
+		case 0x4200: return 0x4200;		//Compression
     default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
     }
   return 0;
 }
 
-Ptr<Packet> PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Programming Project 1
+Ptr<Packet>
+PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Programming Project 1
  {
     NS_LOG_FUNCTION (this);
-    //Ptr<Packet> result = packet -> Copy();
     Ptr<Packet> result;
     PppHeader header;
-    PppHeader secondary_data;
     packet->RemoveHeader (header);
-    secondary_data.SetProtocol(0x0021);
-    packet->AddHeader (secondary_data); //appending original protocol number to original data
 
     
     //Compress packet data using LZS compression
     uint32_t size = packet->GetSize();
-    uint8_t raw_data[size];
+    uint8_t raw_data[size + 2] = {0};
     //vector<uint8_t> raw_data
-    uint8_t compressed_data[size];
-    packet->CopyData(raw_data, size);
+
+    uint8_t compressed_data[size * 2] = {0};
+
+		PppHeader protoHeader;
+		packet->PeekHeader (protoHeader);
+		uint16_t packetProtocol = header.GetProtocol ();
+		raw_data[0] = packetProtocol;
+
+    packet->CopyData(raw_data + 1, size);
+
 
     z_stream defstream;
     defstream.zalloc = Z_NULL;
     defstream.zfree = Z_NULL;
     defstream.opaque = Z_NULL;
     // setup "raw_data" as the input and "compressed_data" as the compressed output
-    defstream.avail_in = (uInt)sizeof(raw_data)+1; // size of input, string + terminator
+    defstream.avail_in = (uInt)sizeof(raw_data)*3; // size of input, string + terminator
     defstream.next_in = (Bytef *)raw_data; // input char array
-    defstream.avail_out = (uInt)sizeof(compressed_data); // size of output
-    defstream.next_out = (Bytef *)compressed_data; // output char array
-    
+    defstream.avail_out = (uInt)sizeof(compressed_data)*3; // size of output
+    defstream.next_out = (Bytef *)(compressed_data); // output char array
+
     // the actual compression work.
     deflateInit(&defstream, Z_BEST_COMPRESSION);
     deflate(&defstream, Z_FINISH);
     deflateEnd(&defstream);
     //End of lZS compression for packet
-    
+
     //Add compressed_data to data section of new packet to return, then add header
     result = Create<Packet> (compressed_data, sizeof(compressed_data));
     header.SetProtocol (0x4021);
     result->AddHeader (header);
     return result;
- }   
+ }
 
- Ptr<Packet> PointToPointNetDevice::DecodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Programming Project 1
+ Ptr<Packet>
+ PointToPointNetDevice::DecodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Programming Project 1
  {
     //Here just remove newest added header, and decompress data to become just the old header and data
     NS_LOG_FUNCTION (this);
@@ -740,7 +772,8 @@ Ptr<Packet> PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE:
     uint32_t size = packet->GetSize();
     uint8_t compressed_data[size];
     uint8_t uncompressed_data[size];
-    packet->CopyData(compressed_data, size);
+		packet->CopyData(compressed_data, size);
+
     z_stream infstream;
     infstream.zalloc = Z_NULL;
     infstream.zfree = Z_NULL;
@@ -757,29 +790,53 @@ Ptr<Packet> PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE:
     inflateEnd(&infstream);
     //End of LZS decompression for packet
 
-    //remove "0x0021" from decompressed data
-    //"0x0021" is always in indices 0 & 1 of uncompressed data
-    //Taking the indices higher than 2 means removing "0x0021"
-    uint8_t packet_data[(int)sizeof(uncompressed_data) - 2];
-    int index = 0;
-    for(int i=2; i<(int)sizeof(uncompressed_data); i++){
-      packet_data[index] = uncompressed_data[i];
-      index++;
-    }
+		uint16_t packetProtocol = uncompressed_data[0];
 
-    //Create new packet with data -- where appended protocol has been removed
-    result = Create<Packet> (packet_data, sizeof(packet_data));
+    //Add decompressed data to packet, then add the header
+    result = Create<Packet> (uncompressed_data + 1, sizeof(compressed_data)-1);
+    //remove "0x4021" from decompressed data
+
+		//Shit's broken yo
+		//std::vector<char> protocolTobyteArray = GetArrayofByte(0x4021);
+    //result ->RemoveAtStart(protocolTobyteArray.size());
+
     //Add "0x0021" as header to complete re-creation of original packet sent
-    header.SetProtocol (0x0021);
+    header.SetProtocol (packetProtocol);
     result->AddHeader (header);
     return result;
- } 
+ }
 
-std::vector<char> PointToPointNetDevice::GetArrayofByte(uint16_t number){//HINT.SOPE: Network Programming Project 1
+std::vector<char>
+PointToPointNetDevice::GetArrayofByte(uint16_t number)
+{//HINT.SOPE: Network Programming Project 1
     std::vector<char> chars;
     char* a_begin = reinterpret_cast<char*>(&number);
     char* a_end = a_begin +4;
     copy(a_begin,a_end, back_inserter(chars));
     return chars;
-  } 
+}
+
+void
+PointToPointNetDevice::TurnOnCompress()
+{
+	weAreCompressing = true;
+}
+
+void
+PointToPointNetDevice::TurnOffCompress()
+{
+	weAreCompressing = false;
+}
+
+bool
+PointToPointNetDevice::IsCompressing()
+{
+	if (weAreCompressing)
+		{
+			return true;
+		}
+
+	return false;
+}
+
 } // namespace ns3
