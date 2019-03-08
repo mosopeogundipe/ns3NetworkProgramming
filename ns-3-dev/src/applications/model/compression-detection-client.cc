@@ -17,7 +17,7 @@
 		2/25/19
 
 	Todo:
-		Pretty much everything
+
 */
 
 
@@ -58,7 +58,7 @@ namespace ns3 {
 							MakeUintegerChecker<uint32_t> ())
 			.AddAttribute ("Interval",
 							"The time to wait between packets",
-							TimeValue (Seconds (0.001)), //should be 0, or very close to, as per faq
+							TimeValue (Seconds (0.01)), //should be 0, or very close to, as per faq
 							MakeTimeAccessor (&CompressionDetectionClient::m_interval),
 							MakeTimeChecker ())
 			.AddAttribute ("RemoteAddress",
@@ -171,7 +171,7 @@ namespace ns3 {
 		//where the functions to send the two trains are called
 			//is a 5 sec delay good?
 		m_sendTrain1 = Simulator::Schedule (Seconds (0.0), &CompressionDetectionClient::SendEmptyTrain, this);
-		m_sendTrain2 = Simulator::Schedule (Seconds (5.0), &CompressionDetectionClient::SendRandomTrain, this);
+		m_sendTrain2 = Simulator::Schedule (Seconds (25.0), &CompressionDetectionClient::SendRandomTrain, this);
 	}
 	 
 	void
@@ -207,10 +207,7 @@ namespace ns3 {
 		if ((m_socket->Send (p)) >= 0)
 			{
 				++m_sent;
-				NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
-												<< peerAddressStringStream.str () << " Uid: "
-												<< p->GetUid () << " Time: "
-												<< (Simulator::Now ()).GetSeconds ());
+				NS_LOG_INFO ("Sending empty packet: " << m_sent%6000);
 
 			}
 		else
@@ -261,10 +258,7 @@ namespace ns3 {
 		if ((m_socket->Send (p)) >= 0)
 			{
 				++m_sent;
-				NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
-												<< peerAddressStringStream.str () << " Uid: "
-												<< p->GetUid () << " Time: "
-												<< (Simulator::Now ()).GetSeconds ());
+				NS_LOG_INFO ("Sending random packet: " << m_sent%6000);
 	 
 			}
 		else

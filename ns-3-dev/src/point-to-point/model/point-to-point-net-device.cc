@@ -567,6 +567,7 @@ PointToPointNetDevice::Send (
 	if (weAreCompressing && shouldCompress)
 		{
 			// need to compress this uncompressed packet
+      NS_LOG_ERROR("Packet being encoded");
 			newPacket = EncodePacket(packet);    //Enconde the packet and put the value in original packet
 		}
 

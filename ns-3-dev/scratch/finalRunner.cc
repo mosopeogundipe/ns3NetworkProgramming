@@ -18,28 +18,33 @@ NS_LOG_COMPONENT_DEFINE ("ControlTest");
 int 
 main (int argc, char *argv[])
 {
-  LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
-  LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
-  LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
+  //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
+  //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
+  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
+  LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
+  LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
+  //LogComponentEnable ("ControlTest", LOG_LEVEL_ERROR);
+  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ERROR);
+  //LogComponentEnable ("PointToPointHelper", LOG_LEVEL_ERROR);
 
   uint16_t port = 9;  // well-known echo port number
-  uint32_t packetSize = 32; // this will be set by the app
-  uint32_t maxPacketCount = 1; // this will be set by the app
+  //uint32_t packetSize = 32; // this will be set by the app
+  //uint32_t maxPacketCount = 1; // this will be set by the app
 	uint8_t midLinkSpeed = 8;
 	uint8_t outerLinkSpeed = 8;
 	bool enableCompression = false;
 	bool enableGlobalCompression = false;
-	std::string fill = "praise jesus"; // will be set by app, 
+	//std::string fill = "praise jesus"; // will be set by app, 
 																			//have here for testing
 
-  Time interPacketInterval = Seconds (1.); //this will be set by the app
+  //Time interPacketInterval = Seconds (1.); //this will be set by the app
   CommandLine cmd;
   cmd.AddValue ("port", "Port being used to commuincate", port);
   cmd.AddValue ("midLinkSpeed", "Speed (Mbps) of the link between nodes 1 and 2. (middle link)", midLinkSpeed);
   cmd.AddValue ("outerLinkSpeed", "Speed (Mbps) of the links between nodes 0 and 1, and 2 and 3.", outerLinkSpeed);
   cmd.AddValue ("enableCompression", "Compression enabled on the center link, between nodes 2 and 3.", enableCompression);
   cmd.AddValue ("enableGlobalCompression", "Compression enabled on all links.", enableGlobalCompression);
-  cmd.AddValue ("fill", "String to fill packets with.", fill);
+  //cmd.AddValue ("fill", "String to fill packets with.", fill);
   cmd.Parse (argc, argv);
 
 	NodeContainer c;
@@ -58,6 +63,7 @@ main (int argc, char *argv[])
 	str = std::to_string (midLinkSpeed) + "Mbps";
   p2p.SetDeviceAttribute ("DataRate", StringValue(str));
   p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
+  NS_LOG_ERROR("enable compression:" << enableCompression);
 	p2p.SetCompress (enableCompression);
   NetDeviceContainer d12 = p2p.Install (c12);
 
@@ -93,7 +99,7 @@ main (int argc, char *argv[])
   CompressionDetectionServerHelper server (port);
 	ApplicationContainer apps = server.Install(c.Get (3));
   apps.Start(Seconds (1.0));
-  apps.Stop(Seconds (20.0));
+  apps.Stop(Seconds (500.0));
 
   CompressionDetectionClientHelper client ( i23.GetAddress(1), port);
   //client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
@@ -101,7 +107,7 @@ main (int argc, char *argv[])
   //client.SetAttribute ("PacketSize", UintegerValue (packetSize));
 	apps = client.Install (c.Get (0));
   apps.Start (Seconds (2.0));
-  apps.Stop (Seconds (20.0));
+  apps.Stop (Seconds (500.0));
 
 
 	//client.SetFill (apps.Get (0), fill);

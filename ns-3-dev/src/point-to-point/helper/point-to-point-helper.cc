@@ -228,6 +228,7 @@ PointToPointHelper::Install (NodeContainer c)
 void
 PointToPointHelper::SetCompress (bool comp)
 {
+  NS_LOG_ERROR("Compression is set to: "<< comp);
 	compress = comp;
 }
 
@@ -249,6 +250,7 @@ PointToPointHelper::Install (Ptr<Node> a, Ptr<Node> b)
 
 	if (compress)
 		{
+      NS_LOG_ERROR("Turn on compress");
 			devA->TurnOnCompress ();
 		}
 

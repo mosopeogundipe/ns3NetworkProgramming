@@ -61,8 +61,10 @@
    PacketLossCounter m_lossCounter; 
 
    //variables used to test compression
-   uint64_t m_rxHead;
-   uint64_t m_rxTail;
+    Time head1= Time();
+	  Time tail1= Time();
+    Time head2= Time();
+	  Time tail2= Time();
  
    TracedCallback<Ptr<const Packet> > m_rxTrace;
  

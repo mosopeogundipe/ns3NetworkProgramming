@@ -165,7 +165,7 @@ public:
 	//TODO variables
 
 	// boolean about whether or not we are compressing
-	bool weAreCompressing;
+	bool weAreCompressing = false;
 
   virtual void SetIfIndex (const uint32_t index);
   virtual uint32_t GetIfIndex (void) const;
