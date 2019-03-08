@@ -23,18 +23,18 @@ main (int argc, char *argv[])
   uint16_t port = 9;  // well-known echo port number
   uint32_t packetSize = 32; // this will be set by the app
   uint32_t maxPacketCount = 1; // this will be set by the app
-	uint8_t compLinkSpeed = 8;
-	uint8_t regLinkSpeed = 8;
+	uint8_t midLinkSpeed = 8;
+	uint8_t outerLinkSpeed = 8;
 	bool enableCompression = false;
 	bool enableGlobalCompression = false;
-	std::string fill = "hello there"; // will be set by app, 
+	std::string fill = "praise jesus"; // will be set by app, 
 																			//have here for testing
 
   Time interPacketInterval = Seconds (1.);
   CommandLine cmd;
   cmd.AddValue ("port", "Port being used to commuincate", port);
-  cmd.AddValue ("compLinkSpeed", "Speed (Mbps) of the compression link.", compLinkSpeed);
-  cmd.AddValue ("regLinkSpeed", "Speed (Mbps) of the regular links.", regLinkSpeed);
+  cmd.AddValue ("midLinkSpeed", "Speed (Mbps) of the link between nodes 1 and 2. (middle link)", midLinkSpeed);
+  cmd.AddValue ("outerLinkSpeed", "Speed (Mbps) of the links between nodes 0 and 1, and 2 and 3.", outerLinkSpeed);
   cmd.AddValue ("enableCompression", "Compression enabled on the center link, between nodes 2 and 3.", enableCompression);
   cmd.AddValue ("enableGlobalCompression", "Compression enabled on all links.", enableGlobalCompression);
   cmd.AddValue ("fill", "String to fill packets with.", fill);
@@ -50,15 +50,26 @@ main (int argc, char *argv[])
 
   // We create the channels first without any IP addressing information
   PointToPointHelper p2p;
+	std::string str;
+
+	//setting compression link speed
+	str = std::to_string (midLinkSpeed) + "Mbps";
+  p2p.SetDeviceAttribute ("DataRate", StringValue(str));
+  p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
+	p2p.SetCompress (enableCompression);
+  NetDeviceContainer d12 = p2p.Install (c12);
+
+	//setting the regular link speeds
+	p2p.SetCompress (enableGlobalCompression);
+	str = std::to_string (outerLinkSpeed) + "Mbps";
+
   p2p.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
-
 	NetDeviceContainer d01 = p2p.Install (c01);
-  NetDeviceContainer d12 = p2p.Install (c12);
-  NetDeviceContainer d23 = p2p.Install (c23);
 
-	// tell node 1 it needs to encrypt, node 2 will decrypt automatically
-	//((PointToPointNetDevice) d12.Get (0))->SetCompress (true);
+  p2p.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
+	NetDeviceContainer d23 = p2p.Install (c23);
 
   InternetStackHelper internet;
   internet.Install (c);
@@ -82,13 +93,11 @@ main (int argc, char *argv[])
   apps.Start (Seconds (1.0));
   apps.Stop (Seconds (10.0));
 
-
-
   P2PClientHelper client (i23.GetAddress (1), port);
   client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
   client.SetAttribute ("Interval", TimeValue (interPacketInterval));
   client.SetAttribute ("PacketSize", UintegerValue (packetSize));
-  apps = client.Install (c.Get (0));
+	apps = client.Install (c.Get (0));
   apps.Start (Seconds (2.0));
   apps.Stop (Seconds (10.0));
 	client.SetFill (apps.Get (0), fill);
@@ -99,7 +108,7 @@ main (int argc, char *argv[])
 
   AsciiTraceHelper ascii;
   p2p.EnableAsciiAll (ascii.CreateFileStream ("p2p.tr"));
-  p2p.EnablePcapAll ("control");
+  p2p.EnablePcapAll ("p2p");
 
   Simulator::Run ();
   Simulator::Destroy ();
