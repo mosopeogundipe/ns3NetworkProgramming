@@ -717,10 +717,12 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     PppHeader header;
     packet->RemoveHeader (header);
 
+    
     //Compress packet data using LZS compression
     uint32_t size = packet->GetSize();
     uint8_t raw_data[size + 2] = {0};
     //vector<uint8_t> raw_data
+
     uint8_t compressed_data[size * 2] = {0};
 
 		PppHeader protoHeader;
@@ -729,6 +731,7 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 		raw_data[0] = packetProtocol;
 
     packet->CopyData(raw_data + 1, size);
+
 
     z_stream defstream;
     defstream.zalloc = Z_NULL;
@@ -796,6 +799,7 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 		//Shit's broken yo
 		//std::vector<char> protocolTobyteArray = GetArrayofByte(0x4021);
     //result ->RemoveAtStart(protocolTobyteArray.size());
+
     //Add "0x0021" as header to complete re-creation of original packet sent
     header.SetProtocol (packetProtocol);
     result->AddHeader (header);
