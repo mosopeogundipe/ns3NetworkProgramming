@@ -13,18 +13,16 @@
   
 */
 
-#ifndef COMPRESSIONDETECTIONCLIENTSERVERHELPER_H
-#define COMPRESSIONDETECTIONCLIENTSERVERHELPER_H
+#ifndef COMPRESSION_DETECTION_CLIENT_SERVERHELPER_H
+#define COMPRESSION_DETECTION_CLIENT_SERVERHELPER_H
  
 #include <stdint.h>
 #include "ns3/application-container.h"
 #include "ns3/node-container.h"
 #include "ns3/object-factory.h"
 #include "ns3/ipv4-address.h"
-#include "ns3/udp-server.h"
-#include "ns3/udp-client.h"
-#include "ns3/CompressionDetectionServer.h"
-#include "ns3/CompressionDetectionClient.h"
+#include "ns3/compression-detection-server.h"
+#include "ns3/compression-detection-client.h"
 
 
 namespace ns3 {
@@ -42,7 +40,7 @@ namespace ns3 {
     Ptr<CompressionDetectionServer> GetServer (void);
   private:
     ObjectFactory m_factory; 
-    Ptr<UdpServer> m_server; 
+    Ptr<CompressionDetectionServer> m_server; 
    };
    
   class CompressionDetectionClientHelper

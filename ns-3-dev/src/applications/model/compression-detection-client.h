@@ -13,8 +13,8 @@
 	
 */
 
-#ifndef COMPRESSIONDETECTIONCLIENT_H
-#define COMPRESSIONDETECTIONCLIENT_H
+#ifndef COMPRESSION_DETECTION_CLIENT_H
+#define COMPRESSION_DETECTION_CLIENT_H
 
 
 #include "ns3/application.h"
@@ -69,5 +69,5 @@ namespace ns3 {
 
 }
 
-#endif /*  COMPRESSIONDETECTIONCLIENT_H */
+#endif /*  CompressionDetectionClient_H */
  

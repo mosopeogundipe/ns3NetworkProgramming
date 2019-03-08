@@ -18,6 +18,8 @@ def build(bld):
         'model/request-response-server.cc',
         'model/p2p-server.cc',
         'model/p2p-client.cc',
+        'model/compression-detection-client.cc',
+        'model/compression-detection-server.cc',
         'model/application-packet-probe.cc',
         'model/three-gpp-http-client.cc',
         'model/three-gpp-http-server.cc',
@@ -29,6 +31,7 @@ def build(bld):
         'helper/udp-client-server-helper.cc',
         'helper/request-response-helper.cc',
         'helper/p2p-helper.cc',
+        'model/compression-detection-client-server-helper.c',
         'helper/udp-echo-helper.cc',
         'helper/three-gpp-http-helper.cc',
         ]
@@ -56,6 +59,8 @@ def build(bld):
         'model/request-response-server.h',
         'model/p2p-server.h',
         'model/p2p-client.h',
+        'model/compression-detection-client.h',
+        'model/compression-detection-server.h',
         'model/application-packet-probe.h',
         'model/three-gpp-http-client.h',
         'model/three-gpp-http-server.h',
@@ -68,6 +73,7 @@ def build(bld):
         'helper/request-response-helper.h',
         'helper/udp-echo-helper.h',
         'helper/p2p-helper.h',
+        'model/compression-detection-client-server-helper.h',
         'helper/three-gpp-http-helper.h',
         ]
 

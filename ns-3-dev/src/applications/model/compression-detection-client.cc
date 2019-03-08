@@ -31,17 +31,12 @@
 #include "ns3/socket-factory.h"
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
-#include "ns3/CompressionDetectionServer.h"
-#include "ns3/CompressionDetectionClient.h"
+#include "compression-detection-client.h"
 #include "seq-ts-header.h"
-#include "udp-client.h"
 #include <cstdlib>
 #include <cstdio>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <fstream>
- 
+#include <fstream> 
+
 namespace ns3 {
  
 	NS_LOG_COMPONENT_DEFINE ("CompressionDetectionClient");
@@ -52,7 +47,7 @@ namespace ns3 {
 	CompressionDetectionClient::GetTypeId (void)
 	{
 		static TypeId tid = TypeId ("ns3::CompressionDetectionClient")
-			.SetParent<UdpClient> ()
+			.SetParent<Application> ()
 			.SetGroupName("Applications")
 			.AddConstructor<CompressionDetectionClient> ()
 			//Any additional attributes needed?
@@ -241,11 +236,11 @@ namespace ns3 {
 				//unsigned char is not the same as uint8_t
 				//not const enough
         unsigned char buffer[1100];
-        int fd = open("/dev/random", O_RDONLY);
-        instream::read(fd, &buffer[0], 1100);
-        close(fd);
+				std::fstream fs ("/dev/random", std::fstream::in | std::fstream::binary);
+        fs.read( (char*)&buffer[0], 1100);
+        fs.close();
 
-		uint8_t buffer
+		//uint8_t buffer;
 		NS_LOG_FUNCTION (this);
 		NS_ASSERT (m_sendTrain2.IsExpired ());
 		SeqTsHeader seqTs;

@@ -28,9 +28,9 @@
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
 #include "packet-loss-counter.h"
+
 #include "seq-ts-header.h"
-#include "udp-server.h"
-#include "CompressionDetectionServer.h"
+#include "compression-detection-server.h"
 
 namespace ns3 {
 
@@ -167,6 +167,10 @@ namespace ns3 {
 		Ptr<Packet> packet;
 		Address from;
 		Address localAddress;
+
+		Time head= Time();
+		Time tail= Time();
+		
 		while ((packet = socket->RecvFrom (from)))
 			{
 				socket->GetSockName (localAddress);
@@ -174,29 +178,32 @@ namespace ns3 {
 				m_rxTraceWithAddresses (packet, from, localAddress);
 				if (packet->GetSize () > 0)
 					{
+
 						SeqTsHeader seqTs;
 						packet->RemoveHeader (seqTs);
 						uint32_t currentSequenceNumber = seqTs.GetSeq ();
-						if (InetSocketAddress::IsMatchingType (from))
-							{
-								NS_LOG_INFO ("TraceDelay: RX " << packet->GetSize () <<
-											" bytes from "<< InetSocketAddress::ConvertFrom (from).GetIpv4 () <<
-											" Sequence Number: " << currentSequenceNumber <<
-											" Uid: " << packet->GetUid () <<
-											" TXtime: " << seqTs.GetTs () <<
-											" RXtime: " << Simulator::Now () <<
-											" Delay: " << Simulator::Now () - seqTs.GetTs ());
+
+						//if early in packet train, set head
+						if(m_received%6000 == 1){
+							head = Simulator::Now();
+						} //if close to end of train. Can't use exact end, as some packets may be lost
+						else if (m_received%6000 == 5750){
+							tail = Simulator::Now();
+						}
+
+						int64_t headMs = head.GetMilliSeconds();
+						int64_t tailMs = tail.GetMilliSeconds();
+						if((headMs != 0) & (tailMs != 0)){
+							int64_t dif = tailMs - headMs;
+
+							if(dif >= 100){
+								NS_LOG_INFO ("Compression detected!\n\tDifference In arriva times: "<< dif);
 							}
-						else if (Inet6SocketAddress::IsMatchingType (from))
-							{
-								NS_LOG_INFO ("TraceDelay: RX " << packet->GetSize () <<
-											" bytes from "<< Inet6SocketAddress::ConvertFrom (from).GetIpv6 () <<
-											" Sequence Number: " << currentSequenceNumber <<
-											" Uid: " << packet->GetUid () <<
-											" TXtime: " << seqTs.GetTs () <<
-											" RXtime: " << Simulator::Now () <<
-											" Delay: " << Simulator::Now () - seqTs.GetTs ());
+							else{
+								NS_LOG_INFO ("No compression was detected.\n\tDifference In arriva times: "<< dif);
 							}
+						}
+
 	
 						m_lossCounter.NotifyReceived (currentSequenceNumber);
 						m_received++;
