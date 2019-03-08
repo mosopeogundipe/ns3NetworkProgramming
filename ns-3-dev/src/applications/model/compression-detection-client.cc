@@ -207,7 +207,7 @@ namespace ns3 {
 		if ((m_socket->Send (p)) >= 0)
 			{
 				++m_sent;
-				NS_LOG_INFO ("Sending empty packet: " << m_sent%6000);
+				NS_LOG_INFO ("  Sending empty packet: " << m_sent%6000);
 
 			}
 		else
@@ -258,7 +258,7 @@ namespace ns3 {
 		if ((m_socket->Send (p)) >= 0)
 			{
 				++m_sent;
-				NS_LOG_INFO ("Sending random packet: " << m_sent%6000);
+				NS_LOG_INFO (" Sending random packet: " << m_sent%6000);
 	 
 			}
 		else

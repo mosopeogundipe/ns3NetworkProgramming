@@ -177,7 +177,7 @@ namespace ns3 {
 				m_rxTraceWithAddresses (packet, from, localAddress);
 				if (packet->GetSize () > 0)
 					{
-						NS_LOG_INFO ("server recieved packet:"<< m_received);
+						NS_LOG_INFO ("server recieved packet: "<< m_received%6000);
 
 						SeqTsHeader seqTs;
 						packet->RemoveHeader (seqTs);
@@ -208,8 +208,8 @@ namespace ns3 {
 						int64_t tail2Ms = tail2.GetMilliSeconds();
 
 						if(((head1Ms != 0) && (tail1Ms != 0))&& ((head2Ms != 0) && (tail2Ms != 0))){
-							int64_t dHead = head1Ms - head2Ms;
-							int64_t dTail = tail1Ms - tail2Ms;
+							int64_t dHead = head2Ms - head1Ms;
+							int64_t dTail = tail2Ms - tail1Ms;
 
 							int64_t dif = dHead - dTail;
 
@@ -217,7 +217,12 @@ namespace ns3 {
 								NS_LOG_INFO ("Compression detected!\n\tDifference In arrival times: "<< dif);
 							}
 							else{
-								NS_LOG_INFO ("No compression was detected.\n\tDifference In arrival times: "<< dif);
+								NS_LOG_INFO ("No compression was detected.\n"
+								<<"\tvalue of head1: " << head1Ms << "\n"
+								<<"\tValue of head2: " << head2Ms << "\n"
+								<<"\tvalue of tail1: " << tail1Ms << "\n"
+								<<"\tvalue of tail2: " << tail2Ms << "\n"
+								<<"\t\tDifference In arrival times: "<< dif);
 							}
 
 						}
