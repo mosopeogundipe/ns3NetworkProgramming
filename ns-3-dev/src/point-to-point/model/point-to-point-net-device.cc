@@ -28,6 +28,8 @@
 #include "point-to-point-net-device.h"
 #include "point-to-point-channel.h"
 #include "ppp-header.h"
+#include "ns3/ipv4-header.h"
+#include "ns3/udp-header.h"
 #include "zlib.h"
 
 #include <iostream>
@@ -220,6 +222,7 @@ PointToPointNetDevice::ProcessHeader (Ptr<Packet> p, uint16_t& param)
   NS_LOG_FUNCTION (this << p << param);
   PppHeader ppp;
   p->RemoveHeader (ppp);
+  NS_LOG_INFO("protocol in PppToEther : " << ppp.GetProtocol ());
   param = PppToEther (ppp.GetProtocol ());
   return true;
 }
@@ -690,6 +693,7 @@ PointToPointNetDevice::PppToEther (uint16_t proto)
     case 0x0021: return 0x0800;   //IPv4
     case 0x0057: return 0x86DD;   //IPv6
 		case 0x4021: return 0x4200;		//Compression
+    //case 0: return 0x0800;   //HINR.SOPE: Investigate why when this is commented code fails. Returning from server...
     default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
     }
   return 0;
@@ -715,14 +719,18 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     NS_LOG_FUNCTION (this);
     Ptr<Packet> result;
     PppHeader header;
+    ns3::Ipv4Header ipHeader;
+    ns3::UdpHeader udpHeader;
     packet->RemoveHeader (header);
-
+    packet->RemoveHeader (ipHeader);
+    packet->RemoveHeader (udpHeader);
     
+    
+
     //Compress packet data using LZS compression
     uint32_t size = packet->GetSize();
     uint8_t raw_data[size + 2] = {0};
     //vector<uint8_t> raw_data
-
     uint8_t compressed_data[size * 2] = {0};
 
 		PppHeader protoHeader;
@@ -731,7 +739,6 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 		raw_data[0] = packetProtocol;
 
     packet->CopyData(raw_data + 1, size);
-
 
     z_stream defstream;
     defstream.zalloc = Z_NULL;
@@ -752,6 +759,8 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     //Add compressed_data to data section of new packet to return, then add header
     result = Create<Packet> (compressed_data, sizeof(compressed_data));
     header.SetProtocol (0x4021);
+    result->AddHeader (udpHeader);
+    result->AddHeader (ipHeader);
     result->AddHeader (header);
     return result;
  }
@@ -764,7 +773,11 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     //Ptr<Packet> result = packet -> Copy();
     Ptr<Packet> result;
     PppHeader header;
+    ns3::Ipv4Header ipHeader;
+    ns3::UdpHeader udpHeader;
     packet->RemoveHeader (header);
+    packet->RemoveHeader (ipHeader);
+    packet->RemoveHeader (udpHeader);
     
     //Decompress packet data here
     // inflate b into c
@@ -790,7 +803,7 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     inflateEnd(&infstream);
     //End of LZS decompression for packet
 
-		uint16_t packetProtocol = uncompressed_data[0];
+		//uint16_t packetProtocol = uncompressed_data[1];
 
     //Add decompressed data to packet, then add the header
     result = Create<Packet> (uncompressed_data + 1, sizeof(compressed_data)-1);
@@ -799,9 +812,11 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 		//Shit's broken yo
 		//std::vector<char> protocolTobyteArray = GetArrayofByte(0x4021);
     //result ->RemoveAtStart(protocolTobyteArray.size());
-
     //Add "0x0021" as header to complete re-creation of original packet sent
-    header.SetProtocol (packetProtocol);
+    //header.SetProtocol (packetProtocol);
+    header.SetProtocol (0x0021);    //just set protocol manually, any other way causes issues
+    result->AddHeader (udpHeader);
+    result->AddHeader (ipHeader);
     result->AddHeader (header);
     return result;
  }

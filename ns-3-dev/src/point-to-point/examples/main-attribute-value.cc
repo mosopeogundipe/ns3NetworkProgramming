@@ -32,6 +32,8 @@
 #include "ns3/drop-tail-queue.h"
 #include "ns3/point-to-point-net-device.h"
 #include "zlib.h"
+#include "ns3/ipv4-header.h"
+#include "ns3/udp-header.h"
 
 using namespace ns3;
 
