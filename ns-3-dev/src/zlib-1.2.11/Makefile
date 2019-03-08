@@ -45,7 +45,7 @@ TAR=tar
 SHELL=/bin/sh
 EXE=
 
-prefix =/ns-3-allinone/ns-3-dev/src/zlib-1.2.11
+prefix =~/Documents/cs621/ns-3-dev/src/zlib-1.2.11
 exec_prefix =${prefix}
 libdir =${exec_prefix}/lib
 sharedlibdir =${libdir}
