@@ -153,7 +153,7 @@ namespace ns3 {
 	CompressionDetectionServer::StopApplication ()
 	{
 		NS_LOG_FUNCTION (this);
-	
+		PrintResult();
 		if (m_socket != 0)
 			{
 				m_socket->SetRecvCallback (MakeNullCallback<void, Ptr<Socket> > ());
@@ -177,61 +177,73 @@ namespace ns3 {
 				m_rxTraceWithAddresses (packet, from, localAddress);
 				if (packet->GetSize () > 0)
 					{
-						NS_LOG_INFO ("server recieved packet: "<< m_received%6000);
+						//NS_LOG_INFO ("server recieved packet: "<< m_received%6000);
 
 						SeqTsHeader seqTs;
 						packet->RemoveHeader (seqTs);
 						uint32_t currentSequenceNumber = seqTs.GetSeq ();
 
-						//if early in packet train, set head
-						if(m_received == 1){
-							head1 = Simulator::Now();
-							NS_LOG_INFO ("head1 set to:"<< head1.GetMilliSeconds());
-						} //if close to end of train. Can't use exact end, as some packets may be lost
-						else if (m_received == 5999){
-							tail1 = Simulator::Now();
-							NS_LOG_INFO ("tail1 set to:"<< tail1.GetMilliSeconds());
+						if(!hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
+							firstLow = Simulator::Now();
+							hasSeenFirstLowEntropyPacket = true;
 						}
-						else if(m_received == 6001){
-							head2 = Simulator::Now();
-							NS_LOG_INFO ("head2 set to:"<< head2.GetMilliSeconds());
-						} //if close to end of train. Can't use exact end, as some packets may be lost
-						else if (m_received == 11999){
-							tail2 = Simulator::Now();
-							NS_LOG_INFO ("tail2 set to:"<< tail2.GetMilliSeconds());
+						else if(hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
+							lastLow = Simulator::Now();
 						}
-
-						int64_t head1Ms = head1.GetMilliSeconds();
-						int64_t tail1Ms = tail1.GetMilliSeconds();
-
-						int64_t head2Ms = head2.GetMilliSeconds();
-						int64_t tail2Ms = tail2.GetMilliSeconds();
-
-						if(((head1Ms != 0) && (tail1Ms != 0))&& ((head2Ms != 0) && (tail2Ms != 0))){
-							int64_t dHead = head2Ms - head1Ms;
-							int64_t dTail = tail2Ms - tail1Ms;
-
-							int64_t dif = dHead - dTail;
-
-							if(dif >= 100){
-								NS_LOG_INFO ("Compression detected!\n\tDifference In arrival times: "<< dif);
-							}
-							else{
-								NS_LOG_INFO ("No compression was detected.\n"
-								<<"\tvalue of head1: " << head1Ms << "\n"
-								<<"\tValue of head2: " << head2Ms << "\n"
-								<<"\tvalue of tail1: " << tail1Ms << "\n"
-								<<"\tvalue of tail2: " << tail2Ms << "\n"
-								<<"\t\tDifference In arrival times: "<< dif);
-							}
-
+						else if(!hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
+							firstHigh = Simulator::Now();
+							hasSeenFirstHighEntropyPacket = true;
 						}
-
-	
+						else if(hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
+							lastHigh = Simulator::Now();
+						}
+						
 						m_lossCounter.NotifyReceived (currentSequenceNumber);
 						m_received++;
 					}
 			}
+			int64_t firstLowMs = firstLow.GetMilliSeconds();
+			int64_t lastLowMs = lastLow.GetMilliSeconds();
+
+			int64_t firstHighMs = firstHigh.GetMilliSeconds();
+			int64_t lastHighMs = lastHigh.GetMilliSeconds();
+			int64_t deltaLow = lastLowMs - firstLowMs;
+			int64_t deltaHigh = lastHighMs - firstHighMs;
+
+			difference = abs(deltaHigh - deltaLow); 	//abs value was important to make it detect compression in links, was getting negative values for valid compression links
 	}
 	
+	//checks if a packet's data contains only zeros. If so, it's a low entropy packet
+	//if we have >= 1100 zeros, then it's a low entropy packet
+	bool CompressionDetectionServer::IsLowEntropyPacket(Ptr<Packet> packet){
+		int size = packet -> GetSize();
+		uint8_t raw_data[size];
+    	packet->CopyData(raw_data, size);
+		int numberOfZeros = 0;
+		for(int i=0; i<size; i++){
+			if((int)raw_data[i] == 0){
+				numberOfZeros ++;
+			}
+		}
+		if(numberOfZeros >= 1100){//1100 is our packet data size
+			return true;
+		}
+		return false;
+	}
+	
+	void CompressionDetectionServer::PrintResult(){		
+		if(difference >= 100){
+			NS_LOG_INFO ("Compression detected!\n\tDifference In arrival times: "<< difference);
+		}
+		else{
+			NS_LOG_INFO ("No Compression detected!\n\tDifference In arrival times: "<< difference);
+			// NS_LOG_INFO ("No compression was detected.\n"
+			// <<"\tfirst low entropy packet time: " << firstLow << "\n"
+			// <<"\tlast low entropy packet time: " << lastLow << "\n"
+			// <<"\tfirst high entropy packet time: " << firstHigh << "\n"
+			// <<"\tlast high entropy packet time: " << lastHigh << "\n"
+			// <<"\t\tDifference In arrival times: "<< dif);
+		}
+		difference = 0;
+	} 
  } // Namespace ns3

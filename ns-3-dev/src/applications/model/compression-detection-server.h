@@ -61,11 +61,17 @@
    PacketLossCounter m_lossCounter; 
 
    //variables used to test compression
-    Time head1= Time();
-	  Time tail1= Time();
-    Time head2= Time();
-	  Time tail2= Time();
- 
+    Time firstLow= Time();
+	  Time lastLow= Time();
+    Time firstHigh= Time();
+	  Time lastHigh= Time();
+
+    bool hasSeenFirstLowEntropyPacket = false;
+    bool hasSeenFirstHighEntropyPacket = false;
+    bool IsLowEntropyPacket(Ptr<Packet> packet);
+    void PrintResult();
+    int64_t difference;
+
    TracedCallback<Ptr<const Packet> > m_rxTrace;
  
    TracedCallback<Ptr<const Packet>, const Address &, const Address &> m_rxTraceWithAddresses;

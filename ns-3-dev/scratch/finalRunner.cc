@@ -21,17 +21,19 @@ main (int argc, char *argv[])
   //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
   //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
   //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
-  LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
+  //LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
   LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
-  //LogComponentEnable ("ControlTest", LOG_LEVEL_ERROR);
+  LogComponentEnable ("ControlTest", LOG_LEVEL_ERROR);
   //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ERROR);
   //LogComponentEnable ("PointToPointHelper", LOG_LEVEL_ERROR);
 
   uint16_t port = 9;  // well-known echo port number
   //uint32_t packetSize = 32; // this will be set by the app
   //uint32_t maxPacketCount = 1; // this will be set by the app
-	uint8_t midLinkSpeed = 8;
-	uint8_t outerLinkSpeed = 8;
+	//uint8_t midLinkSpeed = 1;
+	//uint8_t outerLinkSpeed = 8;
+  std::string midLinkSpeed = "1";
+	std::string outerLinkSpeed = "8";
 	bool enableCompression = false;
 	bool enableGlobalCompression = false;
 	//std::string fill = "praise jesus"; // will be set by app, 
@@ -60,7 +62,9 @@ main (int argc, char *argv[])
 	std::string str;
 
 	//setting compression link speed
-	str = std::to_string (midLinkSpeed) + "Mbps";
+	//str = std::to_string (midLinkSpeed) + "Mbps";
+  str = midLinkSpeed + "Mbps";
+  NS_LOG_ERROR("mid link speed: " << str);
   p2p.SetDeviceAttribute ("DataRate", StringValue(str));
   p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
   NS_LOG_ERROR("enable compression:" << enableCompression);
@@ -69,7 +73,7 @@ main (int argc, char *argv[])
 
 	//setting the regular link speeds
 	p2p.SetCompress (enableGlobalCompression);
-	str = std::to_string (outerLinkSpeed) + "Mbps";
+	//str = std::to_string (outerLinkSpeed) + "Mbps";
 
   p2p.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));

@@ -58,7 +58,7 @@ namespace ns3 {
 							MakeUintegerChecker<uint32_t> ())
 			.AddAttribute ("Interval",
 							"The time to wait between packets",
-							TimeValue (Seconds (0.01)), //should be 0, or very close to, as per faq
+							TimeValue (Seconds (0.005)), //should be 0, or very close to, as per faq
 							MakeTimeAccessor (&CompressionDetectionClient::m_interval),
 							MakeTimeChecker ())
 			.AddAttribute ("RemoteAddress",
