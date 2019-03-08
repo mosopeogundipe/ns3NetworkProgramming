@@ -154,7 +154,8 @@ public:
 
   Ptr<Packet> DecodePacket(Ptr<Packet> packet);    //HINT.SOPE: Network Programming Project 1
   
-  std::vector<char> GetArrayofByte(uint16_t number);
+  std::vector<char> GetArrayofByte(uint16_t number); //HINT.SOPE: Network Programming Project 1
+
   // The remaining methods are documented in ns3::NetDevice*
 
 	//TODO custom functions
