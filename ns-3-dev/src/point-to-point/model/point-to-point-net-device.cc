@@ -184,6 +184,7 @@ PointToPointNetDevice::PointToPointNetDevice ()
     m_currentPkt (0)
 {
   NS_LOG_FUNCTION (this);
+	//TODO this is used to let device know what proto# to compress
 	configFile = "compression-config.json";
 	PopulateProtocolList ();
 	compressionProtocols = new uint16_t [4];
