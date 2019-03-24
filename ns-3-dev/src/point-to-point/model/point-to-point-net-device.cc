@@ -186,15 +186,8 @@ PointToPointNetDevice::PointToPointNetDevice ()
     m_currentPkt (0)
 {
   NS_LOG_FUNCTION (this);
-	//TODO this is used to let device know what proto# to compress
-	configFile = "compression-config.json";
-	weAreCompressing = false;
-	//PopulateProtocolList ();
-	compressionProtocols = new uint16_t [4];
-	compressionProtocols[0] = 0x1800;
-	compressionProtocols[1] = 0x0814;
-	compressionProtocols[2] = 0x0800;
-	compressionProtocols[3] = 0x1111;
+	configFile = "compress-config.txt";
+	PopulateProtocolList ();
 }
 
 PointToPointNetDevice::~PointToPointNetDevice ()
@@ -206,7 +199,25 @@ PointToPointNetDevice::~PointToPointNetDevice ()
 void
 PointToPointNetDevice::PopulateProtocolList (void)
 {
-	std::cout << "still need to populate" << std::endl;
+	std::string line;
+	std::ifstream readFile (configFile);
+	if (readFile.is_open ())
+		{
+			uint8_t i = 0;
+			while (getline (readFile,line) )
+				{
+					if ( i == 0 )
+						{
+							compressionProtocols = new uint16_t [std::stoi (line)];
+							numProtocols = std::stoi (line);
+						}
+					else
+						{
+							compressionProtocols [i - 1] = std::stoi (line);
+						}
+					i++;
+				}
+		}
 }
 
 void
@@ -224,6 +235,7 @@ PointToPointNetDevice::ProcessHeader (Ptr<Packet> p, uint16_t& param)
   NS_LOG_FUNCTION (this << p << param);
   PppHeader ppp;
   p->RemoveHeader (ppp);
+  NS_LOG_INFO("protocol in PppToEther : " << ppp.GetProtocol ());
   param = PppToEther (ppp.GetProtocol ());
   return true;
 }
@@ -573,7 +585,15 @@ PointToPointNetDevice::Send (
     }
 
 	bool shouldCompress = false;
+<<<<<<< HEAD
 	for (uint8_t i = 0; i < sizeof(compressionProtocols); ++i)
+=======
+  AddHeader (packet, protocolNumber);
+  m_macTxTrace (packet);
+	Ptr<Packet> newPacket = packet->Copy ();
+
+	for (uint8_t i = 0; i < numProtocols; ++i)
+>>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
 		{
 			if (protocolNumber == compressionProtocols[i])
 				{
@@ -590,7 +610,11 @@ PointToPointNetDevice::Send (
 	if (weAreCompressing && shouldCompress)
 		{
 			// need to compress this uncompressed packet
+<<<<<<< HEAD
 			std::cout << "compressing send for protoNum: " << int(protocolNumber) << std::endl;
+=======
+      NS_LOG_ERROR("Packet being encoded");
+>>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
 			newPacket = EncodePacket(packet);    //Enconde the packet and put the value in original packet
 		}
 
@@ -727,6 +751,7 @@ PointToPointNetDevice::PppToEther (uint16_t proto)
     case 0x0021: return 0x0800;   //IPv4
     case 0x0057: return 0x86DD;   //IPv6
 		case 0x4021: return 0x4200;		//Compression
+    //case 0: return 0x0800;   //HINR.SOPE: Investigate why when this is commented code fails. Returning from server...
     default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
     }
   return 0;
@@ -752,15 +777,22 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     NS_LOG_FUNCTION (this);
     Ptr<Packet> result;
     PppHeader header;
+    ns3::Ipv4Header ipHeader;
+    ns3::UdpHeader udpHeader;
     packet->RemoveHeader (header);
+    packet->RemoveHeader (ipHeader);
+    packet->RemoveHeader (udpHeader);
 
-    
     //Compress packet data using LZS compression
     uint32_t size = packet->GetSize();
     uint8_t raw_data[size + 1] = {0};
     //vector<uint8_t> raw_data
+<<<<<<< HEAD
 
     uint8_t compressed_data[size] = {0};
+=======
+    uint8_t compressed_data[size * 2] = {0};
+>>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
 
 		PppHeader protoHeader;
 		packet->PeekHeader (protoHeader);
@@ -769,6 +801,7 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 
     packet->CopyData(raw_data + 1, size);
 
+<<<<<<< HEAD
 			std::cout << "NetDevice encode raw_data with protocol: " << std::endl;
 			for (uint16_t i=0; i<size + 1; ++i)
 				{
@@ -776,6 +809,8 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 				}
 				std::cout << std::endl;
 
+=======
+>>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
     z_stream defstream;
     defstream.zalloc = Z_NULL;
     defstream.zfree = Z_NULL;
@@ -795,6 +830,8 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     //Add compressed_data to data section of new packet to return, then add header
     result = Create<Packet> (compressed_data, sizeof(compressed_data));
     header.SetProtocol (0x4021);
+    result->AddHeader (udpHeader);
+    result->AddHeader (ipHeader);
     result->AddHeader (header);
 
 			uint8_t packetData [result->GetSize ()];
@@ -827,8 +864,16 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     //Ptr<Packet> result = packet -> Copy();
     Ptr<Packet> result;
     PppHeader header;
+    ns3::Ipv4Header ipHeader;
+    ns3::UdpHeader udpHeader;
     packet->RemoveHeader (header);
+<<<<<<< HEAD
 
+=======
+    packet->RemoveHeader (ipHeader);
+    packet->RemoveHeader (udpHeader);
+    
+>>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
     //Decompress packet data here
     // inflate b into c
     // zlib struct
@@ -860,6 +905,7 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     inflateEnd(&infstream);
     //End of LZS decompression for packet
 
+<<<<<<< HEAD
 		uint16_t packetProtocol = uncompressed_data[0];
 		std::cout << "packetProtocol: " << packetProtocol << std::endl;
 
@@ -869,6 +915,9 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 				std::cout << int(uncompressed_data[i]) << ",";
 			}
 		std::cout << std::endl;
+=======
+		//uint16_t packetProtocol = uncompressed_data[1];
+>>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
 
     //Add decompressed data to packet, then add the header
     result = Create<Packet> (uncompressed_data + 1, sizeof(uncompressed_data)-1);
@@ -877,9 +926,11 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 		//Shit's broken yo
 		//std::vector<char> protocolTobyteArray = GetArrayofByte(0x4021);
     //result ->RemoveAtStart(protocolTobyteArray.size());
-
     //Add "0x0021" as header to complete re-creation of original packet sent
-    header.SetProtocol (packetProtocol);
+    //header.SetProtocol (packetProtocol);
+    header.SetProtocol (0x0021);    //just set protocol manually, any other way causes issues
+    result->AddHeader (udpHeader);
+    result->AddHeader (ipHeader);
     result->AddHeader (header);
     return result;
  }

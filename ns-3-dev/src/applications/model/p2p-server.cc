@@ -136,6 +136,12 @@ P2PServer::HandleRead (Ptr<Socket> socket)
 			buf = new uint8_t[size];
 			packet->CopyData (buf, size);
 			std::cout << "server read packet with message: " << buf << std::endl;
+			std::cout << "bytes: ";
+			for (int i = 0; i < 12; ++i)
+				{
+					std::cout << static_cast<unsigned> (buf[i]) << " ";
+				}
+			std::cout << std::endl;
 
       socket->GetSockName (localAddress);
       m_rxTrace (packet);

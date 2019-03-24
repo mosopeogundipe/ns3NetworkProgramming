@@ -18,7 +18,9 @@ NS_LOG_COMPONENT_DEFINE ("ControlTest");
 int 
 main (int argc, char *argv[])
 {
-  //LogComponentEnable ("ControlExample", LOG_LEVEL_FUNCTION);
+  //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
+  //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
+  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
 
   uint16_t port = 9;  // well-known echo port number
   uint32_t packetSize = 32; // this will be set by the app
@@ -27,7 +29,14 @@ main (int argc, char *argv[])
 	uint8_t outerLinkSpeed = 8;
 	bool enableCompression = false;
 	bool enableGlobalCompression = false;
-	std::string fill = "praise jesus"; // will be set by app, 
+	char bytes[12] = {0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x41};
+	std::cout << "bytes: ";
+	for (int i = 0; i < 12; ++i)
+		{
+			std::cout << static_cast<unsigned> (bytes[i]) << " ";
+		}
+	std::cout << std::endl;
+	std::string fill = std::string(bytes);//"praise jesus"; // will be set by app, 
 																			//have here for testing
 
   Time interPacketInterval = Seconds (1.);

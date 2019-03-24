@@ -30,7 +30,7 @@
 #include "ns3/uinteger.h"
 #include "udp-client.h"
 #include "seq-ts-header.h"
-#include "CompressionDetectionClient.h"
+#include "compression-detection-client.h"
 #include <cstdlib>
 #include <cstdio>
 
