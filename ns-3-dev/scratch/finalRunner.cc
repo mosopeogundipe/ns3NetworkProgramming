@@ -29,7 +29,7 @@ main (int argc, char *argv[])
 
   uint16_t port = 9;  // well-known echo port number
   //uint32_t packetSize = 32; // this will be set by the app
-  //uint32_t maxPacketCount = 1; // this will be set by the app
+  uint32_t maxPacketCount = 12000; // this will be set by the app
 	//uint8_t midLinkSpeed = 1;
 	//uint8_t outerLinkSpeed = 8;
   std::string midLinkSpeed = "1";
@@ -41,6 +41,7 @@ main (int argc, char *argv[])
 
   //Time interPacketInterval = Seconds (1.); //this will be set by the app
   CommandLine cmd;
+	cmd.AddValue ("numPackets", "Total number of packets to send", maxPacketCount);
   cmd.AddValue ("port", "Port being used to commuincate", port);
   cmd.AddValue ("midLinkSpeed", "Speed (Mbps) of the link between nodes 1 and 2. (middle link)", midLinkSpeed);
   cmd.AddValue ("outerLinkSpeed", "Speed (Mbps) of the links between nodes 0 and 1, and 2 and 3.", outerLinkSpeed);
@@ -75,11 +76,11 @@ main (int argc, char *argv[])
 	p2p.SetCompress (enableGlobalCompression);
 	//str = std::to_string (outerLinkSpeed) + "Mbps";
 
-  p2p.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+  p2p.SetDeviceAttribute ("DataRate", StringValue ("8Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
 	NetDeviceContainer d01 = p2p.Install (c01);
 
-  p2p.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+  p2p.SetDeviceAttribute ("DataRate", StringValue ("8Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
 	NetDeviceContainer d23 = p2p.Install (c23);
 
@@ -106,7 +107,7 @@ main (int argc, char *argv[])
   apps.Stop(Seconds (500.0));
 
   CompressionDetectionClientHelper client ( i23.GetAddress(1), port);
-  //client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
+  client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
   //client.SetAttribute ("Interval", TimeValue (interPacketInterval));
   //client.SetAttribute ("PacketSize", UintegerValue (packetSize));
 	apps = client.Install (c.Get (0));

@@ -186,6 +186,7 @@ PointToPointNetDevice::PointToPointNetDevice ()
     m_currentPkt (0)
 {
   NS_LOG_FUNCTION (this);
+	numProtocols = 0;
 	configFile = "compress-config.txt";
 	PopulateProtocolList ();
 }
@@ -204,16 +205,16 @@ PointToPointNetDevice::PopulateProtocolList (void)
 	if (readFile.is_open ())
 		{
 			uint8_t i = 0;
-			while (getline (readFile,line) )
+			while (getline (readFile, line))
 				{
-					if ( i == 0 )
+					if (i == 0)
 						{
 							compressionProtocols = new uint16_t [std::stoi (line)];
 							numProtocols = std::stoi (line);
 						}
 					else
 						{
-							compressionProtocols [i - 1] = std::stoi (line);
+							compressionProtocols[i-1] = std::stoi (line);
 						}
 					i++;
 				}
@@ -661,7 +662,7 @@ PointToPointNetDevice::DoMpiReceive (Ptr<Packet> p)
 Address 
 PointToPointNetDevice::GetRemote (void) const
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << m_channel->GetNDevices ());
   NS_ASSERT (m_channel->GetNDevices () == 2);
   for (std::size_t i = 0; i < m_channel->GetNDevices (); ++i)
     {
@@ -714,7 +715,11 @@ PointToPointNetDevice::EtherToPpp (uint16_t proto)
     {
     case 0x0800: return 0x0021;   //IPv4
     case 0x86DD: return 0x0057;   //IPv6
+<<<<<<< HEAD
 		case 0x4200: return 0x4021;		//Compression
+=======
+		case 0x4200: return 0x4201;		//Compression
+>>>>>>> 67eb6a487bdd9f2f53809d085814d31ec3865dd8
     default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
     }
   return 0;
@@ -731,6 +736,8 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     packet->RemoveHeader (header);
     packet->RemoveHeader (ipHeader);
     packet->RemoveHeader (udpHeader);
+    
+    
 
     //Compress packet data using LZS compression
     uint32_t size = packet->GetSize();

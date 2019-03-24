@@ -304,8 +304,8 @@ private:
 	/*
 	* This will contain all of the protocols that we can compress
 	*/
-	uint16_t numProtocols;
 	uint16_t *compressionProtocols;
+	uint16_t numProtocols;
 	std::string configFile;
 
   /**
