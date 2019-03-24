@@ -31,11 +31,16 @@
 #include "ns3/socket-factory.h"
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
+#include "ns3/boolean.h"
 #include "compression-detection-client.h"
 #include "seq-ts-header.h"
 #include <cstdlib>
 #include <cstdio>
 #include <fstream> 
+#include <unistd.h>
+#include <fcntl.h>
+#include <string>
+#include <iostream>
 
 namespace ns3 {
  
@@ -53,12 +58,12 @@ namespace ns3 {
 			//Any additional attributes needed?
 			.AddAttribute ("MaxPackets",
 							"The maximum number of packets the application will send",
-							UintegerValue (12000), //changed to 12000, for num of packets to send
+							UintegerValue (6000), //changed to 12000, for num of packets to send
 							MakeUintegerAccessor (&CompressionDetectionClient::m_count),
 							MakeUintegerChecker<uint32_t> ())
 			.AddAttribute ("Interval",
 							"The time to wait between packets",
-							TimeValue (Seconds (0.005)), //should be 0, or very close to, as per faq
+							TimeValue (Seconds (0.001)), //0.00001 gives good results //should be 0, or very close to, as per faq
 							MakeTimeAccessor (&CompressionDetectionClient::m_interval),
 							MakeTimeChecker ())
 			.AddAttribute ("RemoteAddress",
@@ -73,9 +78,17 @@ namespace ns3 {
 							MakeUintegerChecker<uint16_t> ())
 			.AddAttribute ("PacketSize",
 							"Size of packets generated. The minimum packet size is 12 bytes which is the size of the header carrying the sequence number and the time stamp.",
-							UintegerValue (1112), //additional 12 bytes added for header and timestamp, 1100 bytes of payload required
+							UintegerValue (1100), //additional 12 bytes added for header and timestamp, 1100 bytes of payload required
+							//UintegerValue (1100),
 							MakeUintegerAccessor (&CompressionDetectionClient::m_size),
-							MakeUintegerChecker<uint32_t> (12,65507))
+							//MakeUintegerChecker<uint32_t> (12,65507))
+							MakeUintegerChecker<uint32_t> ())
+			.AddAttribute ("SetEntropy",
+							"If true, create high entropy packets. If false, create low entropy packets",
+							BooleanValue (false), //additional 12 bytes added for header and timestamp, 1100 bytes of payload required
+							MakeBooleanAccessor (&CompressionDetectionClient::m_set_entropy),
+							MakeBooleanChecker())
+
 		;
 		return tid;
 	}
@@ -167,11 +180,19 @@ namespace ns3 {
 	 
 		m_socket->SetRecvCallback (MakeNullCallback<void, Ptr<Socket> > ());
 		m_socket->SetAllowBroadcast (true);
+		m_sendEvent = Simulator::Schedule (Seconds (0.0), &CompressionDetectionClient::Send, this);
 
 		//where the functions to send the two trains are called
 			//is a 5 sec delay good?
-		m_sendTrain1 = Simulator::Schedule (Seconds (0.0), &CompressionDetectionClient::SendEmptyTrain, this);
-		m_sendTrain2 = Simulator::Schedule (Seconds (25.0), &CompressionDetectionClient::SendRandomTrain, this);
+		// if(m_set_entropy){
+		// 	NS_LOG_INFO ("Sending HIGH Entropy Packets...");
+		// 	m_sendTrain2 = Simulator::Schedule (Seconds (0.0), &CompressionDetectionClient::SendRandomTrain, this);
+		// }else{
+		// 	NS_LOG_INFO ("Sending LOW Entropy Packets...");
+		// 	m_sendTrain1 = Simulator::Schedule (Seconds (0.0), &CompressionDetectionClient::SendEmptyTrain, this);
+		// }
+		//m_sendTrain1 = Simulator::Schedule (Seconds (0.0), &CompressionDetectionClient::SendEmptyTrain, this);
+		//m_sendTrain2 = Simulator::Schedule (Seconds (25.0), &CompressionDetectionClient::SendRandomTrain, this);
 	}
 	 
 	void
@@ -182,98 +203,165 @@ namespace ns3 {
 		Simulator::Cancel (m_sendTrain2);
 	}
 
-	//all we need to do is change it so we send a train of 6000
-		//already send them empty, do we really need ro read fro /dev/nul?
-	void
-	CompressionDetectionClient::SendEmptyTrain (void)
-	{
-		NS_LOG_FUNCTION (this);
-		NS_ASSERT (m_sendTrain1.IsExpired ());
-		SeqTsHeader seqTs;
-		seqTs.SetSeq (m_sent);
-		Ptr<Packet> p = Create<Packet> (m_size-(8+4)); // 8+4 : the size of the seqTs header
-		p->AddHeader (seqTs);
-	 
-		std::stringstream peerAddressStringStream;
-		if (Ipv4Address::IsMatchingType (m_peerAddress))
-			{
-				peerAddressStringStream << Ipv4Address::ConvertFrom (m_peerAddress);
-			}
-		else if (Ipv6Address::IsMatchingType (m_peerAddress))
-			{
-				peerAddressStringStream << Ipv6Address::ConvertFrom (m_peerAddress);
-			}
-	 
-		if ((m_socket->Send (p)) >= 0)
-			{
-				++m_sent;
-				NS_LOG_INFO ("  Sending empty packet: " << m_sent%6000);
+void
+ CompressionDetectionClient::createLowEntropyPackets (uint8_t*  buffer, uint32_t m_size)
+ {
+  for (uint32_t i = 0; i < m_size; i++){
+    buffer[i] = 0x00;
+  }
+ }
+ //create high entropy
+ void
+ CompressionDetectionClient::createHighEntropyPackets (uint8_t* buffer, uint32_t m_size)
+ {
+	int fd = open("/dev/urandom", O_RDONLY);
+	read(fd, buffer, m_size);
+	 //buffer now contains the random data
+ }
 
-			}
-		else
-			{
-				NS_LOG_INFO ("Error while sending " << m_size << " bytes to "
-														<< peerAddressStringStream.str ());
-			}
+	void
+CompressionDetectionClient::Send (void)
+{
+  NS_LOG_FUNCTION (this);
+    SeqTsHeader seqTs;
+  //cout<<m_sent;
+  seqTs.SetSeq (m_sent);
+  uint8_t* buffer = new uint8_t[m_size+8+4];
+   Ptr<Packet> p;
+   //set entropy high and low done  
+  if (m_set_entropy == true) { //if true
+   createHighEntropyPackets(buffer, m_size+8+4);
+    p = Create<Packet> (buffer, m_size+8+4);
+  }else{ //false 
+    createLowEntropyPackets(buffer, m_size+8+4);
+    p = Create<Packet> (buffer, m_size+8+4);
+  }
+  //Ptr<Packet> p = Create<Packet> ((uint8_t*) str.str().c_str(), str.str().length() + 1); // 8+4 : the size of the seqTs header
+  p->AddHeader (seqTs);
+
+  std::stringstream peerAddressStringStream;
+  if (Ipv4Address::IsMatchingType (m_peerAddress))
+    {
+      peerAddressStringStream << Ipv4Address::ConvertFrom (m_peerAddress);
+    }
+  else if (Ipv6Address::IsMatchingType (m_peerAddress))
+    {
+      peerAddressStringStream << Ipv6Address::ConvertFrom (m_peerAddress);
+    }
+
+  if ((m_socket->Send (p)) >= 0)
+    {
+      ++m_sent;
+      NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
+                                    << peerAddressStringStream.str () << " Uid: "
+                                    << p->GetUid () << " Time: "
+                                    << (Simulator::Now ()).GetSeconds ());
+
+    }
+  else
+    {
+      NS_LOG_INFO ("Error while sending " << m_size << " bytes to "
+                                          << peerAddressStringStream.str ());
+    }
+
+  if (m_sent < m_count)
+    {
+      m_sendEvent = Simulator::Schedule (m_interval, &CompressionDetectionClient::Send, this);
+    }
+}
+
+	// //all we need to do is change it so we send a train of 6000
+	// 	//already send them empty, do we really need ro read fro /dev/nul?
+	// void
+	// CompressionDetectionClient::SendEmptyTrain (void)
+	// {
+	// 	NS_LOG_FUNCTION (this);
+	// 	NS_ASSERT (m_sendTrain1.IsExpired ());
+	// 	SeqTsHeader seqTs;
+	// 	seqTs.SetSeq (m_sent);
+	// 	Ptr<Packet> p = Create<Packet> (m_size-(8+4)); // 8+4 : the size of the seqTs header
+	// 	p->AddHeader (seqTs);
 	 
-	 	//since we send the empty packets first, we only send half of the max (only 1 train)
-		if (m_sent < m_count/2)
-			{
-				m_sendTrain1 = Simulator::Schedule (m_interval, &CompressionDetectionClient::SendEmptyTrain, this);
-			}
-	}
+	// 	std::stringstream peerAddressStringStream;
+	// 	if (Ipv4Address::IsMatchingType (m_peerAddress))
+	// 		{
+	// 			peerAddressStringStream << Ipv4Address::ConvertFrom (m_peerAddress);
+	// 		}
+	// 	else if (Ipv6Address::IsMatchingType (m_peerAddress))
+	// 		{
+	// 			peerAddressStringStream << Ipv6Address::ConvertFrom (m_peerAddress);
+	// 		}
+	 
+	// 	if ((m_socket->Send (p)) >= 0)
+	// 		{
+	// 			++m_sent;
+	// 			NS_LOG_INFO ("  Sending empty packet: " << m_sent%6000);
+
+	// 		}
+	// 	else
+	// 		{
+	// 			NS_LOG_INFO ("Error while sending " << m_size << " bytes to "
+	// 													<< peerAddressStringStream.str ());
+	// 		}
+	 
+	//  	//since we send the empty packets first, we only send half of the max (only 1 train)
+	// 	if (m_sent < m_count/2)
+	// 		{
+	// 			m_sendTrain1 = Simulator::Schedule (m_interval, &CompressionDetectionClient::SendEmptyTrain, this);
+	// 		}
+	// }
 
 	//all we need to do is change it so we send a train of 6000
 		//and read in 1100 bytes from /dev/random
-	void
-	CompressionDetectionClient::SendRandomTrain (void)
-	{
-		//first, read 1100 bytes into the buffer
-			//possible issues:
-				//unsigned char is not the same as uint8_t
-				//not const enough
-        unsigned char buffer[1100];
-				std::fstream fs ("/dev/random", std::fstream::in | std::fstream::binary);
-        fs.read( (char*)&buffer[0], 1100);
-        fs.close();
+	// void
+	// CompressionDetectionClient::SendRandomTrain (void)
+	// {
+	// 	//first, read 1100 bytes into the buffer
+	// 		//possible issues:
+	// 			//unsigned char is not the same as uint8_t
+	// 			//not const enough
+  //       unsigned char buffer[1100];
+	// 			std::fstream fs ("/dev/random", std::fstream::in | std::fstream::binary);
+  //       fs.read( (char*)&buffer[0], 1100);
+  //       fs.close();
 
-		//uint8_t buffer;
-		NS_LOG_FUNCTION (this);
-		NS_ASSERT (m_sendTrain2.IsExpired ());
-		SeqTsHeader seqTs;
-		seqTs.SetSeq (m_sent);
-		Ptr<Packet> p = Create<Packet> (&buffer[0], m_size-(8+4)); // 8+4 : the size of the seqTs header
-		p->AddHeader (seqTs);
+	// 	//uint8_t buffer;
+	// 	NS_LOG_FUNCTION (this);
+	// 	NS_ASSERT (m_sendTrain2.IsExpired ());
+	// 	SeqTsHeader seqTs;
+	// 	seqTs.SetSeq (m_sent);
+	// 	Ptr<Packet> p = Create<Packet> (&buffer[0], m_size-(8+4)); // 8+4 : the size of the seqTs header
+	// 	p->AddHeader (seqTs);
 	 
-		std::stringstream peerAddressStringStream;
-		if (Ipv4Address::IsMatchingType (m_peerAddress))
-			{
-				peerAddressStringStream << Ipv4Address::ConvertFrom (m_peerAddress);
-			}
-		else if (Ipv6Address::IsMatchingType (m_peerAddress))
-			{
-				peerAddressStringStream << Ipv6Address::ConvertFrom (m_peerAddress);
-			}
+	// 	std::stringstream peerAddressStringStream;
+	// 	if (Ipv4Address::IsMatchingType (m_peerAddress))
+	// 		{
+	// 			peerAddressStringStream << Ipv4Address::ConvertFrom (m_peerAddress);
+	// 		}
+	// 	else if (Ipv6Address::IsMatchingType (m_peerAddress))
+	// 		{
+	// 			peerAddressStringStream << Ipv6Address::ConvertFrom (m_peerAddress);
+	// 		}
 	 
-		if ((m_socket->Send (p)) >= 0)
-			{
-				++m_sent;
-				NS_LOG_INFO (" Sending random packet: " << m_sent%6000);
+	// 	if ((m_socket->Send (p)) >= 0)
+	// 		{
+	// 			++m_sent;
+	// 			NS_LOG_INFO (" Sending random packet: " << m_sent%6000);
 	 
-			}
-		else
-			{
-				NS_LOG_INFO ("Error while sending " << m_size << " bytes to "
-														<< peerAddressStringStream.str ());
-			}
+	// 		}
+	// 	else
+	// 		{
+	// 			NS_LOG_INFO ("Error while sending " << m_size << " bytes to "
+	// 													<< peerAddressStringStream.str ());
+	// 		}
 	 
-		//don't divide by 2 this time, because we're sending the remaining half
-			//cleaner way might be:
-			//m_sent%6000 == 0
-		if (m_sent < m_count)
-			{
-				m_sendTrain2 = Simulator::Schedule (m_interval, &CompressionDetectionClient::SendRandomTrain, this);
-			}
-	}
+	// 	//don't divide by 2 this time, because we're sending the remaining half
+	// 		//cleaner way might be:
+	// 		//m_sent%6000 == 0
+	// 	if (m_sent < m_count)
+	// 		{
+	// 			m_sendTrain2 = Simulator::Schedule (m_interval, &CompressionDetectionClient::SendRandomTrain, this);
+	// 		}
+	// }
  
 } // Namespace ns3

@@ -107,6 +107,12 @@ namespace ns3 {
 		return m_received;
 	}
 	
+	Time 
+	CompressionDetectionServer::GetTimeDifference(void)
+	{
+		return diff;
+	}
+
 	void
 	CompressionDetectionServer::DoDispose (void)
 	{
@@ -153,7 +159,8 @@ namespace ns3 {
 	CompressionDetectionServer::StopApplication ()
 	{
 		NS_LOG_FUNCTION (this);
-		PrintResult();
+		//PrintResult();
+		diff = last - first;
 		if (m_socket != 0)
 			{
 				m_socket->SetRecvCallback (MakeNullCallback<void, Ptr<Socket> > ());
@@ -177,40 +184,44 @@ namespace ns3 {
 				m_rxTraceWithAddresses (packet, from, localAddress);
 				if (packet->GetSize () > 0)
 					{
-						//NS_LOG_INFO ("server recieved packet: "<< m_received%6000);
+						NS_LOG_INFO ("server recieved packet: "<< m_received%6000);
 
 						SeqTsHeader seqTs;
 						packet->RemoveHeader (seqTs);
 						uint32_t currentSequenceNumber = seqTs.GetSeq ();
 
-						if(!hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
-							firstLow = Simulator::Now();
-							hasSeenFirstLowEntropyPacket = true;
+						if(currentSequenceNumber == 0){
+							first = Simulator::Now();
 						}
-						else if(hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
-							lastLow = Simulator::Now();
-						}
-						else if(!hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
-							firstHigh = Simulator::Now();
-							hasSeenFirstHighEntropyPacket = true;
-						}
-						else if(hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
-							lastHigh = Simulator::Now();
-						}
+						last = Simulator::Now();
+						// if(!hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
+						// 	firstLow = Simulator::Now();
+						// 	hasSeenFirstLowEntropyPacket = true;
+						// }
+						// else if(hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
+						// 	lastLow = Simulator::Now();
+						// }
+						// else if(!hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
+						// 	firstHigh = Simulator::Now();
+						// 	hasSeenFirstHighEntropyPacket = true;
+						// }
+						// else if(hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
+						// 	lastHigh = Simulator::Now();
+						// }
 						
 						m_lossCounter.NotifyReceived (currentSequenceNumber);
 						m_received++;
 					}
 			}
-			int64_t firstLowMs = firstLow.GetMilliSeconds();
-			int64_t lastLowMs = lastLow.GetMilliSeconds();
+			// int64_t firstLowMs = firstLow.GetMilliSeconds();
+			// int64_t lastLowMs = lastLow.GetMilliSeconds();
 
-			int64_t firstHighMs = firstHigh.GetMilliSeconds();
-			int64_t lastHighMs = lastHigh.GetMilliSeconds();
-			int64_t deltaLow = lastLowMs - firstLowMs;
-			int64_t deltaHigh = lastHighMs - firstHighMs;
+			// int64_t firstHighMs = firstHigh.GetMilliSeconds();
+			// int64_t lastHighMs = lastHigh.GetMilliSeconds();
+			// int64_t deltaLow = lastLowMs - firstLowMs;
+			// int64_t deltaHigh = lastHighMs - firstHighMs;
 
-			difference = abs(deltaHigh - deltaLow); 	//abs value was important to make it detect compression in links, was getting negative values for valid compression links
+			// difference = deltaHigh - deltaLow; 	//abs value was important to make it detect compression in links, was getting negative values for valid compression links
 	}
 	
 	//checks if a packet's data contains only zeros. If so, it's a low entropy packet
@@ -246,4 +257,5 @@ namespace ns3 {
 		}
 		difference = 0;
 	} 
+
  } // Namespace ns3
