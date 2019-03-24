@@ -585,36 +585,15 @@ PointToPointNetDevice::Send (
     }
 
 	bool shouldCompress = false;
-<<<<<<< HEAD
-	for (uint8_t i = 0; i < sizeof(compressionProtocols); ++i)
-=======
-  AddHeader (packet, protocolNumber);
-  m_macTxTrace (packet);
-	Ptr<Packet> newPacket = packet->Copy ();
-
-	for (uint8_t i = 0; i < numProtocols; ++i)
->>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
-		{
-			if (protocolNumber == compressionProtocols[i])
-				{
-					shouldCompress = true;
-					break;
-				}
-		}
 
 	AddHeader (packet, protocolNumber);
 	Ptr<Packet> newPacket = packet->Copy ();
   m_macTxTrace (newPacket);
 
-	std::cout << "weAreCompressing: " << weAreCompressing << std::endl;
 	if (weAreCompressing && shouldCompress)
 		{
 			// need to compress this uncompressed packet
-<<<<<<< HEAD
-			std::cout << "compressing send for protoNum: " << int(protocolNumber) << std::endl;
-=======
       NS_LOG_ERROR("Packet being encoded");
->>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
 			newPacket = EncodePacket(packet);    //Enconde the packet and put the value in original packet
 		}
 
@@ -787,12 +766,7 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     uint32_t size = packet->GetSize();
     uint8_t raw_data[size + 1] = {0};
     //vector<uint8_t> raw_data
-<<<<<<< HEAD
-
-    uint8_t compressed_data[size] = {0};
-=======
     uint8_t compressed_data[size * 2] = {0};
->>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
 
 		PppHeader protoHeader;
 		packet->PeekHeader (protoHeader);
@@ -801,16 +775,6 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 
     packet->CopyData(raw_data + 1, size);
 
-<<<<<<< HEAD
-			std::cout << "NetDevice encode raw_data with protocol: " << std::endl;
-			for (uint16_t i=0; i<size + 1; ++i)
-				{
-					std::cout << int(raw_data[i]) << ",";
-				}
-				std::cout << std::endl;
-
-=======
->>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
     z_stream defstream;
     defstream.zalloc = Z_NULL;
     defstream.zfree = Z_NULL;
@@ -867,13 +831,10 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     ns3::Ipv4Header ipHeader;
     ns3::UdpHeader udpHeader;
     packet->RemoveHeader (header);
-<<<<<<< HEAD
 
-=======
     packet->RemoveHeader (ipHeader);
     packet->RemoveHeader (udpHeader);
-    
->>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
+
     //Decompress packet data here
     // inflate b into c
     // zlib struct
@@ -905,19 +866,7 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     inflateEnd(&infstream);
     //End of LZS decompression for packet
 
-<<<<<<< HEAD
-		uint16_t packetProtocol = uncompressed_data[0];
-		std::cout << "packetProtocol: " << packetProtocol << std::endl;
-
-		std::cout << "NetDevice Decode after we check protocol data: " << std::endl;
-		for (uint16_t i = 0; i < size; ++i)
-			{
-				std::cout << int(uncompressed_data[i]) << ",";
-			}
-		std::cout << std::endl;
-=======
-		//uint16_t packetProtocol = uncompressed_data[1];
->>>>>>> fef15aaaff075b8b56e2ab1fd3be345885d35184
+		//uint16_t packetProtocol = uncompressed_data[0];
 
     //Add decompressed data to packet, then add the header
     result = Create<Packet> (uncompressed_data + 1, sizeof(uncompressed_data)-1);
