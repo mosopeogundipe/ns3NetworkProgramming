@@ -188,37 +188,36 @@ namespace ns3 {
 						{
 							firstLow = temp;
 							hasSeenFirstLowEntropyPacket = true;
+							NS_LOG_INFO ("Seen first low entropy packet: " << temp.GetMilliSeconds ());
 						}
 						else if(hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
 							lastLow = temp;
-							hasSeenFirstLowEntropyPacket = false;
+							NS_LOG_INFO ("Seen non-first low entropy packet: " << temp.GetMilliSeconds ());
 						}
 						else if(!hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
 							firstHigh = temp;
 							hasSeenFirstHighEntropyPacket = true;
+							NS_LOG_INFO ("Seen first high entropy packet: " << temp.GetMilliSeconds ());
 						}
 						else if(hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
 							lastHigh = temp;
-							hasSeenFirstHighEntropyPacket = false;
+							NS_LOG_INFO ("Seen non-first high entropy packet: " << temp.GetMilliSeconds ());
 						}
 						
 						m_lossCounter.NotifyReceived (currentSequenceNumber);
 						m_received++;
 
-						if (hasSeenFirstHighEntropyPacket && hasSeenFirstHighEntropyPacket)
-							{
-								int64_t firstLowMs = firstLow.GetMilliSeconds();
-								int64_t lastLowMs = lastLow.GetMilliSeconds();
-								int64_t firstHighMs = firstHigh.GetMilliSeconds();
-								int64_t lastHighMs = lastHigh.GetMilliSeconds();
-
-								int64_t deltaLow = lastLowMs - firstLowMs;
-								int64_t deltaHigh = lastHighMs - firstHighMs;
-
-								difference += abs(deltaHigh - deltaLow); 	//abs value was important to make it detect compression in links, was getting negative values for valid compression links
-							}
 					}
 			}
+			int64_t firstLowMs = firstLow.GetMilliSeconds();
+			int64_t lastLowMs = lastLow.GetMilliSeconds();
+			int64_t firstHighMs = firstHigh.GetMilliSeconds();
+			int64_t lastHighMs = lastHigh.GetMilliSeconds();
+
+			int64_t deltaLow = lastLowMs - firstLowMs;
+			int64_t deltaHigh = lastHighMs - firstHighMs;
+
+			difference = abs(deltaHigh - deltaLow); 	//abs value was important to make it detect compression in links, was getting negative values for valid compression links
 	}
 	
 	//checks if a packet's data contains only zeros. If so, it's a low entropy packet

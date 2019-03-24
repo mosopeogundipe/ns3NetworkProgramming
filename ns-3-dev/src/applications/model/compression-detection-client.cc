@@ -207,7 +207,7 @@ namespace ns3 {
 		if ((m_socket->Send (p)) >= 0)
 			{
 				++m_sent;
-				NS_LOG_INFO ("  Sending empty packet: " << m_sent%6000);
+				NS_LOG_INFO ("\t\tSending empty packet: " << m_sent%6000);
 
 			}
 		else
@@ -228,17 +228,17 @@ namespace ns3 {
 	void
 	CompressionDetectionClient::SendRandomTrain (void)
 	{
+		NS_LOG_FUNCTION (this);
 		//first, read 1100 bytes into the buffer
 			//possible issues:
 				//unsigned char is not the same as uint8_t
 				//not const enough
         unsigned char buffer[1100];
 				std::fstream fs ("/dev/random", std::fstream::in | std::fstream::binary);
-        fs.read( (char*)&buffer[0], 1100);
+        fs.read( (char*)buffer, 10);
         fs.close();
 
 		//uint8_t buffer;
-		NS_LOG_FUNCTION (this);
 		NS_ASSERT (m_sendTrain2.IsExpired ());
 		SeqTsHeader seqTs;
 		seqTs.SetSeq (m_sent);
@@ -258,8 +258,7 @@ namespace ns3 {
 		if ((m_socket->Send (p)) >= 0)
 			{
 				++m_sent;
-				NS_LOG_INFO (" Sending random packet: " << m_sent%6000);
-	 
+				NS_LOG_INFO ("\tSending random packet: " << m_sent%6000);
 			}
 		else
 			{
