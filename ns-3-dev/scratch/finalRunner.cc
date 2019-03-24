@@ -18,16 +18,16 @@ NS_LOG_COMPONENT_DEFINE ("ControlTest");
 int 
 main (int argc, char *argv[])
 {
+  Time::SetResolution(Time::NS);
   //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
   //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
   //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
-  //LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
-  //LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
-  //LogComponentEnable ("ControlTest", LOG_LEVEL_ERROR);
-  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ERROR);
-  //LogComponentEnable ("PointToPointHelper", LOG_LEVEL_ERROR);
+  LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
+  LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
+  LogComponentEnable ("ControlTest", LOG_LEVEL_ERROR);
+  LogComponentEnable ("PointToPointHelper", LOG_LEVEL_ERROR);
 
-  uint16_t port = 9;  // well-known echo port number
+	uint16_t port = 9;  // well-known echo port number
   //uint32_t packetSize = 32; // this will be set by the app
   uint32_t maxPacketCount = 12000; // this will be set by the app
 	//uint8_t midLinkSpeed = 1;
@@ -67,23 +67,27 @@ main (int argc, char *argv[])
   str = midLinkSpeed + "Mbps";
   NS_LOG_ERROR("mid link speed: " << str);
   p2p.SetDeviceAttribute ("DataRate", StringValue(str));
-  p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
   NS_LOG_ERROR("enable compression:" << enableCompression);
 	p2p.SetCompress (enableCompression);
 	std::cout << enableCompression << std::endl;
   NetDeviceContainer d12 = p2p.Install (c12);
+  p2p.EnablePcap("Compression",d12.Get(0), false);
 
 	//setting the regular link speeds
 	p2p.SetCompress (enableGlobalCompression);
 	//str = std::to_string (outerLinkSpeed) + "Mbps";
 
   p2p.SetDeviceAttribute ("DataRate", StringValue ("8Mbps"));
-  p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
 	NetDeviceContainer d01 = p2p.Install (c01);
+  p2p.EnablePcap("UDPsender", d01.Get(0), false);
 
   p2p.SetDeviceAttribute ("DataRate", StringValue ("8Mbps"));
-  p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
 	NetDeviceContainer d23 = p2p.Install (c23);
+  p2p.EnablePcap("Decompression",d23.Get(0), false);
+	p2p.EnablePcap("UDPreceiver", d23.Get(1), false);
 
   InternetStackHelper internet;
   internet.Install (c);
@@ -102,31 +106,66 @@ main (int argc, char *argv[])
   ipv4.SetBase ("10.0.3.0", "255.255.255.0");
   Ipv4InterfaceContainer i23 = ipv4.Assign (d23);
 
-  CompressionDetectionServerHelper server (port);
-	ApplicationContainer apps = server.Install(c.Get (3));
-  apps.Start(Seconds (1.0));
-  apps.Stop(Seconds (500.0));
+  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
-  CompressionDetectionClientHelper client ( i23.GetAddress(1), port);
-  client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
+  CompressionDetectionServerHelper server1 (2000);
+	ApplicationContainer apps = server1.Install(c.Get (3));
+  apps.Start(Seconds (1.0));
+  apps.Stop(Seconds (150.0));
+
+  CompressionDetectionClientHelper client1 ( i23.GetAddress(1), 2000);
+  //client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
   //client.SetAttribute ("Interval", TimeValue (interPacketInterval));
   //client.SetAttribute ("PacketSize", UintegerValue (packetSize));
-	apps = client.Install (c.Get (0));
+  client1.SetAttribute("SetEntropy", BooleanValue (false));
+	apps = client1.Install (c.Get (0));
   apps.Start (Seconds (2.0));
-  apps.Stop (Seconds (500.0));
+  apps.Stop (Seconds (150.0));
+  Ptr<CompressionDetectionServer> udpServer = server1.GetServer();
+
+  
+  CompressionDetectionServerHelper server2 (4000);
+	apps = server2.Install(c.Get (3));
+  apps.Start(Seconds (152.0));
+  apps.Stop(Seconds (300.0));
+
+  CompressionDetectionClientHelper client2 ( i23.GetAddress(1), 4000);
+  //client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
+  //client.SetAttribute ("Interval", TimeValue (interPacketInterval));
+  //client.SetAttribute ("PacketSize", UintegerValue (packetSize));
+  client2.SetAttribute("SetEntropy", BooleanValue (true));
+	apps = client2.Install (c.Get (0));
+  apps.Start (Seconds (153.0));
+  apps.Stop (Seconds (300.0));
+  Ptr<CompressionDetectionServer> udpServer2 = server2.GetServer();
+
 
 
 	//client.SetFill (apps.Get (0), fill);
 
   // Create router nodes, initialize routing database and set up the routing
   // tables in the nodes.
-  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-
-  AsciiTraceHelper ascii;
-  p2p.EnableAsciiAll (ascii.CreateFileStream ("finalRunner.tr"));
-  p2p.EnablePcapAll ("finalRunner");
+ 
+  //AsciiTraceHelper ascii;
+  //p2p.EnableAsciiAll (ascii.CreateFileStream ("p2p.tr"));
+  //p2p.EnablePcapAll ("p2p");
 
   Simulator::Run ();
   Simulator::Destroy ();
+
+  Time delay = udpServer->GetTimeDifference();
+	//cout << "Delay Low Entropy: " << delay.GetMilliSeconds() << "ms" << endl;
+  NS_LOG_INFO ("Delay Low Entropy: " << delay.GetMilliSeconds() << "ms");
+	Time delay2 = udpServer2->GetTimeDifference();
+	//cout << "Delay High Entropy: " << delay2.GetMilliSeconds() << "ms" << endl;
+  NS_LOG_INFO ("Delay High Entropy: " << delay2.GetMilliSeconds() << "ms");
+	Time deltaLH = (delay2 - delay); // convert nanoseconds to milliseconds
+	if(deltaLH.GetMilliSeconds() > 100) {
+		NS_LOG_INFO ("Compression Detected");
+	}
+	else {
+	 NS_LOG_INFO ("No Compression Detected");
+	}
+	return 0;
 }
 

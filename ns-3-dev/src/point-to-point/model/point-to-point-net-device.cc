@@ -606,7 +606,7 @@ PointToPointNetDevice::Send (
     }
 
   // Enqueue may fail (overflow)
-
+  NS_LOG_INFO("Leaving PPP Send Method...");
   m_macTxDropTrace (packet);
   return false;
 }
@@ -742,51 +742,45 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     packet->RemoveHeader (udpHeader);
 
     //Compress packet data using LZS compression
-    uint32_t size = packet->GetSize();
-    uint8_t raw_data[size + 2] = {0};
-    //vector<uint8_t> raw_data
-    uint8_t compressed_data[size+2];
+    int size = packet->GetSize();
+    uint8_t *raw_data = new uint8_t[size + 2];    
+    raw_data[0] = 0x00;
+    raw_data[1] = 0x21;
+    packet->CopyData((&raw_data[2]), size);
+    
+    size = size + 2;
+    uint8_t *initial_size = new uint8_t[2];
+    memcpy(initial_size, &size, sizeof(size));
+    uint8_t *compressed_data = new uint8_t[size * 2];
 
-		PppHeader protoHeader;
-		packet->PeekHeader (protoHeader);
-		uint16_t packetProtocol = header.GetProtocol ();
-		raw_data[0] = packetProtocol;
-
-    packet->CopyData(raw_data + 2, size);
-
-    z_stream defstream;
-    defstream.zalloc = Z_NULL;
-    defstream.zfree = Z_NULL;
-    defstream.opaque = Z_NULL;
+		
+    //z_stream defstream;
+    //defstream.zalloc = Z_NULL;
+    //defstream.zfree = Z_NULL;
+    //defstream.opaque = Z_NULL;
     // setup "raw_data" as the input and "compressed_data" as the compressed output
-    defstream.avail_in = (uInt)sizeof(raw_data); // size of input, string + terminator
-    defstream.next_in = (Bytef *)raw_data; // input char array
-    defstream.avail_out = (uInt)sizeof(compressed_data); // size of output
-    defstream.next_out = (Bytef *)(compressed_data); // output char array
+    //defstream.avail_in = (uInt)sizeof(raw_data); // size of input, string + terminator
+    //defstream.next_in = (Bytef *)raw_data; // input char array
+    //defstream.avail_out = (uInt)sizeof(compressed_data); // size of output
+    //defstream.next_out = (Bytef *)(compressed_data); // output char array
+    uLongf destlen = compressBound(size);
+    compress2(&compressed_data[2], &destlen, raw_data, size,9);
+    compressed_data[0] = initial_size[0];
+    compressed_data[1] = initial_size[1];
 
     // the actual compression work.
-    deflateInit(&defstream, Z_BEST_COMPRESSION);
-    deflate(&defstream, Z_FINISH);
-    deflateEnd(&defstream);
+    //deflateInit(&defstream, Z_BEST_COMPRESSION);
+    //deflate(&defstream, Z_FINISH);
+    //deflateEnd(&defstream);
     //End of lZS compression for packet
 
-		uint8_t pos = size + 1;
-		uint8_t arrSize = 0;
-		do
-			{
-				arrSize++;
-				pos--;
-			} while (compressed_data[pos] == 0);
-
-		std::cout << "arraySize: " << (int)arrSize << " pos: " << (int)pos << std::endl;
-
-		uint8_t shortened[arrSize] = {0};
-		std::copy (compressed_data, compressed_data + arrSize, shortened);
-
+    size = destlen;
     //Add compressed_data to data section of new packet to return, then add header
-    result = Create<Packet> (shortened, sizeof(shortened));
+    result = Create<Packet> (compressed_data, size);
     header.SetProtocol (0x4021);
+    udpHeader.ForcePayloadSize(size);
     result->AddHeader (udpHeader);
+    ipHeader.SetPayloadSize(size);
     result->AddHeader (ipHeader);
     result->AddHeader (header);
 
@@ -804,48 +798,43 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     PppHeader header;
     ns3::Ipv4Header ipHeader;
     ns3::UdpHeader udpHeader;
+    uint32_t size = packet->GetSize();
     packet->RemoveHeader (header);
 
-    packet->RemoveHeader (ipHeader);
-    packet->RemoveHeader (udpHeader);
-
+    int len = packet->RemoveHeader (ipHeader);
+    size -= len;
+    len = packet->RemoveHeader (udpHeader);
+    size -= len;
+    
     //Decompress packet data here
     // inflate b into c
     // zlib struct
-    uint32_t size = packet->GetSize();
-    uint8_t compressed_data[size];
-    uint8_t uncompressed_data[size];
-		packet->CopyData(compressed_data, size);
+    
+    uint8_t *compressed_data = new uint8_t[size];
+    packet->CopyData(compressed_data, size);
 
-    z_stream infstream;
-    infstream.zalloc = Z_NULL;
-    infstream.zfree = Z_NULL;
-    infstream.opaque = Z_NULL;
-    // setup "b" as the input and "c" as the compressed output
-    infstream.avail_in = (uInt)(size); // size of input
-    infstream.next_in = (Bytef *)compressed_data; // input char array
-    infstream.avail_out = (uInt)sizeof(uncompressed_data); // size of output
-    infstream.next_out = (Bytef *)uncompressed_data; // output char array
+    uint8_t *original_header_size = new uint8_t[2];
+    original_header_size[0] = compressed_data[0];
+    original_header_size[1] = compressed_data[1];
 
-    // the actual DE-compression work.
-    inflateInit(&infstream);
-    inflate(&infstream, Z_NO_FLUSH);
-    inflateEnd(&infstream);
-    //End of LZS decompression for packet
-
-		//uint16_t packetProtocol = uncompressed_data[0];
+    int a = int((unsigned char)(original_header_size[1]) << 8 |
+            (unsigned char)(original_header_size[0]));
+    uLongf uncomp_data_size = a;
+    uint8_t *uncompressed_data = new uint8_t[uncomp_data_size]; //if size causes problems, change it
+    int error = uncompress(uncompressed_data, &uncomp_data_size, &compressed_data[2], size);//First two bytes is data length
+    NS_LOG_DEBUG(error);
+    uncompressed_data = &uncompressed_data[2];
+    uncomp_data_size = uncomp_data_size - 2;
 
     //Add decompressed data to packet, then add the header
-    result = Create<Packet> (uncompressed_data + 2, sizeof(uncompressed_data)-2);
+    result = Create<Packet> (uncompressed_data, uncomp_data_size);
     //remove "0x4021" from decompressed data
 
-		//it's broken yo
-		//std::vector<char> protocolTobyteArray = GetArrayofByte(0x4021);
-    //result ->RemoveAtStart(protocolTobyteArray.size());
-    //Add "0x0021" as header to complete re-creation of original packet sent
-    //header.SetProtocol (packetProtocol);
     header.SetProtocol (0x0021);    //just set protocol manually, any other way causes issues
+    int udp_header_size = uncomp_data_size + 8;
+    udpHeader.ForcePayloadSize(udp_header_size);
     result->AddHeader (udpHeader);
+    ipHeader.SetPayloadSize(udp_header_size);
     result->AddHeader (ipHeader);
     result->AddHeader (header);
     return result;
