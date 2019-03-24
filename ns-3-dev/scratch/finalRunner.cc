@@ -121,8 +121,8 @@ main (int argc, char *argv[])
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
   AsciiTraceHelper ascii;
-  p2p.EnableAsciiAll (ascii.CreateFileStream ("p2p.tr"));
-  p2p.EnablePcapAll ("p2p");
+  p2p.EnableAsciiAll (ascii.CreateFileStream ("finalRunner.tr"));
+  p2p.EnablePcapAll ("finalRunner");
 
   Simulator::Run ();
   Simulator::Destroy ();

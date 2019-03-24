@@ -71,6 +71,7 @@ namespace ns3 {
 	CompressionDetectionServer::CompressionDetectionServer () : m_lossCounter (0)
 	{
 		NS_LOG_FUNCTION (this);
+		difference = 0;
 		m_received=0;
 	}
 	
@@ -170,8 +171,8 @@ namespace ns3 {
 		
 		while ((packet = socket->RecvFrom (from)))
 			{
-				
-							
+				temp = Simulator::Now();
+
 				socket->GetSockName (localAddress);
 				m_rxTrace (packet);
 				m_rxTraceWithAddresses (packet, from, localAddress);
@@ -183,34 +184,41 @@ namespace ns3 {
 						packet->RemoveHeader (seqTs);
 						uint32_t currentSequenceNumber = seqTs.GetSeq ();
 
-						if(!hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
-							firstLow = Simulator::Now();
+						if(!hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet))
+						{
+							firstLow = temp;
 							hasSeenFirstLowEntropyPacket = true;
 						}
 						else if(hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
-							lastLow = Simulator::Now();
+							lastLow = temp;
+							hasSeenFirstLowEntropyPacket = false;
 						}
 						else if(!hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
-							firstHigh = Simulator::Now();
+							firstHigh = temp;
 							hasSeenFirstHighEntropyPacket = true;
 						}
 						else if(hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
-							lastHigh = Simulator::Now();
+							lastHigh = temp;
+							hasSeenFirstHighEntropyPacket = false;
 						}
 						
 						m_lossCounter.NotifyReceived (currentSequenceNumber);
 						m_received++;
+
+						if (hasSeenFirstHighEntropyPacket && hasSeenFirstHighEntropyPacket)
+							{
+								int64_t firstLowMs = firstLow.GetMilliSeconds();
+								int64_t lastLowMs = lastLow.GetMilliSeconds();
+								int64_t firstHighMs = firstHigh.GetMilliSeconds();
+								int64_t lastHighMs = lastHigh.GetMilliSeconds();
+
+								int64_t deltaLow = lastLowMs - firstLowMs;
+								int64_t deltaHigh = lastHighMs - firstHighMs;
+
+								difference += abs(deltaHigh - deltaLow); 	//abs value was important to make it detect compression in links, was getting negative values for valid compression links
+							}
 					}
 			}
-			int64_t firstLowMs = firstLow.GetMilliSeconds();
-			int64_t lastLowMs = lastLow.GetMilliSeconds();
-
-			int64_t firstHighMs = firstHigh.GetMilliSeconds();
-			int64_t lastHighMs = lastHigh.GetMilliSeconds();
-			int64_t deltaLow = lastLowMs - firstLowMs;
-			int64_t deltaHigh = lastHighMs - firstHighMs;
-
-			difference = abs(deltaHigh - deltaLow); 	//abs value was important to make it detect compression in links, was getting negative values for valid compression links
 	}
 	
 	//checks if a packet's data contains only zeros. If so, it's a low entropy packet

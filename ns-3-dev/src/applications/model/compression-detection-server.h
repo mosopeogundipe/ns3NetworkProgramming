@@ -61,10 +61,11 @@
    PacketLossCounter m_lossCounter; 
 
    //variables used to test compression
-    Time firstLow= Time();
-	  Time lastLow= Time();
-    Time firstHigh= Time();
-	  Time lastHigh= Time();
+    Time firstLow;
+	  Time lastLow;
+    Time firstHigh;
+	  Time lastHigh;
+		Time temp;
 
     bool hasSeenFirstLowEntropyPacket = false;
     bool hasSeenFirstHighEntropyPacket = false;
