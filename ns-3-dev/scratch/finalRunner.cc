@@ -20,8 +20,8 @@ main (int argc, char *argv[])
 {
   //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
   //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
-  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
-  //LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
+  LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
+  LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
   LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
   LogComponentEnable ("ControlTest", LOG_LEVEL_ERROR);
   //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ERROR);

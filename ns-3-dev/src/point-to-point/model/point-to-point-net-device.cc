@@ -365,7 +365,6 @@ PointToPointNetDevice::SetReceiveErrorModel (Ptr<ErrorModel> em)
 void
 PointToPointNetDevice::Receive (Ptr<Packet> packet)
 {
-	std::cout << std::endl;
   NS_LOG_FUNCTION (this << packet);
 
 	uint16_t protocol = 0;
@@ -398,7 +397,6 @@ PointToPointNetDevice::Receive (Ptr<Packet> packet)
 
 			if (!weAreCompressing && protocol == 0x4021)
 				{
-					std::cout << "decompressing in receive" << std::endl;
 					updatedPacket = DecodePacket (updatedPacket);
 				}
 
@@ -409,15 +407,6 @@ PointToPointNetDevice::Receive (Ptr<Packet> packet)
       // normal receive callback sees.
       //
       ProcessHeader (updatedPacket, protocol);
-
-			uint8_t packetData [updatedPacket->GetSize ()];
-			updatedPacket->CopyData (packetData, updatedPacket->GetSize ());
-			std::cout << "NetDevice Receive after ProcessHeader with size: " << packet->GetSize() << " and data: " << std::endl;
-			for (uint16_t i=0; i<updatedPacket->GetSize (); ++i)
-				{
-					std::cout << int(packetData[i]) << ",";
-				}
-				std::cout << std::endl;
 
       if (!m_promiscCallback.IsNull ())
         {
@@ -565,15 +554,6 @@ PointToPointNetDevice::Send (
   NS_LOG_LOGIC ("p=" << packet << ", dest=" << &dest);
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
 
-	uint8_t packetData [packet->GetSize ()];
-	packet->CopyData (packetData, packet->GetSize ());
-	std::cout << "ND Send with size: " << packet->GetSize() << " and data: " << std::endl;
-	for (uint16_t i=0; i<packet->GetSize (); ++i)
-	{
-		std::cout << int(packetData[i]) << ",";
-	}
-	std::cout << std::endl;
-
   //
   // If IsLinkUp() is false it means there is no channel to send any packet 
   // over so we just hit the drop trace on the packet and return an error.
@@ -596,16 +576,6 @@ PointToPointNetDevice::Send (
       NS_LOG_ERROR("Packet being encoded");
 			newPacket = EncodePacket(packet);    //Enconde the packet and put the value in original packet
 		}
-
-
-	std::cout << "NetDevice Send final packet with size: " << newPacket->GetSize() << " and data: " << std::endl;
-	newPacket->CopyData (packetData, newPacket->GetSize ());
-	for (uint16_t i=0; i<newPacket->GetSize (); ++i)
-	{
-		std::cout << int(packetData[i]) << ",";
-	}
-	std::cout << std::endl;
-
 
   //
   // We should enqueue and dequeue the packet to hit the tracing hooks.
@@ -798,15 +768,6 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     result->AddHeader (ipHeader);
     result->AddHeader (header);
 
-			uint8_t packetData [result->GetSize ()];
-			result->CopyData (packetData, result->GetSize ());
-			std::cout << "NeDevice encode result packet b4 return with size: " << result->GetSize() << " and data: " << std::endl;
-			for (uint16_t i=0; i<result->GetSize (); ++i)
-				{
-					std::cout << int(packetData[i]) << ",";
-				}
-				std::cout << std::endl;
-
     return result;
  }
 
@@ -815,15 +776,6 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
  {
     //Here just remove newest added header, and decompress data to become just the old header and data
     NS_LOG_FUNCTION (this);
-
-		uint8_t buffer[packet->GetSize ()];
-		packet->CopyData (buffer, packet->GetSize ());
-		std::cout << "NetDevice decode initial packet data: " << std::endl;
-		for (uint16_t i = 0; i < packet->GetSize (); ++i)
-			{
-				std::cout << int(buffer[i]) << ",";
-			}
-		std::cout << std::endl;
 
     //Ptr<Packet> result = packet -> Copy();
     Ptr<Packet> result;
@@ -842,13 +794,6 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     uint8_t compressed_data[size];
     uint8_t uncompressed_data[size];
 		packet->CopyData(compressed_data, size);
-
-		std::cout << "NetDevice coppied compressed_data without header:" << std::endl;
-		for (uint16_t i = 0; i < size; ++i)
-			{
-				std::cout << int(compressed_data[i]) << ",";
-			}
-		std::cout << std::endl;
 
     z_stream infstream;
     infstream.zalloc = Z_NULL;

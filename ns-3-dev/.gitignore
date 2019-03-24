@@ -1,3 +1,4 @@
+*.swp
 *.diff
 *.orig
 *.patch
