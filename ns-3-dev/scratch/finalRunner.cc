@@ -20,10 +20,10 @@ main (int argc, char *argv[])
 {
   //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
   //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
-  LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
-  LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
-  LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
-  LogComponentEnable ("ControlTest", LOG_LEVEL_ERROR);
+  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
+  //LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
+  //LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
+  //LogComponentEnable ("ControlTest", LOG_LEVEL_ERROR);
   //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ERROR);
   //LogComponentEnable ("PointToPointHelper", LOG_LEVEL_ERROR);
 
@@ -70,6 +70,7 @@ main (int argc, char *argv[])
   p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
   NS_LOG_ERROR("enable compression:" << enableCompression);
 	p2p.SetCompress (enableCompression);
+	std::cout << enableCompression << std::endl;
   NetDeviceContainer d12 = p2p.Install (c12);
 
 	//setting the regular link speeds

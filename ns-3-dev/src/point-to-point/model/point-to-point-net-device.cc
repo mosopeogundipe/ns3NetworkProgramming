@@ -566,6 +566,14 @@ PointToPointNetDevice::Send (
     }
 
 	bool shouldCompress = false;
+	for (uint8_t i = 0; i < numProtocols; ++i)
+		{
+			if (compressionProtocols[i] == protocolNumber)
+				{
+					shouldCompress = true;
+					break;
+				}
+		}
 
 	AddHeader (packet, protocolNumber);
 	Ptr<Packet> newPacket = packet->Copy ();
@@ -715,11 +723,7 @@ PointToPointNetDevice::EtherToPpp (uint16_t proto)
     {
     case 0x0800: return 0x0021;   //IPv4
     case 0x86DD: return 0x0057;   //IPv6
-<<<<<<< HEAD
 		case 0x4200: return 0x4021;		//Compression
-=======
-		case 0x4200: return 0x4201;		//Compression
->>>>>>> 67eb6a487bdd9f2f53809d085814d31ec3865dd8
     default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
     }
   return 0;
@@ -736,21 +740,19 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     packet->RemoveHeader (header);
     packet->RemoveHeader (ipHeader);
     packet->RemoveHeader (udpHeader);
-    
-    
 
     //Compress packet data using LZS compression
     uint32_t size = packet->GetSize();
-    uint8_t raw_data[size + 1] = {0};
+    uint8_t raw_data[size + 2] = {0};
     //vector<uint8_t> raw_data
-    uint8_t compressed_data[size * 2] = {0};
+    uint8_t compressed_data[size+2];
 
 		PppHeader protoHeader;
 		packet->PeekHeader (protoHeader);
 		uint16_t packetProtocol = header.GetProtocol ();
 		raw_data[0] = packetProtocol;
 
-    packet->CopyData(raw_data + 1, size);
+    packet->CopyData(raw_data + 2, size);
 
     z_stream defstream;
     defstream.zalloc = Z_NULL;
@@ -768,8 +770,21 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     deflateEnd(&defstream);
     //End of lZS compression for packet
 
+		uint8_t pos = size + 1;
+		uint8_t arrSize = 0;
+		do
+			{
+				arrSize++;
+				pos--;
+			} while (compressed_data[pos] == 0);
+
+		std::cout << "arraySize: " << (int)arrSize << " pos: " << (int)pos << std::endl;
+
+		uint8_t shortened[arrSize] = {0};
+		std::copy (compressed_data, compressed_data + arrSize, shortened);
+
     //Add compressed_data to data section of new packet to return, then add header
-    result = Create<Packet> (compressed_data, sizeof(compressed_data));
+    result = Create<Packet> (shortened, sizeof(shortened));
     header.SetProtocol (0x4021);
     result->AddHeader (udpHeader);
     result->AddHeader (ipHeader);
@@ -821,10 +836,10 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
 		//uint16_t packetProtocol = uncompressed_data[0];
 
     //Add decompressed data to packet, then add the header
-    result = Create<Packet> (uncompressed_data + 1, sizeof(uncompressed_data)-1);
+    result = Create<Packet> (uncompressed_data + 2, sizeof(uncompressed_data)-2);
     //remove "0x4021" from decompressed data
 
-		//Shit's broken yo
+		//it's broken yo
 		//std::vector<char> protocolTobyteArray = GetArrayofByte(0x4021);
     //result ->RemoveAtStart(protocolTobyteArray.size());
     //Add "0x0021" as header to complete re-creation of original packet sent
