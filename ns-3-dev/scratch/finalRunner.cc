@@ -21,17 +21,10 @@ main (int argc, char *argv[])
   Time::SetResolution(Time::NS);
   //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
   //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
-<<<<<<< HEAD
   //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
   //LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
   LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
   LogComponentEnable ("ControlTest", LOG_LEVEL_INFO);
-=======
-  LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
-  LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_ALL);
-  LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_ALL);
-  LogComponentEnable ("ControlTest", LOG_LEVEL_ERROR);
->>>>>>> 67eb6a487bdd9f2f53809d085814d31ec3865dd8
   //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ERROR);
   //LogComponentEnable ("PointToPointHelper", LOG_LEVEL_ERROR);
   uint16_t port = 9;  // well-known echo port number
@@ -85,20 +78,12 @@ main (int argc, char *argv[])
 	//str = std::to_string (outerLinkSpeed) + "Mbps";
 
   p2p.SetDeviceAttribute ("DataRate", StringValue ("8Mbps"));
-<<<<<<< HEAD
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
-=======
-  p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
->>>>>>> 67eb6a487bdd9f2f53809d085814d31ec3865dd8
 	NetDeviceContainer d01 = p2p.Install (c01);
   p2p.EnablePcap("UDPsender", d01.Get(0), false);
 
   p2p.SetDeviceAttribute ("DataRate", StringValue ("8Mbps"));
-<<<<<<< HEAD
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
-=======
-  p2p.SetChannelAttribute ("Delay", StringValue ("0ms"));
->>>>>>> 67eb6a487bdd9f2f53809d085814d31ec3865dd8
 	NetDeviceContainer d23 = p2p.Install (c23);
   p2p.EnablePcap("Decompression",d23.Get(0), false);
 	p2p.EnablePcap("UDPreceiver", d23.Get(1), false);
@@ -127,13 +112,8 @@ main (int argc, char *argv[])
   apps.Start(Seconds (1.0));
   apps.Stop(Seconds (150.0));
 
-<<<<<<< HEAD
   CompressionDetectionClientHelper client1 ( i23.GetAddress(1), 2000);
   //client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
-=======
-  CompressionDetectionClientHelper client ( i23.GetAddress(1), port);
-  client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
->>>>>>> 67eb6a487bdd9f2f53809d085814d31ec3865dd8
   //client.SetAttribute ("Interval", TimeValue (interPacketInterval));
   //client.SetAttribute ("PacketSize", UintegerValue (packetSize));
   client1.SetAttribute("SetEntropy", BooleanValue (false));
@@ -164,18 +144,10 @@ main (int argc, char *argv[])
 
   // Create router nodes, initialize routing database and set up the routing
   // tables in the nodes.
-<<<<<<< HEAD
  
   //AsciiTraceHelper ascii;
   //p2p.EnableAsciiAll (ascii.CreateFileStream ("p2p.tr"));
   //p2p.EnablePcapAll ("p2p");
-=======
-  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-
-  AsciiTraceHelper ascii;
-  p2p.EnableAsciiAll (ascii.CreateFileStream ("finalRunner.tr"));
-  p2p.EnablePcapAll ("finalRunner");
->>>>>>> 67eb6a487bdd9f2f53809d085814d31ec3865dd8
 
   Simulator::Run ();
   Simulator::Destroy ();

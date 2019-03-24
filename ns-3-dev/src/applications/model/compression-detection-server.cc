@@ -178,8 +178,6 @@ namespace ns3 {
 		
 		while ((packet = socket->RecvFrom (from)))
 			{
-				temp = Simulator::Now();
-
 				socket->GetSockName (localAddress);
 				m_rxTrace (packet);
 				m_rxTraceWithAddresses (packet, from, localAddress);
@@ -191,29 +189,8 @@ namespace ns3 {
 						packet->RemoveHeader (seqTs);
 						uint32_t currentSequenceNumber = seqTs.GetSeq ();
 
-<<<<<<< HEAD
 						if(currentSequenceNumber == 0){
 							first = Simulator::Now();
-=======
-						if(!hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet))
-						{
-							firstLow = temp;
-							hasSeenFirstLowEntropyPacket = true;
-							NS_LOG_INFO ("Seen first low entropy packet: " << temp.GetMilliSeconds ());
-						}
-						else if(hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
-							lastLow = temp;
-							NS_LOG_INFO ("Seen non-first low entropy packet: " << temp.GetMilliSeconds ());
-						}
-						else if(!hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
-							firstHigh = temp;
-							hasSeenFirstHighEntropyPacket = true;
-							NS_LOG_INFO ("Seen first high entropy packet: " << temp.GetMilliSeconds ());
-						}
-						else if(hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
-							lastHigh = temp;
-							NS_LOG_INFO ("Seen non-first high entropy packet: " << temp.GetMilliSeconds ());
->>>>>>> 67eb6a487bdd9f2f53809d085814d31ec3865dd8
 						}
 						last = Simulator::Now();
 						// if(!hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
@@ -236,7 +213,6 @@ namespace ns3 {
 
 					}
 			}
-<<<<<<< HEAD
 			// int64_t firstLowMs = firstLow.GetMilliSeconds();
 			// int64_t lastLowMs = lastLow.GetMilliSeconds();
 
@@ -244,15 +220,6 @@ namespace ns3 {
 			// int64_t lastHighMs = lastHigh.GetMilliSeconds();
 			// int64_t deltaLow = lastLowMs - firstLowMs;
 			// int64_t deltaHigh = lastHighMs - firstHighMs;
-=======
-			int64_t firstLowMs = firstLow.GetMilliSeconds();
-			int64_t lastLowMs = lastLow.GetMilliSeconds();
-			int64_t firstHighMs = firstHigh.GetMilliSeconds();
-			int64_t lastHighMs = lastHigh.GetMilliSeconds();
-
-			int64_t deltaLow = lastLowMs - firstLowMs;
-			int64_t deltaHigh = lastHighMs - firstHighMs;
->>>>>>> 67eb6a487bdd9f2f53809d085814d31ec3865dd8
 
 			// difference = deltaHigh - deltaLow; 	//abs value was important to make it detect compression in links, was getting negative values for valid compression links
 	}
