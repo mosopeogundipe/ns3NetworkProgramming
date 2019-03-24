@@ -186,8 +186,13 @@ PointToPointNetDevice::PointToPointNetDevice ()
     m_currentPkt (0)
 {
   NS_LOG_FUNCTION (this);
-	configFile = "compress-config.txt";
+	configFile = "compression-config.json";
 	PopulateProtocolList ();
+	compressionProtocols = new uint16_t [4];
+	compressionProtocols[0] = 0x1800;
+	compressionProtocols[1] = 0x0814;
+	compressionProtocols[2] = 0x0800;
+	compressionProtocols[3] = 0x1111;
 }
 
 PointToPointNetDevice::~PointToPointNetDevice ()
@@ -199,25 +204,7 @@ PointToPointNetDevice::~PointToPointNetDevice ()
 void
 PointToPointNetDevice::PopulateProtocolList (void)
 {
-	std::string line;
-	std::ifstream readFile (configFile);
-	if (readFile.is_open ())
-		{
-			uint8_t i = 0;
-			while (getline (readFile,line) )
-				{
-					if ( i == 0 )
-						{
-							compressionProtocols = new uint16_t [std::stoi (line)];
-							numProtocols = std::stoi (line);
-						}
-					else
-						{
-							compressionProtocols [i - 1] = std::stoi (line);
-						}
-					i++;
-				}
-		}
+	std::cout << "still need to populate" << std::endl;
 }
 
 void
@@ -568,7 +555,7 @@ PointToPointNetDevice::Send (
   m_macTxTrace (packet);
 	Ptr<Packet> newPacket = packet->Copy ();
 
-	for (uint8_t i = 0; i < numProtocols; ++i)
+	for (uint8_t i = 0; i < sizeof(compressionProtocols); ++i)
 		{
 			if (protocolNumber == compressionProtocols[i])
 				{
@@ -738,6 +725,8 @@ PointToPointNetDevice::EncodePacket(Ptr<Packet> packet) //HINT.SOPE: Network Pro
     packet->RemoveHeader (header);
     packet->RemoveHeader (ipHeader);
     packet->RemoveHeader (udpHeader);
+    
+    
 
     //Compress packet data using LZS compression
     uint32_t size = packet->GetSize();
