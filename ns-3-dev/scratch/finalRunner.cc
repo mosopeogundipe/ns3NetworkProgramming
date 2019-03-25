@@ -145,9 +145,14 @@ main (int argc, char *argv[])
   // Create router nodes, initialize routing database and set up the routing
   // tables in the nodes.
  
-  //AsciiTraceHelper ascii;
-  //p2p.EnableAsciiAll (ascii.CreateFileStream ("p2p.tr"));
-  //p2p.EnablePcapAll ("p2p");
+  AsciiTraceHelper ascii;
+	if (enableCompression) {
+		p2p.EnableAsciiAll (ascii.CreateFileStream (midLinkSpeed + "mbps-compression-application.tr"));
+  	p2p.EnablePcapAll (midLinkSpeed + "mbps-compression-application");
+	} else {
+		p2p.EnableAsciiAll (ascii.CreateFileStream (midLinkSpeed + "mbps-nocompression-application.tr"));
+  	p2p.EnablePcapAll (midLinkSpeed + "mbps-nocompression-application");
+	}
 
   Simulator::Run ();
   Simulator::Destroy ();
