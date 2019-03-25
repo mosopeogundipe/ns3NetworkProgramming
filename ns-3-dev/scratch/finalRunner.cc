@@ -158,8 +158,9 @@ main (int argc, char *argv[])
 	Time delay2 = udpServer2->GetTimeDifference();
 	//cout << "Delay High Entropy: " << delay2.GetMilliSeconds() << "ms" << endl;
   NS_LOG_INFO ("Delay High Entropy: " << delay2.GetMilliSeconds() << "ms");
-	Time deltaLH = (delay2 - delay); // convert nanoseconds to milliseconds
-	if(deltaLH.GetMilliSeconds() > 100) {
+	Time delta = (delay2 - delay); // convert nanoseconds to milliseconds
+  NS_LOG_INFO ("Delta: " << delta.GetMilliSeconds());
+	if(delta.GetMilliSeconds() > 100) {
 		NS_LOG_INFO ("Compression Detected");
 	}
 	else {
