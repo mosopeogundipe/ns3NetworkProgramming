@@ -21,17 +21,15 @@ main (int argc, char *argv[])
   Time::SetResolution(Time::NS);
   //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
   //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
-  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
+  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
   //LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
-  LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
-  LogComponentEnable ("ControlTest", LOG_LEVEL_INFO);
+  LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_ALL);
+  //LogComponentEnable ("ControlTest", LOG_LEVEL_INFO);
   //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ERROR);
   //LogComponentEnable ("PointToPointHelper", LOG_LEVEL_ERROR);
   uint16_t port = 9;  // well-known echo port number
   //uint32_t packetSize = 32; // this will be set by the app
   uint32_t maxPacketCount = 12000; // this will be set by the app
-	//uint8_t midLinkSpeed = 1;
-	//uint8_t outerLinkSpeed = 8;
   std::string midLinkSpeed = "1";
 	std::string outerLinkSpeed = "8";
 	bool enableCompression = false;

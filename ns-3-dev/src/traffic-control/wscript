@@ -21,6 +21,14 @@ def build(bld):
       'model/prio-queue-disc.cc',
       'model/mq-queue-disc.cc',
       'model/tbf-queue-disc.cc',
+			'model/source-addr-packet-filter.cc',
+			'model/source-mask-packet-filter.cc',
+			'model/source-port-packet-filter.cc',
+			'model/dest-addr-packet-filter.cc',
+			'model/dest-mask-packet-filter.cc',
+			'model/dest-port-packet-filter.cc',
+			'model/protocol-packet-filter.cc',
+			'model/filter-list.cc',
       'helper/traffic-control-helper.cc',
       'helper/queue-disc-container.cc'
         ]
@@ -53,6 +61,14 @@ def build(bld):
       'model/prio-queue-disc.h',
       'model/mq-queue-disc.h',
       'model/tbf-queue-disc.h',
+			'model/source-addr-packet-filter.h',
+			'model/source-mask-packet-filter.h',
+			'model/source-port-packet-filter.cc',
+			'model/dest-addr-packet-filter.h',
+			'model/dest-mask-packet-filter.h',
+			'model/dest-port-packet-filter.h',
+			'model/protocol-packet-filter.h',
+			'model/filter-list.h',
       'helper/traffic-control-helper.h',
       'helper/queue-disc-container.h'
         ]
