@@ -16,31 +16,37 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef FILTER_LIST_H
-#define FILTER_LIST_H
+#ifndef FILTER_H
+#define FILTER_H
 
 #include "ns3/packet.h"
 #include "ns3/packet-filter.h"
 #include <vector>
 #include "ns3/ptr.h"
+#include "ns3/filter-element.h"
 
 namespace ns3 {
 
-class PacketFilter;
+class FilterElement;
 
-class FilterList {
+class Filter {
 public:
 	static TypeId GetTypeId (void);
-	FilterList ();
-	~FilterList ();
+	Filter ();
+	~Filter ();
 
-	void AddFilter (Ptr<PacketFilter> filter);
+	void AddFilter (Ptr<FilterElement> element);
 	bool Match (Ptr<Packet> packet);
 
+	/**
+	* this is here to allow it to be in a Ptr<Filter>
+	**/
+	void Unref ();
+
 private:
-	std::vector<Ptr<PacketFilter>> filters;
+	std::vector<Ptr<FilterElement>> elements;
 };
 
 } // namespace ns3
 
-#endif /* FILTER_LIST */
+#endif /* FILTER */

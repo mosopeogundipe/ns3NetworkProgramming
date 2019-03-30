@@ -40,7 +40,7 @@ public:
    */
   static TypeId GetTypeId (void);
 
-  SourceMaskFilterElement (Ipv4Address addr, Ipv4Mask ipMask);
+  SourceMaskFilterElement (Ipv4Address startAddr, Ipv4Address endAddr);
   virtual ~SourceMaskFilterElement ();
 
   /**
@@ -55,8 +55,10 @@ public:
   bool Match (Ptr<Packet> packet) const;
 
 private:
-	Ipv4Mask mask;
-	Ipv4Address address;
+	Ipv4Address startAddress;
+	uint32_t startBits;
+	Ipv4Address endAddress;
+	uint32_t endBits;
 };
 
 } // namespace ns3

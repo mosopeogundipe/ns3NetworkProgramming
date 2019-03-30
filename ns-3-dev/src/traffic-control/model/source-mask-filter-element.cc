@@ -42,11 +42,13 @@ SourceMaskFilterElement::GetTypeId (void)
   return tid;
 }
 
-SourceMaskFilterElement::SourceMaskFilterElement (Ipv4Address addr, Ipv4Mask ipv4Mask)
+SourceMaskFilterElement::SourceMaskFilterElement (Ipv4Address startAddr, Ipv4Address endAddr)
 {
   NS_LOG_FUNCTION (this);
-	mask = ipv4Mask;
-	address = addr;
+	startAddress = startAddr;
+	startBits = startAddr.Get ();
+	endAddress = endAddr;
+	endBits = endAddr.Get ();
 }
 
 SourceMaskFilterElement::~SourceMaskFilterElement()
@@ -59,18 +61,15 @@ SourceMaskFilterElement::Match (Ptr<Packet> packet) const
 {
   NS_LOG_FUNCTION (this);
 
+	uint32_t compareBits;
 	ns3::Ipv4Header ipHeader;
 	Ipv4Address compareAddr;
 
 	packet->PeekHeader (ipHeader);
 	compareAddr = ipHeader.GetSource ();
+	compareBits = compareAddr.Get ();
 
-	if (mask.IsMatch (address, compareAddr))
-		{
-			return true;
-		}
-
-	return false;
+	return (compareBits >= startBits && compareBits < endBits);
 }
 
 } // namespace ns3

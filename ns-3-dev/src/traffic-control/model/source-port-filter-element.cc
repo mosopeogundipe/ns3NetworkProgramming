@@ -22,7 +22,7 @@
 #include "source-port-filter-element.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/ipv4-address.h"
-#include "ns3/ipv4-header.h"
+#include "ns3/tcp-header.h"
 #include "ns3/packet.h"
 #include "ns3/filter-element.h"
 
@@ -57,14 +57,12 @@ bool
 SourcePortFilterElement::Match (Ptr<Packet> packet) const
 {
   NS_LOG_FUNCTION (this);
-	//TODO idk how to get port
-	ns3::Ipv4Header ipHeader;
-	Ipv4Address compareAddr;
 
-	packet->PeekHeader (ipHeader);
-	compareAddr = ipHeader.GetSource ();
+	ns3::TcpHeader tcpHeader;
 
-	return false;
+	packet->PeekHeader (tcpHeader);
+
+	return tcpHeader.GetSourcePort () == port;
 }
 
 } // namespace ns3

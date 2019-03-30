@@ -22,7 +22,7 @@
 #include "dest-port-filter-element.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/ipv4-address.h"
-#include "ns3/ipv4-header.h"
+#include "ns3/tcp-header.h"
 #include "ns3/packet.h"
 #include "ns3/filter-element.h"
 
@@ -58,14 +58,11 @@ DestPortFilterElement::Match (Ptr<Packet> packet) const
 {
   NS_LOG_FUNCTION (this);
 
-	//TODO idk how to get port
-	ns3::Ipv4Header ipHeader;
-	Ipv4Address compareAddr;
+	ns3::TcpHeader tcpHeader;
 
-	packet->PeekHeader (ipHeader);
-	compareAddr = ipHeader.GetDestination ();
+	packet->PeekHeader (tcpHeader);
 
-	return false;
+	return tcpHeader.GetDestinationPort () == port;
 }
 
 } // namespace ns3

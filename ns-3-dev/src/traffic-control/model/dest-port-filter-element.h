@@ -26,8 +26,6 @@
 
 namespace ns3 {
 
-class QueueDiscItem;
-
 /**
  * \ingroup traffic-control
  *

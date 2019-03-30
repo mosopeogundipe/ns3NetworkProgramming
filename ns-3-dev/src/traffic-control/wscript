@@ -29,7 +29,8 @@ def build(bld):
 			'model/dest-mask-filter-element.cc',
 			'model/dest-port-filter-element.cc',
 			'model/protocol-filter-element.cc',
-			'model/filter-list.cc',
+			'model/filter.cc',
+			'model/traffic-class.cc',
       'helper/traffic-control-helper.cc',
       'helper/queue-disc-container.cc'
         ]
@@ -65,12 +66,13 @@ def build(bld):
 			'model/filter-element.h',
 			'model/source-addr-filter-element.h',
 			'model/source-mask-filter-element.h',
-			'model/source-port-filter-element.cc',
+			'model/source-port-filter-element.h',
 			'model/dest-addr-filter-element.h',
 			'model/dest-mask-filter-element.h',
 			'model/dest-port-filter-element.h',
 			'model/protocol-filter-element.h',
-			'model/filter-list.h',
+			'model/filter.h',
+			'model/traffic-class.h',
       'helper/traffic-control-helper.h',
       'helper/queue-disc-container.h'
         ]

@@ -64,12 +64,7 @@ SourceAddrFilterElement::Match (Ptr<Packet> packet) const
 	packet->PeekHeader (ipHeader);
 	compareAddr = ipHeader.GetSource ();
 
-	if (address.IsEqual (compareAddr))
-		{
-			return true;
-		}
-
-	return false;
+	return address.IsEqual (compareAddr);
 }
 
 } // namespace ns3
