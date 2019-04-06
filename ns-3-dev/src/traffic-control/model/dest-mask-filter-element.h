@@ -23,6 +23,7 @@
 #include "ns3/inet-socket-address.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/packet.h"
+#include "ns3/filter-element.h"
 
 namespace ns3 {
 
@@ -32,7 +33,7 @@ class QueueDiscItem;
  * \ingroup traffic-control
  *
  */
-class DestMaskFilterElement: public Object {
+class DestMaskFilterElement: public FilterElement {
 public:
   /**
    * \brief Get the type ID.

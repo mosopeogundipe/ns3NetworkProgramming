@@ -57,6 +57,7 @@ Filter::Match (Ptr<Packet> packet)
 					return false;
 				}
 		}
+
 	return true;
 }
 

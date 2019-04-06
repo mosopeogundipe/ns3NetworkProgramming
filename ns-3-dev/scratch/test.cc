@@ -21,6 +21,7 @@
 #include "ns3/dest-port-filter-element.h"
 #include "ns3/dest-mask-filter-element.h"
 #include "ns3/protocol-filter-element.h"
+#include "ns3/filter.h"
 
 using namespace ns3;
 
@@ -33,17 +34,34 @@ main (int argc, char *argv[])
 	TcpHeader tHead;
 	Ipv4Header iHead;
 
-	Ipv4Address addr = Ipv4Address ("111.111.111.111");
+	Ipv4Address addr = Ipv4Address ("111.111.001.113");
 	//Ipv4Address addr2 = Ipv4Address ("112.112.112.112");
 
-	//Ipv4Address start = Ipv4Address ("111.111.111.000");
-	//Ipv4Address end = Ipv4Address ("111.111.111.255");
+	Ipv4Address start1 = Ipv4Address ("000.000.000.000");
+	Ipv4Address end1 = Ipv4Address ("255.255.255.255");
 
-	uint8_t port = 12;
+	Ipv4Address start2 = Ipv4Address ("111.111.000.111");
+	Ipv4Address end2 = Ipv4Address ("200.194.234.111");
+
+	Ipv4Address start3 = Ipv4Address ("111.111.000.255");
+	Ipv4Address end3 = Ipv4Address ("199.122.255.255");
+
+	SourceMaskFilterElement f1 = SourceMaskFilterElement (start1, end1);
+	SourceMaskFilterElement f2 = SourceMaskFilterElement (start2, end2);
+	SourceMaskFilterElement f3 = SourceMaskFilterElement (start3, end3);
+
+	Ptr<SourceMaskFilterElement> fe1 (&f1);
+	Ptr<SourceMaskFilterElement> fe2 (&f2);
+	Ptr<SourceMaskFilterElement> fe3 (&f3);
+
+	Filter filter;
+
+	filter.AddFilter (fe1);
+	filter.AddFilter (fe2);
+	filter.AddFilter (fe3);
 
 	tHead.SetDestinationPort (11);
-	iHead.SetDestination (addr);
-	iHead.SetProtocol (port);
+	iHead.SetSource (addr);
 	p.AddHeader (iHead);
 	//p.AddHeader (tHead);
 
@@ -52,6 +70,6 @@ main (int argc, char *argv[])
 
 	Ptr<Packet> pp = Ptr<Packet> (&p);
 
-	std::cout << "f match " << f.Match (pp) << std::endl;
+	std::cout << "f match " << filter.Match (pp) << std::endl;
 }
 
