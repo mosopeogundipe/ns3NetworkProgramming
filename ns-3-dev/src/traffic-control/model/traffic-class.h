@@ -15,7 +15,7 @@ namespace ns3 {
 
 class TrafficClass:public Object {
 public:
-	std::vector<Ptr<Filter>> filters;
+	std::vector<Filter> filters;
 
 	void SetBytes (uint32_t b);
 	void SetPackets (uint32_t p);
@@ -25,7 +25,11 @@ public:
 	void SetPriorityLevel (uint32_t p);
 	void SetIsDefault (bool b);
 	void SetMQueue (std::queue<Ptr<ns3::Packet>> q);
-	void Unref ();
+	void Unref (); //required for pointers
+
+	double_t GetWeight ();
+	uint32_t GetPriorityLevel ();
+	bool IsDefault ();
 
   /**
    * \brief Get the type ID.
