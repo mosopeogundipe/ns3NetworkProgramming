@@ -7,6 +7,9 @@
 #include <queue>
 #include <vector>
 #include "ns3/traffic-class.h"
+#include "ns3/uinteger.h"
+#include "ns3/double.h"
+#include "ns3/boolean.h"
 
 namespace ns3 {
 
@@ -21,6 +24,31 @@ TrafficClass::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::TrafficClass")
     .SetParent<Object> ()
     .SetGroupName ("TrafficControl")
+		.AddAttribute ("MaxBytes",
+									 "The maximum number of bytes that will be held in this TrafficClass' queue",
+									 UintegerValue (UINT32_MAX),
+									 MakeUintegerAccessor (&TrafficClass::maxBytes),
+									 MakeUintegerChecker<uint32_t> ())
+		.AddAttribute ("MaxPackets",
+									 "The maximum number of packets that will be held in this TrafficClass' queue",
+									 UintegerValue (UINT32_MAX),
+									 MakeUintegerAccessor (&TrafficClass::maxPackets),
+									 MakeUintegerChecker<uint32_t> ())
+		.AddAttribute ("PriorityLevel",
+									 "The priority level assigned to this TrafficClass",
+									 UintegerValue (0),
+									 MakeUintegerAccessor (&TrafficClass::priority_level),
+									 MakeUintegerChecker<uint32_t> ())
+		.AddAttribute ("Weight",
+									 "The weight assigned to this TrafficClass",
+									 DoubleValue (0),
+									 MakeDoubleAccessor (&TrafficClass::weight),
+									 MakeDoubleChecker<double_t> ())
+		.AddAttribute ("IsDefault",
+									 "Whether or not this is the default TrafficClass",
+									 BooleanValue (false),
+									 MakeBooleanAccessor (&TrafficClass::isDefault),
+									 MakeBooleanChecker ())
   ;
   return tid;
 }
@@ -34,6 +62,8 @@ TrafficClass::Unref ()
 TrafficClass::TrafficClass ()
 {
 	NS_LOG_FUNCTION (this);
+	bytes = 0;
+	packets = 0;
 }
 
 TrafficClass::~TrafficClass ()
@@ -41,46 +71,6 @@ TrafficClass::~TrafficClass ()
 	NS_LOG_FUNCTION (this);
 	delete &m_queue;
 	delete &filters;
-}
-
-void
-TrafficClass::SetBytes (uint32_t b)
-{
-	NS_LOG_FUNCTION (this << b);
-
-	bytes = b;
-}
-
-void
-TrafficClass::SetPackets (uint32_t p)
-{
-	NS_LOG_FUNCTION (this << p);
-
-	packets = p;
-}
-
-void
-TrafficClass::SetMaxPackets (uint32_t p)
-{
-	NS_LOG_FUNCTION (this << p);
-
-	maxPackets = p;
-}
-
-void
-TrafficClass::SetMaxBytes (uint32_t b)
-{
-	NS_LOG_FUNCTION (this << b);
-
-	maxBytes = b;
-}
-
-void
-TrafficClass::SetWeight (double_t w)
-{
-	NS_LOG_FUNCTION (this << w);
-
-	weight = w;
 }
 
 double_t
@@ -91,14 +81,6 @@ TrafficClass::GetWeight ()
 	return weight;
 }
 
-void
-TrafficClass::SetPriorityLevel (uint32_t p)
-{
-	NS_LOG_FUNCTION (this << p);
-
-	priority_level = p;
-}
-
 uint32_t
 TrafficClass::GetPriorityLevel ()
 {
@@ -107,28 +89,12 @@ TrafficClass::GetPriorityLevel ()
 	return priority_level;
 }
 
-void
-TrafficClass::SetIsDefault (bool d)
-{
-	NS_LOG_FUNCTION (this << d);
-
-	isDefault = d;
-}
-
 bool
 TrafficClass::IsDefault ()
 {
 	NS_LOG_FUNCTION (this);
 
 	return isDefault;
-}
-
-void
-TrafficClass::SetMQueue (std::queue<Ptr<ns3::Packet>> m)
-{
-	NS_LOG_FUNCTION (this);
-
-	m_queue = m;
 }
 
 bool

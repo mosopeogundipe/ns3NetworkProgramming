@@ -17,14 +17,6 @@ class TrafficClass:public Object {
 public:
 	std::vector<Filter> filters;
 
-	void SetBytes (uint32_t b);
-	void SetPackets (uint32_t p);
-	void SetMaxBytes (uint32_t b);
-	void SetMaxPackets (uint32_t p);
-	void SetWeight (double_t w);
-	void SetPriorityLevel (uint32_t p);
-	void SetIsDefault (bool b);
-	void SetMQueue (std::queue<Ptr<ns3::Packet>> q);
 	void Unref (); //required for pointers
 
 	double_t GetWeight ();
