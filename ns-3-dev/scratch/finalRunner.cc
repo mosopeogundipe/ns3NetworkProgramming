@@ -11,6 +11,12 @@
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-static-routing-helper.h"
 
+#include "ns3/attribute.h"
+#include "ns3/type-id.h"
+#include "ns3/traffic-class.h"
+#include "ns3/uinteger.h"
+#include "ns3/pointer.h"
+
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("ControlTest");
@@ -18,6 +24,17 @@ NS_LOG_COMPONENT_DEFINE ("ControlTest");
 int 
 main (int argc, char *argv[])
 {
+/*
+	Ptr<TrafficClass> tc = CreateObject<TrafficClass> ();
+	TypeId id = tc->GetTypeId ();
+	TypeId::AttributeInformation info;
+	id.LookupAttributeByName (std::string ("MaxBytes"), &info);
+	std::cout << info.initialValue << std::endl;
+	uint32_t a = 100;
+	std::cout << a << std::endl;
+	return 0;
+	*/
+
   Time::SetResolution(Time::NS);
   //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
   //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);

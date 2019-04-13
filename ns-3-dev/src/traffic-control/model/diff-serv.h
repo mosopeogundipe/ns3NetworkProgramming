@@ -6,7 +6,6 @@
 #include "ns3/packet.h"
 #include "ns3/queue.h"
 #include "ns3/traffic-class.h"
-#include "ns3/packet.h"
 #include "ns3/ptr.h"
 
 namespace ns3 {
@@ -22,17 +21,18 @@ public:
 
 	void SetMode (QueueMode mode);
 	QueueMode GetMode ();
-	Ptr<Packet> Schedule ();
+	Ptr<Packet> Schedule (); //this only calls DoDequeue so....
 	uint32_t Classify (Ptr<Packet> p);
 
 private:
 	std::vector<TrafficClass> q_class;
 	QueueMode m_mode;
 
+	//need to overwrite all of these marked virtual
 	bool DoEnqueue (Ptr<Packet> p);
-	Ptr<Packet> DoDequeue ();
-	Ptr<Packet> DoRemove ();
-	Ptr<Packet> DoPeek ();
+	virtual Ptr<Packet> DoDequeue ();
+	Ptr<Packet> DoRemove (); // why is this here? it's the same as DoDequeue
+	virtual Ptr<Packet> DoPeek ();
 };
 
 }

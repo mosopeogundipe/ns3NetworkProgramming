@@ -22,8 +22,8 @@ TypeId
 TrafficClass::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::TrafficClass")
-    .SetParent<Object> ()
     .SetGroupName ("TrafficControl")
+		.AddConstructor<TrafficClass> ()
 		.AddAttribute ("MaxBytes",
 									 "The maximum number of bytes that will be held in this TrafficClass' queue",
 									 UintegerValue (UINT32_MAX),
@@ -53,47 +53,26 @@ TrafficClass::GetTypeId (void)
   return tid;
 }
 
+TrafficClass::TrafficClass ()
+{
+	NS_LOG_FUNCTION (this);
+}
+
+TrafficClass::~TrafficClass ()
+{
+	NS_LOG_FUNCTION (this);
+}
+
 void
 TrafficClass::Unref ()
 {
 	NS_LOG_FUNCTION (this);
 }
 
-TrafficClass::TrafficClass ()
-{
-	NS_LOG_FUNCTION (this);
-	bytes = 0;
-	packets = 0;
-}
-
-TrafficClass::~TrafficClass ()
-{
-	NS_LOG_FUNCTION (this);
-	delete &m_queue;
-	delete &filters;
-}
-
-double_t
-TrafficClass::GetWeight ()
-{
-	NS_LOG_FUNCTION (this);
-
-	return weight;
-}
-
-uint32_t
-TrafficClass::GetPriorityLevel ()
-{
-	NS_LOG_FUNCTION (this);
-
-	return priority_level;
-}
-
 bool
 TrafficClass::IsDefault ()
 {
 	NS_LOG_FUNCTION (this);
-
 	return isDefault;
 }
 
@@ -148,7 +127,7 @@ TrafficClass::Dequeue ()
 }
 
 bool
-TrafficClass::Match (Ptr<ns3::Packet> p)
+TrafficClass::Match (ns3::Ptr<ns3::Packet> p)
 {
 	NS_LOG_FUNCTION (this);
 

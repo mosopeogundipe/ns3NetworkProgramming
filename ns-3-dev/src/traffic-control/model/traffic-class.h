@@ -19,10 +19,6 @@ public:
 
 	void Unref (); //required for pointers
 
-	double_t GetWeight ();
-	uint32_t GetPriorityLevel ();
-	bool IsDefault ();
-
   /**
    * \brief Get the type ID.
    * \return the object TypeId
@@ -32,9 +28,11 @@ public:
 	TrafficClass ();
 	~TrafficClass ();
 
+	bool IsDefault ();
+
 	bool Enqueue (Ptr<ns3::Packet> p);
 	Ptr<ns3::Packet> Dequeue ();
-	bool Match (Ptr<ns3::Packet> p);
+	bool Match (ns3::Ptr<ns3::Packet> p);
 
 private:
 	uint32_t bytes;
