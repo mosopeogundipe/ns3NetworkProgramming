@@ -38,17 +38,29 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 {
 	NS_LOG_FUNCTION (this);
 
-/*
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);
 
-	if (q_class.empty () || queuePos >= q_class.size ())
+	if (q_class.empty () || queuePos == NOCLASSIFY)
 	{
 		// there is nothing in the queue, or the packet does not belong in any
 		return false;
 	}
-*/
+
+/*
+	uint32_t i = 0;
+	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
+		{
+			if (i == queuePos)
+				{
+					return it->Enqueue (p);
+				}
+			i++;
+		}
+
 	return false;
+	*/
+	return q_class[queuePos].Enqueue (p);
 }
 
 Ptr<Packet>
@@ -77,9 +89,7 @@ DiffServ::DoRemove ()
 	NS_LOG_FUNCTION (this);
 
 	// Actual logic should be same as DoDequeue
-	// Will use the first TrafficClass by default
-	//TrafficClass first = q_class.front ();
-	return NULL;
+	return DoDequeue ();
 }
 
 Ptr<Packet>
@@ -87,9 +97,18 @@ DiffServ::DoPeek ()
 {
 	NS_LOG_FUNCTION (this);
 
+	//same logic as DoDequeue () but we don't remove the packet
+	Ptr<Packet> packet;
+
 	// Will use the first TrafficClass by default
-	//TrafficClass first = q_class.front ();
-	// No first.pop () because we are not dequeue-ing
+	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
+		{
+			packet = it->Peek ();
+			if (packet != NULL)
+				{
+					return packet;
+				}
+		}
 	return NULL;
 }
 

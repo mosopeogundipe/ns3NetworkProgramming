@@ -127,6 +127,20 @@ TrafficClass::Dequeue ()
 	return packet;
 }
 
+Ptr<ns3::Packet>
+TrafficClass::Peek ()
+{
+	NS_LOG_FUNCTION (this);
+
+	// if queue is empty return null
+	if (packets == 0)
+		{
+			return NULL;
+		}
+
+	return m_queue.front ();
+}
+
 bool
 TrafficClass::Match (ns3::Ptr<ns3::Packet> p)
 {

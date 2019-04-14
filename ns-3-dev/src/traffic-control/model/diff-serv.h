@@ -21,7 +21,7 @@ public:
 
 	void SetMode (QueueMode mode);
 	QueueMode GetMode ();
-	Ptr<Packet> Schedule (); //this only calls DoDequeue so....
+	virtual Ptr<Packet> Schedule (); //this only calls DoDequeue so....
 	uint32_t Classify (Ptr<Packet> p);
 
 private:
@@ -31,8 +31,8 @@ private:
 	//need to overwrite all of these marked virtual
 	bool DoEnqueue (Ptr<Packet> p);
 	virtual Ptr<Packet> DoDequeue ();
-	Ptr<Packet> DoRemove (); // why is this here? it's the same as DoDequeue
-	virtual Ptr<Packet> DoPeek ();
+	virtual Ptr<Packet> DoRemove (); // why is this here? it's the same as DoDequeue
+	virtual Ptr<Packet> DoPeek (); // same logic as DoDequeue but no removal
 };
 
 }

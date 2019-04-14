@@ -32,6 +32,7 @@ public:
 
 	bool Enqueue (Ptr<ns3::Packet> p);
 	Ptr<ns3::Packet> Dequeue ();
+	Ptr<ns3::Packet> Peek ();
 	bool Match (ns3::Ptr<ns3::Packet> p);
 
 private:
