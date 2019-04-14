@@ -29,7 +29,7 @@ namespace ns3 {
 
 class FilterElement;
 
-class Filter {
+class Filter:public Object {
 public:
 	static TypeId GetTypeId (void);
 	Filter ();

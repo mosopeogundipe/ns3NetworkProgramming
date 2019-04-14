@@ -33,6 +33,7 @@ FilterElement::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::FilterElement")
     .SetParent<Object> ()
     .SetGroupName ("TrafficControl")
+		.AddConstructor<FilterElement> ()
   ;
   return tid;
 }

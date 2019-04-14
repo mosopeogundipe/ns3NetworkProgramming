@@ -19,6 +19,7 @@ Filter::GetTypeId (void)
 	static TypeId tid = TypeId ("ns3::Filter")
 	.SetParent<Object> ()
 	.SetGroupName("TrafficControl")
+		.AddConstructor<Filter> ()
 	;
 	return tid;
 }

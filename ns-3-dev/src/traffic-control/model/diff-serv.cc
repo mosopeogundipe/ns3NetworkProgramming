@@ -17,7 +17,7 @@ DiffServ::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::DiffServ")
     .SetParent<QueueBase> ()
-    .SetGroupName ("Network")
+    .SetGroupName ("TrafficControl")
 		.AddConstructor<DiffServ> ()
   ;
   return tid;

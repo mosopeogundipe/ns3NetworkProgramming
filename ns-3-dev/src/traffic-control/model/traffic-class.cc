@@ -22,6 +22,7 @@ TypeId
 TrafficClass::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::TrafficClass")
+		.SetParent<Object> ()
     .SetGroupName ("TrafficControl")
 		.AddConstructor<TrafficClass> ()
 		.AddAttribute ("MaxBytes",
