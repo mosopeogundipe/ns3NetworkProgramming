@@ -34,6 +34,13 @@ def build(bld):
         'helper/compression-detection-client-server-helper.cc',
         'helper/udp-echo-helper.cc',
         'helper/three-gpp-http-helper.cc',
+
+        'model/spq-application-client.cc',
+        'model/spq-application-server.cc',
+        'model/drr-application-client.cc',
+        'model/drr-application-server.cc',
+        'helper/spq-application-helper.cc',
+        'helper/drr-application-helper.cc',
         ]
 
     applications_test = bld.create_ns3_module_test_library('applications')
@@ -75,6 +82,13 @@ def build(bld):
         'helper/p2p-helper.h',
         'helper/compression-detection-client-server-helper.h',
         'helper/three-gpp-http-helper.h',
+
+        'model/spq-application-client.h',
+        'model/spq-application-server.h',
+        'model/drr-application-client.h',
+        'model/drr-application-server.h',
+        'helper/spq-application-helper.h',
+        'helper/drr-application-helper.h',
         ]
 
     if (bld.env['ENABLE_EXAMPLES']):
