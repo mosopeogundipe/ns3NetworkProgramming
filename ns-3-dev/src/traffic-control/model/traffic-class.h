@@ -28,6 +28,18 @@ public:
 	TrafficClass ();
 	~TrafficClass ();
 
+	void SetMaxBytes (uint32_t b);
+	void SetMaxPackets (uint32_t p);
+	void SetPriorityLevel (uint32_t p);
+	void SetWeight (double_t w);
+	void SetDefault (bool d);
+
+	uint32_t GetMaxBytes ();
+	uint32_t GetBytes ();
+	uint32_t GetMaxPackets ();
+	uint32_t GetPackets ();
+	uint32_t GetPriorityLevel ();
+	double_t GetWeight ();
 	bool IsDefault ();
 
 	bool Enqueue (Ptr<ns3::Packet> p);

@@ -47,20 +47,20 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 		return false;
 	}
 
-/*
-	uint32_t i = 0;
-	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
+	TrafficClass target = q_class[queuePos];
+	uint32_t pSize = p->GetSize ();
+
+	if (m_mode == packet && target.GetPackets () < target.GetMaxPackets () - 1)
 		{
-			if (i == queuePos)
-				{
-					return it->Enqueue (p);
-				}
-			i++;
+			return target.Enqueue (p);
+		}
+
+	if (m_mode == byte && target.GetBytes () + pSize < target.GetMaxPackets ())
+		{
+			return target.Enqueue (p);
 		}
 
 	return false;
-	*/
-	return q_class[queuePos].Enqueue (p);
 }
 
 Ptr<Packet>

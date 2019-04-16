@@ -70,6 +70,83 @@ TrafficClass::Unref ()
 	NS_LOG_FUNCTION (this);
 }
 
+void
+TrafficClass::SetMaxBytes (uint32_t b)
+{
+	NS_LOG_FUNCTION (this);
+	maxBytes = b;
+}
+
+void
+TrafficClass::SetMaxPackets (uint32_t p)
+{
+	NS_LOG_FUNCTION (this);
+	maxPackets = p;
+}
+
+void
+TrafficClass::SetPriorityLevel (uint32_t p)
+{
+	NS_LOG_FUNCTION (this);
+	priority_level = p;
+}
+
+void
+TrafficClass::SetWeight (double_t w)
+{
+	NS_LOG_FUNCTION (this);
+	weight = w;
+}
+
+void
+TrafficClass::SetDefault (bool d)
+{
+	NS_LOG_FUNCTION (this);
+	isDefault = d;
+}
+
+uint32_t
+TrafficClass::GetMaxBytes ()
+{
+	NS_LOG_FUNCTION (this);
+	return maxBytes;
+}
+
+uint32_t
+TrafficClass::GetBytes ()
+{
+	NS_LOG_FUNCTION (this);
+	return bytes;
+}
+
+uint32_t
+TrafficClass::GetMaxPackets ()
+{
+	NS_LOG_FUNCTION (this);
+	return maxPackets;
+}
+
+uint32_t
+TrafficClass::GetPackets ()
+{
+	NS_LOG_FUNCTION (this);
+	return packets;
+}
+
+uint32_t
+TrafficClass::GetPriorityLevel ()
+{
+	NS_LOG_FUNCTION (this);
+	return priority_level;
+}
+
+double_t
+TrafficClass::GetWeight ()
+{
+	NS_LOG_FUNCTION (this);
+	return weight;
+}
+
 bool
 TrafficClass::IsDefault ()
 {
