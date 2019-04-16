@@ -33,6 +33,13 @@ DiffServ::~DiffServ ()
 	NS_LOG_FUNCTION (this);
 }
 
+void
+DiffServ::AddTrafficClass (TrafficClass t)
+{
+	NS_LOG_FUNCTION (this);
+	q_class.push_back (t);
+}
+
 bool
 DiffServ::DoEnqueue (Ptr<Packet> p)
 {

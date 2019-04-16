@@ -19,6 +19,8 @@ public:
 	DiffServ ();
 	~DiffServ ();
 
+	void AddTrafficClass (TrafficClass t);
+
 	void SetMode (QueueMode mode);
 	QueueMode GetMode ();
 	virtual Ptr<Packet> Schedule (); //this only calls DoDequeue so....
