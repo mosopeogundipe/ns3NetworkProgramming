@@ -13,44 +13,44 @@
   
 */
 
-#ifndef COMPRESSION_DETECTION_CLIENT_SERVERHELPER_H
-#define COMPRESSION_DETECTION_CLIENT_SERVERHELPER_H
+#ifndef DRR_APPLICATION_HELPER_H
+#define DRR_APPLICATION_HELPER_H
  
 #include <stdint.h>
 #include "ns3/application-container.h"
 #include "ns3/node-container.h"
 #include "ns3/object-factory.h"
 #include "ns3/ipv4-address.h"
-#include "ns3/compression-detection-server.h"
-#include "ns3/compression-detection-client.h"
+#include "ns3/drr-application-client.h"
+#include "ns3/drr-application-server.h"
 
 
 namespace ns3 {
-  class CompressionDetectionServerHelper
+  class DrrServerHelper
   {
   public:
-    CompressionDetectionServerHelper ();
+    DrrServerHelper ();
    
-    CompressionDetectionServerHelper (uint16_t port);
+    DrrServerHelper (uint16_t port);
    
     void SetAttribute (std::string name, const AttributeValue &value);
    
     ApplicationContainer Install (NodeContainer c);
    
-    Ptr<CompressionDetectionServer> GetServer (void);
+    Ptr<CompressionDetectionServer> GetServer (void); //not sure if needed, may delete later
   private:
     ObjectFactory m_factory; 
     Ptr<CompressionDetectionServer> m_server; 
    };
    
-  class CompressionDetectionClientHelper
+  class DrrClientHelper
   {
    
   public:
-    CompressionDetectionClientHelper ();
+    DrrClientHelper ();
    
-    CompressionDetectionClientHelper (Address ip, uint16_t port);
-    CompressionDetectionClientHelper (Address addr);
+    DrrClientHelper (Address ip, uint16_t port);
+    DrrClientHelper (Address addr);
    
     void SetAttribute (std::string name, const AttributeValue &value);
    
@@ -62,4 +62,4 @@ namespace ns3 {
  
 } // namespace ns3
  
-#endif /* UDP_CLIENT_SERVER_H */
+#endif /* DRR_APPLICATION_HELPER_H */

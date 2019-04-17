@@ -26,8 +26,9 @@
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
 #include "ns3/boolean.h"
-#include "drr-application-client.h"
+
 #include "seq-ts-header.h"
+#include "drr-application-client.h"
 
 
 #include <cstdlib>

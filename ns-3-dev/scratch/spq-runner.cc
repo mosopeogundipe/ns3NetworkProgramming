@@ -101,12 +101,12 @@ main (int argc, char *argv[])
 
   //two servers, one for high priority, and one for low
   SpqServerHelper highServer(portHigh)
-  ApplicationContainer apps = server1.Install(c.Get (0));
+  ApplicationContainer apps = highServer.Install(c.Get (0));
   apps.Start(Seconds (0.0));
   apps.Stop(Seconds (150.0));
 
   SpqServerHelper lowServer(portLow)
-  ApplicationContainer apps = server1.Install(c.Get (2));
+  ApplicationContainer apps = lowServer.Install(c.Get (2));
   apps.Start(Seconds (0.0));
   apps.Stop(Seconds (150.0));
 
@@ -114,15 +114,15 @@ main (int argc, char *argv[])
 
   // two clients, one for high priority, one for low
     //note: not sure that's the correct way to get the destination address
-  SpqClientHelper hgihClient(i12.GetAddress(1), portHigh)
-  client1.SetAttribute("SetEntropy", BooleanValue (false));
-  apps = client1.Install (c.Get (0));
+  SpqClientHelper highClient(i12.GetAddress(1), portHigh)
+  highClient.SetAttribute("SetEntropy", BooleanValue (false));
+  apps = highClient.Install (c.Get (0));
   apps.Start (Seconds (12.0)); //start sending at 12s
   apps.Stop (Seconds (150.0));
 
   SpqClientHelper lowClient(i12.GetAddress(1), portLow)
-  client1.SetAttribute("SetEntropy", BooleanValue (false));
-  apps = client1.Install (c.Get (0));
+  lowClient.SetAttribute("SetEntropy", BooleanValue (false));
+  apps = lowClient.Install (c.Get (0));
   apps.Start (Seconds (0.0)); //start sending at immediately 
   apps.Stop (Seconds (150.0));
 

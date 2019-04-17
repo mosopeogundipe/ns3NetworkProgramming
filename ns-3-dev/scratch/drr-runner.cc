@@ -10,6 +10,7 @@
 #include "ns3/csma-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-static-routing-helper.h"
+#include "ns3/strict-priority-queue.h"
 
 using namespace ns3;
 
@@ -19,80 +20,75 @@ int
 main (int argc, char *argv[])
 {
   Time::SetResolution(Time::NS);
-  //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
-  //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
-  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
-  //LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
-  LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
-  LogComponentEnable ("ControlTest", LOG_LEVEL_INFO);
-  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ERROR);
-  //LogComponentEnable ("PointToPointHelper", LOG_LEVEL_ERROR);
-  uint16_t port = 9;  // well-known echo port number
-  //uint32_t packetSize = 32; // this will be set by the app
-  uint32_t maxPacketCount = 12000; // this will be set by the app
-	//uint8_t midLinkSpeed = 1;
-	//uint8_t outerLinkSpeed = 8;
-  std::string midLinkSpeed = "1";
-	std::string outerLinkSpeed = "8";
-	bool enableCompression = false;
-	bool enableGlobalCompression = false;
-	//std::string fill = "praise jesus"; // will be set by app, 
-																			//have here for testing
 
-  //Time interPacketInterval = Seconds (1.); //this will be set by the app
+  // setup logs
+  LogComponentEnable ("ControlTest", LOG_LEVEL_ALL);
+  LogComponentEnable ("DrrApplicationClient", LOG_LEVEL_ALL);
+  LogComponentEnable ("DrrApplicationServer", LOG_LEVEL_ALL);
+  
+  //create variables we will need
+  std::string configPath = "";
+  bool enableGlobalCompression = false;
+  uint16_t portHigh = 9999;
+  uint16_t portMed  = 5555;
+  uint16_t portLow  = 1111;
+
+
+  //read command line argument
+    //in this case, only config file
   CommandLine cmd;
-	cmd.AddValue ("numPackets", "Total number of packets to send", maxPacketCount);
-  cmd.AddValue ("port", "Port being used to commuincate", port);
-  cmd.AddValue ("midLinkSpeed", "Speed (Mbps) of the link between nodes 1 and 2. (middle link)", midLinkSpeed);
-  cmd.AddValue ("outerLinkSpeed", "Speed (Mbps) of the links between nodes 0 and 1, and 2 and 3.", outerLinkSpeed);
-  cmd.AddValue ("enableCompression", "Compression enabled on the center link, between nodes 2 and 3.", enableCompression);
-  cmd.AddValue ("enableGlobalCompression", "Compression enabled on all links.", enableGlobalCompression);
-  //cmd.AddValue ("fill", "String to fill packets with.", fill);
+  cmd.AddValue ("config", "The path to the config file that will be read", configPath);
   cmd.Parse (argc, argv);
 
-	NodeContainer c;
-	c.Create (4);
+  //Todo:
+    //read values from config file
 
-  // Point-to-point links
-  NodeContainer c01 = NodeContainer (c.Get (0), c.Get (1));
-  NodeContainer c12 = NodeContainer (c.Get (1), c.Get (2));
-  NodeContainer c23 = NodeContainer (c.Get (2), c.Get (3));
+
+  //----------------------------------- create nodes -----------------------------------
+  NodeContainer c;
+  c.Create(3);
+
+  
+  //----------------------------------- create links -----------------------------------
 
   // We create the channels first without any IP addressing information
   PointToPointHelper p2p;
-	std::string str;
+  std::string str;
 
-	//setting compression link speed
-	//str = std::to_string (midLinkSpeed) + "Mbps";
-  str = midLinkSpeed + "Mbps";
-  NS_LOG_ERROR("mid link speed: " << str);
-  p2p.SetDeviceAttribute ("DataRate", StringValue(str));
+  // Point-to-point links
+  NodeContainer c01 = NodeContainer(c.Get (0), c.Get (1)); //link 1
+  NodeContainer c12 = NodeContainer(c.Get (1), c.Get (2)); //link 2
+
+  // populate link 1 
+  p2p.SetDeviceAttribute ("DataRate", StringValue ("4Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
-  NS_LOG_ERROR("enable compression:" << enableCompression);
-	p2p.SetCompress (enableCompression);
-  NetDeviceContainer d12 = p2p.Install (c12);
-  p2p.EnablePcap("Compression",d12.Get(0), false);
+  NetDeviceContainer d01 = p2p.Install (c01);
+  p2p.EnablePcap("UDPsender", d01.Get(0), BooleanValue(false));
 
-	//setting the regular link speeds
-	p2p.SetCompress (enableGlobalCompression);
-	//str = std::to_string (outerLinkSpeed) + "Mbps";
 
-  p2p.SetDeviceAttribute ("DataRate", StringValue ("8Mbps"));
+  //populate link 2
+  NS_LOG_INFO("Second link speed: 1Mbps");
+  p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
-	NetDeviceContainer d01 = p2p.Install (c01);
-  p2p.EnablePcap("UDPsender", d01.Get(0), false);
+  NetDeviceContainer d12 = p2p.Install(c12);
+  p2p.EnablePcap("Receiver",d12.Get(0), BooleanValue(false));
 
-  p2p.SetDeviceAttribute ("DataRate", StringValue ("8Mbps"));
-  p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
-	NetDeviceContainer d23 = p2p.Install (c23);
-  p2p.EnablePcap("Decompression",d23.Get(0), false);
-	p2p.EnablePcap("UDPreceiver", d23.Get(1), false);
+  //not quite sure what this does, tbh
+  p2p.SetCompress (BooleanValue (false));
 
+  //----------------------------------- add queue to middle node -----------------------------------
+  //todo:
+    //there's no way it's this easy
+    //this sets all queues to SPQ. Do we only want to set the middle?
+      //is there more that one queue?
+  p2p.SetQueue("ns3::StrictPriorityQueue")
+
+
+  //----------------------------------- add to internet -----------------------------------
   InternetStackHelper internet;
   internet.Install (c);
 
-  // Later, we add IP addresses.  The middle two octets correspond to 
-  // the channel number.
+
   NS_LOG_INFO ("Assign IP Addresses.");
   Ipv4AddressHelper ipv4;
 
@@ -102,70 +98,49 @@ main (int argc, char *argv[])
   ipv4.SetBase ("10.0.2.0", "255.255.255.0");
   Ipv4InterfaceContainer i12 = ipv4.Assign (d12);
 
-  ipv4.SetBase ("10.0.3.0", "255.255.255.0");
-  Ipv4InterfaceContainer i23 = ipv4.Assign (d23);
-
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
-  CompressionDetectionServerHelper server1 (2000);
-	ApplicationContainer apps = server1.Install(c.Get (3));
-  apps.Start(Seconds (1.0));
+
+  //----------------------------------- add application -----------------------------------
+
+  //two servers, one for high priority, and one for low
+  DrrServerHelper highServer(portHigh)
+  ApplicationContainer apps = highServer.Install(c.Get (0));
+  apps.Start(Seconds (0.0));
   apps.Stop(Seconds (150.0));
 
-  CompressionDetectionClientHelper client1 ( i23.GetAddress(1), 2000);
-  //client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
-  //client.SetAttribute ("Interval", TimeValue (interPacketInterval));
-  //client.SetAttribute ("PacketSize", UintegerValue (packetSize));
-  client1.SetAttribute("SetEntropy", BooleanValue (false));
-	apps = client1.Install (c.Get (0));
-  apps.Start (Seconds (2.0));
+  DrrServerHelper lowServer(portLow)
+  ApplicationContainer apps = lowServer.Install(c.Get (2));
+  apps.Start(Seconds (0.0));
+  apps.Stop(Seconds (150.0));
+
+
+
+  // two clients, one for high priority, one for low
+    //note: not sure that's the correct way to get the destination address
+  DrrClientHelper highClient(i12.GetAddress(1), portHigh)
+  highClient.SetAttribute("SetEntropy", BooleanValue (false));
+  apps = highClient.Install (c.Get (0));
+  apps.Start (Seconds (0.0)); //all start at same time
   apps.Stop (Seconds (150.0));
-  Ptr<CompressionDetectionServer> udpServer = server1.GetServer();
 
-  
-  CompressionDetectionServerHelper server2 (4000);
-	apps = server2.Install(c.Get (3));
-  apps.Start(Seconds (152.0));
-  apps.Stop(Seconds (300.0));
+  DrrClientHelper MedClient(i12.GetAddress(1), portMed)
+  MedClient.SetAttribute("SetEntropy", BooleanValue (false));
+  apps = MedClient.Install (c.Get (0));
+  apps.Start (Seconds (0.0)); //all start at same time
+  apps.Stop (Seconds (150.0));
 
-  CompressionDetectionClientHelper client2 ( i23.GetAddress(1), 4000);
-  //client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
-  //client.SetAttribute ("Interval", TimeValue (interPacketInterval));
-  //client.SetAttribute ("PacketSize", UintegerValue (packetSize));
-  client2.SetAttribute("SetEntropy", BooleanValue (true));
-	apps = client2.Install (c.Get (0));
-  apps.Start (Seconds (153.0));
-  apps.Stop (Seconds (300.0));
-  Ptr<CompressionDetectionServer> udpServer2 = server2.GetServer();
+  DrrClientHelper lowClient(i12.GetAddress(1), portLow)
+  lowClient.SetAttribute("SetEntropy", BooleanValue (false));
+  apps = lowClient.Install (c.Get (0));
+  apps.Start (Seconds (0.0)); //all start at same time
+  apps.Stop (Seconds (150.0));
 
-
-
-	//client.SetFill (apps.Get (0), fill);
-
-  // Create router nodes, initialize routing database and set up the routing
-  // tables in the nodes.
- 
-  //AsciiTraceHelper ascii;
-  //p2p.EnableAsciiAll (ascii.CreateFileStream ("p2p.tr"));
-  //p2p.EnablePcapAll ("p2p");
 
   Simulator::Run ();
   Simulator::Destroy ();
 
-  Time delay = udpServer->GetTimeDifference();
-	//cout << "Delay Low Entropy: " << delay.GetMilliSeconds() << "ms" << endl;
-  NS_LOG_INFO ("Delay Low Entropy: " << delay.GetMilliSeconds() << "ms");
-	Time delay2 = udpServer2->GetTimeDifference();
-	//cout << "Delay High Entropy: " << delay2.GetMilliSeconds() << "ms" << endl;
-  NS_LOG_INFO ("Delay High Entropy: " << delay2.GetMilliSeconds() << "ms");
-	Time delta = (delay2 - delay); // convert nanoseconds to milliseconds
-  NS_LOG_INFO ("Delta: " << delta.GetMilliSeconds());
-	if(delta.GetMilliSeconds() > 100) {
-		NS_LOG_INFO ("Compression Detected");
-	}
-	else {
-	 NS_LOG_INFO ("No Compression Detected");
-	}
-	return 0;
+
+  return 0;
 }
 

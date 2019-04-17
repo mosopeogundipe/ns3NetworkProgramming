@@ -37,7 +37,8 @@ namespace ns3 {
    
     ApplicationContainer Install (NodeContainer c);
    
-    Ptr<CompressionDetectionServer> GetServer (void);
+    Ptr<CompressionDetectionServer> GetServer (void); //not really needed, may remove
+    
   private:
     ObjectFactory m_factory; 
     Ptr<CompressionDetectionServer> m_server; 

@@ -14,9 +14,9 @@
 	Todo:
 	
 */
-#include "compression-detection-client-server-helper.h"
-#include "ns3/compression-detection-server.h"
-#include "ns3/compression-detection-client.h"
+#include "spq-application-helper.h"
+#include "ns3/spq-application-client.h"
+#include "ns3/spq-application-server.h"
 #include "ns3/uinteger.h"
 #include "ns3/string.h"
  
