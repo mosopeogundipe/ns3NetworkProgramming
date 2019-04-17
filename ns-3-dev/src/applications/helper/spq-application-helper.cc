@@ -22,25 +22,25 @@
  
 namespace ns3 {
  
-CompressionDetectionServerHelper::CompressionDetectionServerHelper ()
+SpqServerHelper::SpqServerHelper ()
 {
 	m_factory.SetTypeId (CompressionDetectionServer::GetTypeId ());
 }
  
-CompressionDetectionServerHelper::CompressionDetectionServerHelper (uint16_t port)
+SpqServerHelper::SpqServerHelper (uint16_t port)
 {
 	m_factory.SetTypeId (CompressionDetectionServer::GetTypeId ());
 	SetAttribute ("Port", UintegerValue (port));
 }
  
 void
-CompressionDetectionServerHelper::SetAttribute (std::string name, const AttributeValue &value)
+SpqServerHelper::SetAttribute (std::string name, const AttributeValue &value)
 {
 	m_factory.Set (name, value);
 }
  
 ApplicationContainer
-CompressionDetectionServerHelper::Install (NodeContainer c)
+SpqServerHelper::Install (NodeContainer c)
 {
 	ApplicationContainer apps;
 	for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
@@ -56,37 +56,37 @@ CompressionDetectionServerHelper::Install (NodeContainer c)
 }
  
 Ptr<CompressionDetectionServer>
-CompressionDetectionServerHelper::GetServer (void)
+SpqServerHelper::GetServer (void)
 {
 	return m_server;
 }
  
-CompressionDetectionClientHelper::CompressionDetectionClientHelper ()
+SpqClientHelper::SpqClientHelper ()
 {
 	m_factory.SetTypeId (CompressionDetectionClient::GetTypeId ());
 }
  
-CompressionDetectionClientHelper::CompressionDetectionClientHelper (Address address, uint16_t port)
+SpqClientHelper::SpqClientHelper (Address address, uint16_t port)
 {
 	m_factory.SetTypeId (CompressionDetectionClient::GetTypeId ());
 	SetAttribute ("RemoteAddress", AddressValue (address));
 	SetAttribute ("RemotePort", UintegerValue (port));
 }
  
-CompressionDetectionClientHelper::CompressionDetectionClientHelper (Address address)
+SpqClientHelper::SpqClientHelper (Address address)
 {
 	m_factory.SetTypeId (CompressionDetectionClient::GetTypeId ());
 	SetAttribute ("RemoteAddress", AddressValue (address));
 }
  
 void
-CompressionDetectionClientHelper::SetAttribute (std::string name, const AttributeValue &value)
+SpqClientHelper::SetAttribute (std::string name, const AttributeValue &value)
 {
 	m_factory.Set (name, value);
 }
  
 ApplicationContainer
-CompressionDetectionClientHelper::Install (NodeContainer c)
+SpqClientHelper::Install (NodeContainer c)
 {
 	ApplicationContainer apps;
 	for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)

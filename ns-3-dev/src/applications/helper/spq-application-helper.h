@@ -13,25 +13,25 @@
   
 */
 
-#ifndef COMPRESSION_DETECTION_CLIENT_SERVERHELPER_H
-#define COMPRESSION_DETECTION_CLIENT_SERVERHELPER_H
+#ifndef SPQ_APPLICATION_HELPER_H
+#define SPQ_APPLICATION_HELPER_H
  
 #include <stdint.h>
 #include "ns3/application-container.h"
 #include "ns3/node-container.h"
 #include "ns3/object-factory.h"
 #include "ns3/ipv4-address.h"
-#include "ns3/compression-detection-server.h"
-#include "ns3/compression-detection-client.h"
+#include "ns3/spq-application-client.h"
+#include "ns3/spq-application-server.h"
 
 
 namespace ns3 {
-  class CompressionDetectionServerHelper
+  class SpqServerHelper
   {
   public:
-    CompressionDetectionServerHelper ();
+    SpqServerHelper ();
    
-    CompressionDetectionServerHelper (uint16_t port);
+    SpqServerHelper (uint16_t port);
    
     void SetAttribute (std::string name, const AttributeValue &value);
    
@@ -43,14 +43,14 @@ namespace ns3 {
     Ptr<CompressionDetectionServer> m_server; 
    };
    
-  class CompressionDetectionClientHelper
+  class SpqClientHelper
   {
    
   public:
-    CompressionDetectionClientHelper ();
+    SpqClientHelper ();
    
-    CompressionDetectionClientHelper (Address ip, uint16_t port);
-    CompressionDetectionClientHelper (Address addr);
+    SpqClientHelper (Address ip, uint16_t port);
+    SpqClientHelper (Address addr);
    
     void SetAttribute (std::string name, const AttributeValue &value);
    

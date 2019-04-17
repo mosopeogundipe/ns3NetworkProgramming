@@ -59,7 +59,7 @@ namespace ns3 {
 							MakeUintegerChecker<uint32_t> ())
 			.AddAttribute ("Interval",
 							"The time to wait between packets",
-							TimeValue (Seconds (0.001)), //0.00001 gives good results //should be 0, or very close to, as per faq
+							TimeValue (Seconds (0.001)), //0.00001 gives good results
 							MakeTimeAccessor (&SpqApplicationClient::m_interval),
 							MakeTimeChecker ())
 			.AddAttribute ("RemoteAddress",
@@ -177,27 +177,14 @@ namespace ns3 {
 		m_socket->SetRecvCallback (MakeNullCallback<void, Ptr<Socket> > ());
 		m_socket->SetAllowBroadcast (true);
 		m_sendEvent = Simulator::Schedule (Seconds (0.0), &SpqApplicationClient::Send, this);
-
-		//where the functions to send the two trains are called
-			//is a 5 sec delay good?
-		// if(m_set_entropy){
-		// 	NS_LOG_INFO ("Sending HIGH Entropy Packets...");
-		// 	m_sendTrain2 = Simulator::Schedule (Seconds (0.0), &SpqApplicationClient::SendRandomTrain, this);
-		// }else{
-		// 	NS_LOG_INFO ("Sending LOW Entropy Packets...");
-		// 	m_sendTrain1 = Simulator::Schedule (Seconds (0.0), &SpqApplicationClient::SendEmptyTrain, this);
-		// }
-		//m_sendTrain1 = Simulator::Schedule (Seconds (0.0), &SpqApplicationClient::SendEmptyTrain, this);
-		//m_sendTrain2 = Simulator::Schedule (Seconds (25.0), &SpqApplicationClient::SendRandomTrain, this);
-	}
+}
 	 
-	void
-	SpqApplicationClient::StopApplication (void)
-	{
-		NS_LOG_FUNCTION (this);
-		Simulator::Cancel (m_sendTrain1);
-		Simulator::Cancel (m_sendTrain2);
-	}
+void
+SpqApplicationClient::StopApplication (void)
+{
+	NS_LOG_FUNCTION (this);
+	Simulator::Cancel (m_sendEvent);
+}
 
 void
  SpqApplicationClient::createLowEntropyPackets (uint8_t*  buffer, uint32_t m_size)
@@ -206,6 +193,7 @@ void
     buffer[i] = 0x00;
   }
  }
+
  //create high entropy
  void
  SpqApplicationClient::createHighEntropyPackets (uint8_t* buffer, uint32_t m_size)
@@ -215,7 +203,7 @@ void
 	 //buffer now contains the random data
  }
 
-	void
+void
 SpqApplicationClient::Send (void)
 {
   NS_LOG_FUNCTION (this);
@@ -265,99 +253,5 @@ SpqApplicationClient::Send (void)
       m_sendEvent = Simulator::Schedule (m_interval, &SpqApplicationClient::Send, this);
     }
 }
-
-	// //all we need to do is change it so we send a train of 6000
-	// 	//already send them empty, do we really need ro read fro /dev/nul?
-	// void
-	// SpqApplicationClient::SendEmptyTrain (void)
-	// {
-	// 	NS_LOG_FUNCTION (this);
-	// 	NS_ASSERT (m_sendTrain1.IsExpired ());
-	// 	SeqTsHeader seqTs;
-	// 	seqTs.SetSeq (m_sent);
-	// 	Ptr<Packet> p = Create<Packet> (m_size-(8+4)); // 8+4 : the size of the seqTs header
-	// 	p->AddHeader (seqTs);
-	 
-	// 	std::stringstream peerAddressStringStream;
-	// 	if (Ipv4Address::IsMatchingType (m_peerAddress))
-	// 		{
-	// 			peerAddressStringStream << Ipv4Address::ConvertFrom (m_peerAddress);
-	// 		}
-	// 	else if (Ipv6Address::IsMatchingType (m_peerAddress))
-	// 		{
-	// 			peerAddressStringStream << Ipv6Address::ConvertFrom (m_peerAddress);
-	// 		}
-	 
-	// 	if ((m_socket->Send (p)) >= 0)
-	// 		{
-	// 			++m_sent;
-	// 			NS_LOG_INFO ("  Sending empty packet: " << m_sent%6000);
-
-	// 		}
-	// 	else
-	// 		{
-	// 			NS_LOG_INFO ("Error while sending " << m_size << " bytes to "
-	// 													<< peerAddressStringStream.str ());
-	// 		}
-	 
-	//  	//since we send the empty packets first, we only send half of the max (only 1 train)
-	// 	if (m_sent < m_count/2)
-	// 		{
-	// 			m_sendTrain1 = Simulator::Schedule (m_interval, &SpqApplicationClient::SendEmptyTrain, this);
-	// 		}
-	// }
-
-	//all we need to do is change it so we send a train of 6000
-		//and read in 1100 bytes from /dev/random
-	// void
-	// SpqApplicationClient::SendRandomTrain (void)
-	// {
-	// 	//first, read 1100 bytes into the buffer
-	// 		//possible issues:
-	// 			//unsigned char is not the same as uint8_t
-	// 			//not const enough
-  //       unsigned char buffer[1100];
-	// 			std::fstream fs ("/dev/random", std::fstream::in | std::fstream::binary);
-  //       fs.read( (char*)&buffer[0], 1100);
-  //       fs.close();
-
-	// 	//uint8_t buffer;
-	// 	NS_LOG_FUNCTION (this);
-	// 	NS_ASSERT (m_sendTrain2.IsExpired ());
-	// 	SeqTsHeader seqTs;
-	// 	seqTs.SetSeq (m_sent);
-	// 	Ptr<Packet> p = Create<Packet> (&buffer[0], m_size-(8+4)); // 8+4 : the size of the seqTs header
-	// 	p->AddHeader (seqTs);
-	 
-	// 	std::stringstream peerAddressStringStream;
-	// 	if (Ipv4Address::IsMatchingType (m_peerAddress))
-	// 		{
-	// 			peerAddressStringStream << Ipv4Address::ConvertFrom (m_peerAddress);
-	// 		}
-	// 	else if (Ipv6Address::IsMatchingType (m_peerAddress))
-	// 		{
-	// 			peerAddressStringStream << Ipv6Address::ConvertFrom (m_peerAddress);
-	// 		}
-	 
-	// 	if ((m_socket->Send (p)) >= 0)
-	// 		{
-	// 			++m_sent;
-	// 			NS_LOG_INFO (" Sending random packet: " << m_sent%6000);
-	 
-	// 		}
-	// 	else
-	// 		{
-	// 			NS_LOG_INFO ("Error while sending " << m_size << " bytes to "
-	// 													<< peerAddressStringStream.str ());
-	// 		}
-	 
-	// 	//don't divide by 2 this time, because we're sending the remaining half
-	// 		//cleaner way might be:
-	// 		//m_sent%6000 == 0
-	// 	if (m_sent < m_count)
-	// 		{
-	// 			m_sendTrain2 = Simulator::Schedule (m_interval, &SpqApplicationClient::SendRandomTrain, this);
-	// 		}
-	// }
  
 } // Namespace ns3
