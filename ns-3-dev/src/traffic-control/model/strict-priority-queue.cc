@@ -77,11 +77,11 @@ StrictPriorityQueue::DoEnqueue (Ptr<Packet> p)
 		//the packet does not belong in any queue, add to default queue
         target = q_class.back();   //default queue is always last in list, according to my design
 		IsEnqueuingSuccessful(target, p);
+	}else{
+		target = q_class[queuePos];		//HINT.SOPE: Should I change this and get queue where queuePos == queue's priority?
 	}
 
-	target = q_class[queuePos];		//HINT.SOPE: Should I change this and get queue where queuePos == queue's priority?
-    return IsEnqueuingSuccessful(target, p);	
-	
+    return IsEnqueuingSuccessful(target, p);		
 }
 
 bool
