@@ -3,8 +3,6 @@
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
-<<<<<<< HEAD
-<<<<<<< HEAD
 #include "ns3/drrqueue.h"
 =======
 #include "drrqueue.h"
@@ -40,17 +38,11 @@ DRR::DRR (std::string configFile)
         	std::advance(iter, 1);
         }
 }
-
-DRR::~DRR ()
 {
         NS_LOG_FUNCTION (this);
 }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
-DRR::DRR ()
-{
-        NS_LOG_FUNCTION (this);
 }
 
 =======
@@ -86,11 +78,7 @@ DRR:DoEnqueue (Ptr<Packet> p)
 		return false;
 	}
 	TrafficClass drrQueue = q_class[queuePos];
-
 	return drrQueue.Enqueue(p);
-}
-
-
 Ptr<Packet>
 <<<<<<< HEAD
 DRR::DoPeek ()
@@ -133,33 +121,16 @@ DiffServ::DoPeek ()
 // 	}
 // }
 
-Ptr<Packet>
-DRR::DoDequeue() {
-	uint16_t num_empty = 0;
-	while(true) {
-		Ptr<Packet>p = q_class[curr_queue_index].Peek();
-		if (p==NULL) {
+			num_empty++;//put as condition for while loop
 			num_empty++;
 <<<<<<< HEAD
 <<<<<<< HEAD
 			if (num_empty == num_queues) {//put as condition for while loop
 =======
 			if (num_empty == num_queues) {
->>>>>>> f6dd3561ce82654f8afc374b0eddb2b36501a52a
 				return NULL;
 			}
 			curr_queue_index++;
-			continue;
-		}
-<<<<<<< HEAD
-
-		else if (p->GetSize()<deficit[curr_queue_index]) {
-=======
-			if (num_empty == num_queues) {
-				return NULL;
-			}
-			curr_queue_index++;
-			continue;
 		}
 		if (p->GetSize()<deficit[curr_queue_index]) {
 >>>>>>> 268ba1f7133403f085b26b14b451162e6b586a7d
