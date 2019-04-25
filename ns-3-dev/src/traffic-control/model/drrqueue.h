@@ -1,3 +1,5 @@
+#ifndef DRR_H
+#define DRR_H
 #include <queue>
 #include <vector>
 #include "ns3/packet.h"
@@ -28,3 +30,5 @@ private:
     void ConfigReader(std::string config_file_name);
     };
 }
+
+#endif
