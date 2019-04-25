@@ -168,7 +168,7 @@ namespace ns3 {
 	void
 	DrrApplicationServer::HandleRead (Ptr<Socket> socket)
 	{
-		NS_LOG_FUNCTION (this << socket);
+		//NS_LOG_FUNCTION (this << socket);
 		Ptr<Packet> packet;
 		Address from;
 		Address localAddress;
