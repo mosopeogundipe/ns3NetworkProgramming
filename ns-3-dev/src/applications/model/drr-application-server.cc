@@ -168,7 +168,7 @@ namespace ns3 {
 	void
 	DrrApplicationServer::HandleRead (Ptr<Socket> socket)
 	{
-		NS_LOG_FUNCTION (this << socket);
+		//NS_LOG_FUNCTION (this << socket);
 		Ptr<Packet> packet;
 		Address from;
 		Address localAddress;
@@ -180,7 +180,7 @@ namespace ns3 {
 				m_rxTraceWithAddresses (packet, from, localAddress);
 				if (packet->GetSize () > 0)
 					{
-						NS_LOG_INFO ("server recieved packet: "<< m_received%6000);
+						NS_LOG_INFO ("server recieved packet: "<< m_received << " on port "<< m_port);
 
 						SeqTsHeader seqTs;
 						packet->RemoveHeader (seqTs);
