@@ -11,6 +11,12 @@
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-static-routing-helper.h"
 
+#include "ns3/attribute.h"
+#include "ns3/type-id.h"
+#include "ns3/traffic-class.h"
+#include "ns3/uinteger.h"
+#include "ns3/pointer.h"
+
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("ControlTest");
@@ -21,17 +27,15 @@ main (int argc, char *argv[])
   Time::SetResolution(Time::NS);
   //LogComponentEnable ("P2PServerApplication", LOG_LEVEL_ALL);
   //LogComponentEnable ("P2PClientApplication", LOG_LEVEL_ALL);
-  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
+  //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ALL);
   //LogComponentEnable ("CompressionDetectionClient", LOG_LEVEL_INFO);
-  LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_INFO);
-  LogComponentEnable ("ControlTest", LOG_LEVEL_INFO);
+  LogComponentEnable ("CompressionDetectionServer", LOG_LEVEL_ALL);
+  //LogComponentEnable ("ControlTest", LOG_LEVEL_INFO);
   //LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_ERROR);
   //LogComponentEnable ("PointToPointHelper", LOG_LEVEL_ERROR);
   uint16_t port = 9;  // well-known echo port number
   //uint32_t packetSize = 32; // this will be set by the app
   uint32_t maxPacketCount = 12000; // this will be set by the app
-	//uint8_t midLinkSpeed = 1;
-	//uint8_t outerLinkSpeed = 8;
   std::string midLinkSpeed = "1";
 	std::string outerLinkSpeed = "8";
 	bool enableCompression = false;
@@ -145,9 +149,14 @@ main (int argc, char *argv[])
   // Create router nodes, initialize routing database and set up the routing
   // tables in the nodes.
  
-  //AsciiTraceHelper ascii;
-  //p2p.EnableAsciiAll (ascii.CreateFileStream ("p2p.tr"));
-  //p2p.EnablePcapAll ("p2p");
+  AsciiTraceHelper ascii;
+	if (enableCompression) {
+		p2p.EnableAsciiAll (ascii.CreateFileStream (midLinkSpeed + "mbps-compression-application.tr"));
+  	p2p.EnablePcapAll (midLinkSpeed + "mbps-compression-application");
+	} else {
+		p2p.EnableAsciiAll (ascii.CreateFileStream (midLinkSpeed + "mbps-nocompression-application.tr"));
+  	p2p.EnablePcapAll (midLinkSpeed + "mbps-nocompression-application");
+	}
 
   Simulator::Run ();
   Simulator::Destroy ();
