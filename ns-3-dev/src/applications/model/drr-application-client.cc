@@ -219,7 +219,7 @@ void
 	void
 DrrApplicationClient::Send (void)
 {
-  NS_LOG_FUNCTION (this);
+  //NS_LOG_FUNCTION (this);
     SeqTsHeader seqTs;
   //cout<<m_sent;
   seqTs.SetSeq (m_sent);
@@ -249,10 +249,10 @@ DrrApplicationClient::Send (void)
   if ((m_socket->Send (p)) >= 0)
     {
       ++m_sent;
-      NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
-                                    << peerAddressStringStream.str () << " Uid: "
-                                    << p->GetUid () << " Time: "
-                                    << (Simulator::Now ()).GetSeconds ());
+      //NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
+      //                              << peerAddressStringStream.str () << " Uid: "
+      //                              << p->GetUid () << " Time: "
+      //                              << (Simulator::Now ()).GetSeconds ());
 
     }
   else
