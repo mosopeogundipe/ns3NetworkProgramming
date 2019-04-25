@@ -23,6 +23,7 @@
 #include "ns3/inet-socket-address.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/ipv4-header.h"
+#include "ns3/ppp-header.h"
 #include "ns3/packet.h"
 #include "ns3/filter-element.h"
 
@@ -58,15 +59,12 @@ ProtocolFilterElement::Match (Ptr<Packet> packet) const
 {
   NS_LOG_FUNCTION (this);
 
+	ns3::PppHeader pppHeader;
 	ns3::Ipv4Header ipHeader;
 
+	packet->PeekHeader (pppHeader);
 	packet->PeekHeader (ipHeader);
-	if (protocol == ipHeader.GetProtocol ())
-		{
-			return true;
-		}
-
-	return false;
+	return protocol == ipHeader.GetProtocol ();
 }
 
 } // namespace ns3

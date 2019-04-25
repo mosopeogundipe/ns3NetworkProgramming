@@ -1,9 +1,11 @@
 
+#include <queue>
 #include "ns3/log.h"
 #include "ns3/enum.h"
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
+#include "ns3/queue.h"
 
 #define NOCLASSIFY 0xffffffff
 
