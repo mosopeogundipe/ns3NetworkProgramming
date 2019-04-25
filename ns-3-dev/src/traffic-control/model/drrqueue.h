@@ -17,6 +17,7 @@ public:
 	uint32_t num_queues;
     std::vector<uint32_t> quantum;
 	
+	
 private:
 	std::vector<TrafficClass> q_class;
 	std::vector<uint32_t> deficit;
