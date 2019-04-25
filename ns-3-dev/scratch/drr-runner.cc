@@ -25,6 +25,8 @@ main (int argc, char *argv[])
   LogComponentEnable ("ControlTest", LOG_LEVEL_ALL);
   LogComponentEnable ("DrrApplicationClient", LOG_LEVEL_ALL);
   LogComponentEnable ("DrrApplicationServer", LOG_LEVEL_ALL);
+  LogComponentEnable ("StrictPriorityQueue", LOG_LEVEL_ALL); //log for the queue
+
   
   //create variables we will need
   std::string configPath = "";
@@ -78,7 +80,7 @@ main (int argc, char *argv[])
   //----------------------------------- add queue to middle node -----------------------------------
   //todo:
     //there's no way it's this easy
-    //this sets all queues to SPQ. Do we only want to set the middle?
+    //this sets all queues to DRR. Do we only want to set the middle?
       //is there more that one queue?
   //p2p.SetQueue("ns3::StrictPriorityQueue");
 

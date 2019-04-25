@@ -25,6 +25,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("ControlTest", LOG_LEVEL_ALL);
   LogComponentEnable ("SpqApplicationClient", LOG_LEVEL_ALL);
   LogComponentEnable ("SpqApplicationServer", LOG_LEVEL_ALL);
+  //LogComponentEnable ("StrictPriorityQueue", LOG_LEVEL_ALL); //log for the queue
   
   //create variables we will need
   std::string configPath = "";
