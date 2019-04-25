@@ -236,10 +236,10 @@ SpqApplicationClient::Send (void)
   if ((m_socket->Send (p)) >= 0)
     {
       ++m_sent;
-      NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
-                                    << peerAddressStringStream.str () << " Uid: "
-                                    << p->GetUid () << " Time: "
-                                    << (Simulator::Now ()).GetSeconds ());
+      //NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
+      //                              << peerAddressStringStream.str () << " Uid: "
+      //                              << p->GetUid () << " Time: "
+      //                              << (Simulator::Now ()).GetSeconds ());
 
     }
   else

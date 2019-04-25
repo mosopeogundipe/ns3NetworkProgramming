@@ -24,12 +24,12 @@ namespace ns3 {
  
 DrrServerHelper::DrrServerHelper ()
 {
-	m_factory.SetTypeId (CompressionDetectionServer::GetTypeId ());
+	m_factory.SetTypeId (DrrApplicationServer::GetTypeId ());
 }
  
 DrrServerHelper::DrrServerHelper (uint16_t port)
 {
-	m_factory.SetTypeId (CompressionDetectionServer::GetTypeId ());
+	m_factory.SetTypeId (DrrApplicationServer::GetTypeId ());
 	SetAttribute ("Port", UintegerValue (port));
 }
  
@@ -47,7 +47,7 @@ DrrServerHelper::Install (NodeContainer c)
 		{
 			Ptr<Node> node = *i;
  
-			m_server = m_factory.Create<CompressionDetectionServer> ();
+			m_server = m_factory.Create<DrrApplicationServer> ();
 			node->AddApplication (m_server);
 			apps.Add (m_server);
  
@@ -55,7 +55,7 @@ DrrServerHelper::Install (NodeContainer c)
 	return apps;
 }
  
-Ptr<CompressionDetectionServer>
+Ptr<DrrApplicationServer>
 DrrServerHelper::GetServer (void)
 {
 	return m_server;
@@ -63,19 +63,19 @@ DrrServerHelper::GetServer (void)
  
 DrrClientHelper::DrrClientHelper ()
 {
-	m_factory.SetTypeId (CompressionDetectionClient::GetTypeId ());
+	m_factory.SetTypeId (DrrApplicationClient::GetTypeId ());
 }
  
 DrrClientHelper::DrrClientHelper (Address address, uint16_t port)
 {
-	m_factory.SetTypeId (CompressionDetectionClient::GetTypeId ());
+	m_factory.SetTypeId (DrrApplicationClient::GetTypeId ());
 	SetAttribute ("RemoteAddress", AddressValue (address));
 	SetAttribute ("RemotePort", UintegerValue (port));
 }
  
 DrrClientHelper::DrrClientHelper (Address address)
 {
-	m_factory.SetTypeId (CompressionDetectionClient::GetTypeId ());
+	m_factory.SetTypeId (DrrApplicationClient::GetTypeId ());
 	SetAttribute ("RemoteAddress", AddressValue (address));
 }
  
@@ -92,7 +92,7 @@ DrrClientHelper::Install (NodeContainer c)
 	for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
 		{
 			Ptr<Node> node = *i;
-			Ptr<CompressionDetectionClient> client = m_factory.Create<CompressionDetectionClient> ();
+			Ptr<DrrApplicationClient> client = m_factory.Create<DrrApplicationClient> ();
 			node->AddApplication (client);
 			apps.Add (client);
 		}

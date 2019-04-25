@@ -28,7 +28,7 @@ main (int argc, char *argv[])
   
   //create variables we will need
   std::string configPath = "";
-  bool enableGlobalCompression = false;
+  //bool enableGlobalCompression = false;
   uint16_t portHigh = 9999;
   uint16_t portMed  = 5555;
   uint16_t portLow  = 1111;
@@ -81,7 +81,7 @@ main (int argc, char *argv[])
     //there's no way it's this easy
     //this sets all queues to SPQ. Do we only want to set the middle?
       //is there more that one queue?
-  p2p.SetQueue("ns3::StrictPriorityQueue")
+  //p2p.SetQueue("ns3::StrictPriorityQueue");
 
 
   //----------------------------------- add to internet -----------------------------------
@@ -104,37 +104,44 @@ main (int argc, char *argv[])
   //----------------------------------- add application -----------------------------------
 
   //two servers, one for high priority, and one for low
-  DrrServerHelper highServer(portHigh)
-  ApplicationContainer apps = highServer.Install(c.Get (0));
-  apps.Start(Seconds (0.0));
-  apps.Stop(Seconds (150.0));
+  DrrServerHelper highServer(portHigh);
+  ApplicationContainer appsHigh = highServer.Install(c.Get (2));
+  appsHigh.Start(Seconds (0.0));
+  appsHigh.Stop(Seconds (150.0));
 
-  DrrServerHelper lowServer(portLow)
-  ApplicationContainer apps = lowServer.Install(c.Get (2));
-  apps.Start(Seconds (0.0));
-  apps.Stop(Seconds (150.0));
+  DrrServerHelper medServer(portMed);
+  ApplicationContainer appsMed = medServer.Install(c.Get (2));
+  appsMed = medServer.Install(c.Get (2));
+  appsMed.Start(Seconds (0.0));
+  appsMed.Stop(Seconds (150.0));
+
+  DrrServerHelper lowServer(portLow);
+  ApplicationContainer appsLow = lowServer.Install(c.Get (2));
+  appsLow = lowServer.Install(c.Get (2));
+  appsLow.Start(Seconds (0.0));
+  appsLow.Stop(Seconds (150.0));
 
 
 
   // two clients, one for high priority, one for low
     //note: not sure that's the correct way to get the destination address
-  DrrClientHelper highClient(i12.GetAddress(1), portHigh)
+  DrrClientHelper highClient(i12.GetAddress(1), portHigh);
   highClient.SetAttribute("SetEntropy", BooleanValue (false));
-  apps = highClient.Install (c.Get (0));
-  apps.Start (Seconds (0.0)); //all start at same time
-  apps.Stop (Seconds (150.0));
+  appsHigh = highClient.Install (c.Get (0));
+  appsHigh.Start (Seconds (0.0)); //all start at same time
+  appsHigh.Stop (Seconds (150.0));
 
-  DrrClientHelper MedClient(i12.GetAddress(1), portMed)
+  DrrClientHelper MedClient(i12.GetAddress(1), portMed);
   MedClient.SetAttribute("SetEntropy", BooleanValue (false));
-  apps = MedClient.Install (c.Get (0));
-  apps.Start (Seconds (0.0)); //all start at same time
-  apps.Stop (Seconds (150.0));
+  appsMed = MedClient.Install (c.Get (0));
+  appsMed.Start (Seconds (0.0)); //all start at same time
+  appsMed.Stop (Seconds (150.0));
 
-  DrrClientHelper lowClient(i12.GetAddress(1), portLow)
+  DrrClientHelper lowClient(i12.GetAddress(1), portLow);
   lowClient.SetAttribute("SetEntropy", BooleanValue (false));
-  apps = lowClient.Install (c.Get (0));
-  apps.Start (Seconds (0.0)); //all start at same time
-  apps.Stop (Seconds (150.0));
+  appsLow = lowClient.Install (c.Get (0));
+  appsLow.Start (Seconds (0.0)); //all start at same time
+  appsLow.Stop (Seconds (150.0));
 
 
   Simulator::Run ();

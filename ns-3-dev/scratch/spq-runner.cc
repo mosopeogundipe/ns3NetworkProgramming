@@ -23,12 +23,12 @@ main (int argc, char *argv[])
 
   // setup logs
   LogComponentEnable ("ControlTest", LOG_LEVEL_ALL);
-  LogComponentEnable ("SpqApplicationClient", LOG_LEVEL_ALL);
+  //LogComponentEnable ("SpqApplicationClient", LOG_LEVEL_ALL);
   LogComponentEnable ("SpqApplicationServer", LOG_LEVEL_ALL);
   
   //create variables we will need
   std::string configPath = "";
-  bool enableGlobalCompression = false;
+  //bool enableGlobalCompression = false;
   uint16_t portHigh = 9999;
   uint16_t portLow  = 1111;
 
@@ -77,7 +77,7 @@ main (int argc, char *argv[])
     //there's no way it's this easy
     //this sets all queues to SPQ. Do we only want to set the middle?
       //is there more that one queue?
-  p2p.SetQueue("ns3::StrictPriorityQueue")
+  //p2p.SetQueue("ns3::StrictPriorityQueue");
 
 
   //----------------------------------- add to internet -----------------------------------
@@ -100,31 +100,32 @@ main (int argc, char *argv[])
   //----------------------------------- add application -----------------------------------
 
   //two servers, one for high priority, and one for low
-  SpqServerHelper highServer(portHigh)
-  ApplicationContainer apps = highServer.Install(c.Get (0));
-  apps.Start(Seconds (0.0));
-  apps.Stop(Seconds (150.0));
+  SpqServerHelper highServer(portHigh);
+  ApplicationContainer appsHigh = highServer.Install(c.Get (2));
+  appsHigh.Start(Seconds (0.0));
+  appsHigh.Stop(Seconds (150.0));
 
-  SpqServerHelper lowServer(portLow)
-  ApplicationContainer apps = lowServer.Install(c.Get (2));
-  apps.Start(Seconds (0.0));
-  apps.Stop(Seconds (150.0));
+  SpqServerHelper lowServer(portLow);
+  ApplicationContainer appsLow = lowServer.Install(c.Get (2));
+  //appsLow = lowServer.Install(c.Get (2));
+  appsLow.Start(Seconds (0.0));
+  appsLow.Stop(Seconds (150.0));
 
 
 
   // two clients, one for high priority, one for low
     //note: not sure that's the correct way to get the destination address
-  SpqClientHelper highClient(i12.GetAddress(1), portHigh)
+  SpqClientHelper highClient(i12.GetAddress(1), portHigh);
   highClient.SetAttribute("SetEntropy", BooleanValue (false));
-  apps = highClient.Install (c.Get (0));
-  apps.Start (Seconds (12.0)); //start sending at 12s
-  apps.Stop (Seconds (150.0));
+  appsHigh = highClient.Install (c.Get (0));
+  appsHigh.Start (Seconds (12.0)); //start sending at 12s
+  appsHigh.Stop (Seconds (150.0));
 
-  SpqClientHelper lowClient(i12.GetAddress(1), portLow)
+  SpqClientHelper lowClient(i12.GetAddress(1), portLow);
   lowClient.SetAttribute("SetEntropy", BooleanValue (false));
-  apps = lowClient.Install (c.Get (0));
-  apps.Start (Seconds (0.0)); //start sending at immediately 
-  apps.Stop (Seconds (150.0));
+  appsLow = lowClient.Install (c.Get (0));
+  appsLow.Start (Seconds (0.0)); //start sending at immediately 
+  appsLow.Stop (Seconds (150.0));
 
 
   Simulator::Run ();

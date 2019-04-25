@@ -37,10 +37,10 @@ namespace ns3 {
    
     ApplicationContainer Install (NodeContainer c);
    
-    Ptr<CompressionDetectionServer> GetServer (void); //not sure if needed, may delete later
+    Ptr<DrrApplicationServer> GetServer (void); //not sure if needed, may delete later
   private:
     ObjectFactory m_factory; 
-    Ptr<CompressionDetectionServer> m_server; 
+    Ptr<DrrApplicationServer> m_server; 
    };
    
   class DrrClientHelper

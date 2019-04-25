@@ -37,11 +37,11 @@ namespace ns3 {
    
     ApplicationContainer Install (NodeContainer c);
    
-    Ptr<CompressionDetectionServer> GetServer (void); //not really needed, may remove
+    Ptr<SpqApplicationServer> GetServer (void); //not really needed, may remove
     
   private:
     ObjectFactory m_factory; 
-    Ptr<CompressionDetectionServer> m_server; 
+    Ptr<SpqApplicationServer> m_server; 
    };
    
   class SpqClientHelper
