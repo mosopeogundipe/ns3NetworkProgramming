@@ -4,10 +4,14 @@
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include "ns3/drrqueue.h"
 =======
 #include "drrqueue.h"
 >>>>>>> 268ba1f7133403f085b26b14b451162e6b586a7d
+=======
+#include "drrqueue.h"
+>>>>>>> f6dd3561ce82654f8afc374b0eddb2b36501a52a
 #include <bits/stdc++.h>
 
 #define NOCLASSIFY 0xffffffff
@@ -28,8 +32,9 @@ DRR::DRR (std::string configFile)
 	std::vector<uint32_t>::iterator iter = quantum.begin();
         for (int i=0; i<(int)num_queues; i++){
 	        TrafficClass queue;
-			deficit.push_back(0);
+			//deficit.push_back(0);
        		queue.SetWeight(*iter);
+		deficit.push_back(queue.GetWeight());
         	queue.SetDefault(false);
         	q_class.push_back(queue);
         	std::advance(iter, 1);
@@ -42,6 +47,7 @@ DRR::~DRR ()
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 DRR::DRR ()
 {
         NS_LOG_FUNCTION (this);
@@ -49,6 +55,8 @@ DRR::DRR ()
 
 =======
 >>>>>>> 268ba1f7133403f085b26b14b451162e6b586a7d
+=======
+>>>>>>> f6dd3561ce82654f8afc374b0eddb2b36501a52a
 TypeId
 DRR::GetTypeId (void)
 {
@@ -63,10 +71,14 @@ DRR::GetTypeId (void)
 
 bool
 <<<<<<< HEAD
+<<<<<<< HEAD
 DRR::DoEnqueue (Ptr<Packet> p)
 =======
 DiffServ::DoEnqueue (Ptr<Packet> p)
 >>>>>>> 268ba1f7133403f085b26b14b451162e6b586a7d
+=======
+DRR:DoEnqueue (Ptr<Packet> p)
+>>>>>>> f6dd3561ce82654f8afc374b0eddb2b36501a52a
 {
 	NS_LOG_FUNCTION (this);
  	uint32_t queuePos = Classify (p); //what logic should be in classify?
@@ -125,17 +137,21 @@ Ptr<Packet>
 DRR::DoDequeue() {
 	uint16_t num_empty = 0;
 	while(true) {
-		deficit[curr_queue_index]+=q_class[curr_queue_index].GetWeight();
 		Ptr<Packet>p = q_class[curr_queue_index].Peek();
 		if (p==NULL) {
 			num_empty++;
 <<<<<<< HEAD
+<<<<<<< HEAD
 			if (num_empty == num_queues) {//put as condition for while loop
+=======
+			if (num_empty == num_queues) {
+>>>>>>> f6dd3561ce82654f8afc374b0eddb2b36501a52a
 				return NULL;
 			}
 			curr_queue_index++;
-			//continue;
+			continue;
 		}
+<<<<<<< HEAD
 
 		else if (p->GetSize()<deficit[curr_queue_index]) {
 =======
@@ -147,10 +163,14 @@ DRR::DoDequeue() {
 		}
 		if (p->GetSize()<deficit[curr_queue_index]) {
 >>>>>>> 268ba1f7133403f085b26b14b451162e6b586a7d
+=======
+		if (p->GetSize()<=deficit[curr_queue_index]) {
+>>>>>>> f6dd3561ce82654f8afc374b0eddb2b36501a52a
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
-			curr_queue_index++;
+			//curr_queue_index++;
 			return q_class[curr_queue_index].Dequeue();
 		} else {
+			deficit[curr_queue_index]+=q_class[curr_queue_index].GetWeight();
 			curr_queue_index++;
 		}
 	}
