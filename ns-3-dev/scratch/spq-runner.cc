@@ -25,7 +25,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("ControlTest", LOG_LEVEL_ALL);
   LogComponentEnable ("SpqApplicationClient", LOG_LEVEL_ALL);
   LogComponentEnable ("SpqApplicationServer", LOG_LEVEL_ALL);
-  //LogComponentEnable ("StrictPriorityQueue", LOG_LEVEL_ALL); //log for the queue
+  LogComponentEnable ("StrictPriorityQueue", LOG_LEVEL_ALL); //log for the queue
   
   //create variables we will need
   std::string configPath = "";
@@ -60,7 +60,7 @@ main (int argc, char *argv[])
   p2p.SetDeviceAttribute ("DataRate", StringValue ("4Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
   NetDeviceContainer d01 = p2p.Install (c01);
-  p2p.EnablePcap("UDPsender", d01.Get(0), BooleanValue(false));
+  p2p.EnablePcap("SPQsender", d01.Get(0), BooleanValue(false));
 
 
   //populate link 2
@@ -68,7 +68,7 @@ main (int argc, char *argv[])
   p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
   NetDeviceContainer d12 = p2p.Install(c12);
-  p2p.EnablePcap("Receiver",d12.Get(0), BooleanValue(false));
+  p2p.EnablePcap("SPQreceiver",d12.Get(0), BooleanValue(false));
 
   //not quite sure what this does, tbh
 	p2p.SetCompress (BooleanValue (false));
@@ -78,7 +78,7 @@ main (int argc, char *argv[])
     //there's no way it's this easy
     //this sets all queues to SPQ. Do we only want to set the middle?
       //is there more that one queue?
-  //p2p.SetQueue("ns3::StrictPriorityQueue");
+  p2p.SetQueue(std::string("ns3::DropTailQueue"));
 
 
   //----------------------------------- add to internet -----------------------------------
