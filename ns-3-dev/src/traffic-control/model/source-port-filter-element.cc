@@ -25,6 +25,7 @@
 #include "ns3/tcp-header.h"
 #include "ns3/packet.h"
 #include "ns3/filter-element.h"
+#include "ns3/ipv4-header.h"
 
 namespace ns3 {
 
@@ -57,11 +58,9 @@ bool
 SourcePortFilterElement::Match (Ptr<Packet> packet) const
 {
   NS_LOG_FUNCTION (this);
-
-	ns3::TcpHeader tcpHeader;
-
+  
+  ns3::TcpHeader tcpHeader;
 	packet->PeekHeader (tcpHeader);
-
 	return tcpHeader.GetSourcePort () == port;
 }
 

@@ -3,7 +3,11 @@
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
+<<<<<<< HEAD
 #include "ns3/drrqueue.h"
+=======
+#include "drrqueue.h"
+>>>>>>> 268ba1f7133403f085b26b14b451162e6b586a7d
 #include <bits/stdc++.h>
 
 #define NOCLASSIFY 0xffffffff
@@ -37,11 +41,14 @@ DRR::~DRR ()
         NS_LOG_FUNCTION (this);
 }
 
+<<<<<<< HEAD
 DRR::DRR ()
 {
         NS_LOG_FUNCTION (this);
 }
 
+=======
+>>>>>>> 268ba1f7133403f085b26b14b451162e6b586a7d
 TypeId
 DRR::GetTypeId (void)
 {
@@ -55,7 +62,11 @@ DRR::GetTypeId (void)
 
 
 bool
+<<<<<<< HEAD
 DRR::DoEnqueue (Ptr<Packet> p)
+=======
+DiffServ::DoEnqueue (Ptr<Packet> p)
+>>>>>>> 268ba1f7133403f085b26b14b451162e6b586a7d
 {
 	NS_LOG_FUNCTION (this);
  	uint32_t queuePos = Classify (p); //what logic should be in classify?
@@ -69,7 +80,11 @@ DRR::DoEnqueue (Ptr<Packet> p)
 
 
 Ptr<Packet>
+<<<<<<< HEAD
 DRR::DoPeek ()
+=======
+DiffServ::DoPeek ()
+>>>>>>> 268ba1f7133403f085b26b14b451162e6b586a7d
 {
 	NS_LOG_FUNCTION (this);
 	Ptr<Packet> packet;
@@ -114,6 +129,7 @@ DRR::DoDequeue() {
 		Ptr<Packet>p = q_class[curr_queue_index].Peek();
 		if (p==NULL) {
 			num_empty++;
+<<<<<<< HEAD
 			if (num_empty == num_queues) {//put as condition for while loop
 				return NULL;
 			}
@@ -122,6 +138,15 @@ DRR::DoDequeue() {
 		}
 
 		else if (p->GetSize()<deficit[curr_queue_index]) {
+=======
+			if (num_empty == num_queues) {
+				return NULL;
+			}
+			curr_queue_index++;
+			continue;
+		}
+		if (p->GetSize()<deficit[curr_queue_index]) {
+>>>>>>> 268ba1f7133403f085b26b14b451162e6b586a7d
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
 			curr_queue_index++;
 			return q_class[curr_queue_index].Dequeue();
