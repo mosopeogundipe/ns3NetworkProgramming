@@ -110,16 +110,13 @@ main (int argc, char *argv[])
 
   DrrServerHelper medServer(portMed);
   ApplicationContainer appsMed = medServer.Install(c.Get (2));
-  appsMed = medServer.Install(c.Get (2));
   appsMed.Start(Seconds (0.0));
   appsMed.Stop(Seconds (150.0));
 
   DrrServerHelper lowServer(portLow);
   ApplicationContainer appsLow = lowServer.Install(c.Get (2));
-  appsLow = lowServer.Install(c.Get (2));
   appsLow.Start(Seconds (0.0));
   appsLow.Stop(Seconds (150.0));
-
 
 
   // two clients, one for high priority, one for low
