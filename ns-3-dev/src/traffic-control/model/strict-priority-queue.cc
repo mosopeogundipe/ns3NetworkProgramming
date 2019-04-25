@@ -160,6 +160,25 @@ StrictPriorityQueue::Schedule ()
 void
 StrictPriorityQueue::ReadFromConfig(std::string config_file_name){
     //Logic that reads the number_of_queues and priority_levels from config goes here...
+	std::string line;
+	std::ifstream readFile (config_file_name);
+	if (readFile.is_open ())
+		{
+			uint8_t i = 0;
+			while (getline (readFile,line) )
+				{		
+
+					if ( i == 0 )
+					{
+						number_of_queues = std::stoi (line);
+					}
+					else
+					{
+						priority_levels [i - 1] = std::stoi (line);
+					}
+					i++;
+				}
+		}
 }
 
 }

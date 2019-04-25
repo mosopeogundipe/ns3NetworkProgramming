@@ -9,13 +9,11 @@
 namespace ns3 {
     class DRR : public DiffServ{
 public:
-    	static TypeId GetTypeId (void);	
+    static TypeId GetTypeId (void);	
 	DRR (std::string config);
 	DRR();
 	~DRR ();
 
-	
-	uint32_t Classify (Ptr<Packet> p);
 	uint32_t num_queues;
     std::vector<uint32_t> quantum;
 	
@@ -27,6 +25,6 @@ private:
     //virtual bool Enqueue(TrafficClass DRRQueue, Ptr<Packet> p);
    	Ptr<Packet> DoDequeue (void);
 	Ptr<Packet> DoPeek (void);
-    	void ConfigReader(std::string config_file_name);
+    void ConfigReader(std::string config_file_name);
     };
 }
