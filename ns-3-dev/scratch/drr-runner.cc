@@ -28,7 +28,6 @@ main (int argc, char *argv[])
   
   //create variables we will need
   std::string configPath = "";
-  //bool enableGlobalCompression = false;
   uint16_t portHigh = 9999;
   uint16_t portMed  = 5555;
   uint16_t portLow  = 1111;
