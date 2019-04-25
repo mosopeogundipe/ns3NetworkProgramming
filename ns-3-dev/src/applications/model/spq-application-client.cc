@@ -206,7 +206,7 @@ void
 void
 SpqApplicationClient::Send (void)
 {
-  NS_LOG_FUNCTION (this);
+  //NS_LOG_FUNCTION (this);
     SeqTsHeader seqTs;
   //cout<<m_sent;
   seqTs.SetSeq (m_sent);

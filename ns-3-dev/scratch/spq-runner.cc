@@ -23,7 +23,7 @@ main (int argc, char *argv[])
 
   // setup logs
   LogComponentEnable ("ControlTest", LOG_LEVEL_ALL);
-  //LogComponentEnable ("SpqApplicationClient", LOG_LEVEL_ALL);
+  LogComponentEnable ("SpqApplicationClient", LOG_LEVEL_ALL);
   LogComponentEnable ("SpqApplicationServer", LOG_LEVEL_ALL);
   
   //create variables we will need
