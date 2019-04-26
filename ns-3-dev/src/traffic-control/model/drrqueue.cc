@@ -3,9 +3,11 @@
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
+#include "ns3/drrqueue.h"
 #include "drrqueue.h"
 #include <bits/stdc++.h>
 #include "dest-port-filter-element.h"
+#include "filter.h"
 
 #define NOCLASSIFY 0xffffffff
 
@@ -13,8 +15,10 @@ namespace ns3 {
    NS_LOG_COMPONENT_DEFINE("DRR");
    NS_OBJECT_ENSURE_REGISTERED (DRR);
 
-//#include 
-//ns3/traffic-class.h
+DRR::DRR ()
+{
+	NS_LOG_FUNCTION (this);
+}
 
 DRR::DRR (std::string configFile)
 {
@@ -22,6 +26,7 @@ DRR::DRR (std::string configFile)
 	num_queues = 0;	
 	ConfigReader (configFile);
 	FilterElement* fe;
+	Filter* filter;
 	std::vector<uint32_t>::iterator iter = quantum.begin();
     for (int i=0; i<(int)num_queues; i++){
 	    TrafficClass queue;
@@ -35,18 +40,26 @@ DRR::DRR (std::string configFile)
 		switch(i) {
 			case 0:
 			fe = (FilterElement*) new DestPortFilterElement(9999);
+			filter = new Filter();
+			filter->AddFilter(fe);
+			queue.filters.push_back(*filter);		
 			case 1:
 			fe = (FilterElement*) new DestPortFilterElement(5555);
+			filter = new Filter();
+			filter->AddFilter(fe);
+			queue.filters.push_back(*filter);	
 			case 2:
 			fe = (FilterElement*) new DestPortFilterElement(1111);
+			filter = new Filter();
+			filter->AddFilter(fe);
+			queue.filters.push_back(*filter);	
 		}
     }
-
 }
 
 DRR::~DRR ()
 {
-        NS_LOG_FUNCTION (this);
+	NS_LOG_FUNCTION (this);
 }
 
 DRR::DRR ()
@@ -78,7 +91,6 @@ DRR::DoEnqueue (Ptr<Packet> p)
 
 	return drrQueue.Enqueue(p);
 }
-
 
 Ptr<Packet>
 DRR::DoPeek ()

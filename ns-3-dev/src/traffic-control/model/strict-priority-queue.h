@@ -12,8 +12,7 @@ public:
 	//enum QueueMode { packet, byte };
     
     static TypeId GetTypeId (void);	
-	StrictPriorityQueue (std::string config_file_name);
-	StrictPriorityQueue();
+	StrictPriorityQueue ();
 	~StrictPriorityQueue ();
 
 	//void SetMode (QueueMode mode);
@@ -25,6 +24,7 @@ public:
 	
 private:
 	std::vector<TrafficClass> q_class;
+	std::string configFile;
 	//QueueMode m_mode;
 
 	//need to overwrite all of these marked virtual

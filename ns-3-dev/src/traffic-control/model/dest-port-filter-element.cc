@@ -22,6 +22,8 @@
 #include "dest-port-filter-element.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/ipv4-address.h"
+#include "ns3/ppp-header.h"
+#include "ns3/ipv4-header.h"
 #include "ns3/tcp-header.h"
 #include "ns3/packet.h"
 #include "ns3/filter-element.h"
@@ -58,8 +60,12 @@ DestPortFilterElement::Match (Ptr<Packet> packet) const
 {
   NS_LOG_FUNCTION (this);
 
+	ns3::PppHeader pppHeader;
+	ns3::Ipv4Header ipHeader;
 	ns3::TcpHeader tcpHeader;
 
+	packet->PeekHeader (pppHeader);
+	packet->PeekHeader (ipHeader);
 	packet->PeekHeader (tcpHeader);
 
 	return tcpHeader.GetDestinationPort () == port;
