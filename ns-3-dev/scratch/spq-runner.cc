@@ -102,13 +102,13 @@ main (int argc, char *argv[])
   SpqServerHelper highServer(portHigh);
   ApplicationContainer appsHigh = highServer.Install(c.Get (2));
   appsHigh.Start(Seconds (0.0));
-  appsHigh.Stop(Seconds (150.0));
+  appsHigh.Stop(Seconds (40.0));
 
   SpqServerHelper lowServer(portLow);
   ApplicationContainer appsLow = lowServer.Install(c.Get (2));
   //appsLow = lowServer.Install(c.Get (2));
   appsLow.Start(Seconds (0.0));
-  appsLow.Stop(Seconds (150.0));
+  appsLow.Stop(Seconds (40.0));
 
 
 
@@ -117,12 +117,12 @@ main (int argc, char *argv[])
   SpqClientHelper highClient(i12.GetAddress(1), portHigh);
   appsHigh = highClient.Install (c.Get (0));
   appsHigh.Start (Seconds (12.0)); //start sending at 12s
-  appsHigh.Stop (Seconds (150.0));
+  appsHigh.Stop (Seconds (40.0));
 
   SpqClientHelper lowClient(i12.GetAddress(1), portLow);
   appsLow = lowClient.Install (c.Get (0));
   appsLow.Start (Seconds (0.0)); //start sending at immediately 
-  appsLow.Stop (Seconds (150.0));
+  appsLow.Stop (Seconds (40.0));
 
 
   Simulator::Run ();

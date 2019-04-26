@@ -37,6 +37,7 @@ main (int argc, char *argv[])
 
   //read command line argument
     //in this case, only config file
+    
   CommandLine cmd;
   cmd.AddValue ("config", "The path to the config file that will be read", configPath);
   cmd.Parse (argc, argv);
@@ -107,17 +108,17 @@ main (int argc, char *argv[])
   DrrServerHelper highServer(portHigh);
   ApplicationContainer appsHigh = highServer.Install(c.Get (2));
   appsHigh.Start(Seconds (0.0));
-  appsHigh.Stop(Seconds (150.0));
+  appsHigh.Stop(Seconds (40.0));
 
   DrrServerHelper medServer(portMed);
   ApplicationContainer appsMed = medServer.Install(c.Get (2));
   appsMed.Start(Seconds (0.0));
-  appsMed.Stop(Seconds (30.0));
+  appsMed.Stop(Seconds (40.0));
 
   DrrServerHelper lowServer(portLow);
   ApplicationContainer appsLow = lowServer.Install(c.Get (2));
   appsLow.Start(Seconds (0.0));
-  appsLow.Stop(Seconds (30.0));
+  appsLow.Stop(Seconds (40.0));
 
 
   // two clients, one for high priority, one for low
@@ -125,17 +126,17 @@ main (int argc, char *argv[])
   DrrClientHelper highClient(i12.GetAddress(1), portHigh);
   appsHigh = highClient.Install (c.Get (0));
   appsHigh.Start (Seconds (0.0)); //all start at same time
-  appsHigh.Stop (Seconds (30.0));
+  appsHigh.Stop (Seconds (40.0));
 
   DrrClientHelper MedClient(i12.GetAddress(1), portMed);
   appsMed = MedClient.Install (c.Get (0));
   appsMed.Start (Seconds (0.0)); //all start at same time
-  appsMed.Stop (Seconds (30.0));
+  appsMed.Stop (Seconds (40.0));
 
   DrrClientHelper lowClient(i12.GetAddress(1), portLow);
   appsLow = lowClient.Install (c.Get (0));
   appsLow.Start (Seconds (0.0)); //all start at same time
-  appsLow.Stop (Seconds (30.0));
+  appsLow.Stop (Seconds (40.0));
 
 
   Simulator::Run ();
