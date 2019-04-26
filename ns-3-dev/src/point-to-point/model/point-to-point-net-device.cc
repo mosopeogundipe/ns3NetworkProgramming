@@ -555,7 +555,7 @@ PointToPointNetDevice::Send (
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
 
   //
-  // If IsLinkUp() is false it means there is no channel to send any packet 
+  // If IsLinkUp() is false it means there is no channel to send any packet
   // over so we just hit the drop trace on the packet and return an error.
   //
   if (IsLinkUp () == false)

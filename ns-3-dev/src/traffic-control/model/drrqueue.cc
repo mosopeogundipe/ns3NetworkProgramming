@@ -3,6 +3,7 @@
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
+#include "ns3/drrqueue.h"
 #include "drrqueue.h"
 #include <bits/stdc++.h>
 
@@ -12,8 +13,10 @@ namespace ns3 {
    NS_LOG_COMPONENT_DEFINE("DRR");
    NS_OBJECT_ENSURE_REGISTERED (DRR);
 
-//#include 
-//ns3/traffic-class.h
+DRR::DRR ()
+{
+	NS_LOG_FUNCTION (this);
+}
 
 DRR::DRR (std::string configFile)
 {
@@ -35,12 +38,7 @@ DRR::DRR (std::string configFile)
 
 DRR::~DRR ()
 {
-        NS_LOG_FUNCTION (this);
-}
-
-DRR::DRR ()
-{
-        NS_LOG_FUNCTION (this);
+	NS_LOG_FUNCTION (this);
 }
 
 TypeId
@@ -67,7 +65,6 @@ DRR::DoEnqueue (Ptr<Packet> p)
 
 	return drrQueue.Enqueue(p);
 }
-
 
 Ptr<Packet>
 DRR::DoPeek ()

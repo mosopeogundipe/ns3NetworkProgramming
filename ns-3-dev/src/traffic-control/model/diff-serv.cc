@@ -1,42 +1,74 @@
 
-#include "ns3/log.h"
+#include <queue>
 #include "ns3/enum.h"
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
+#include "ns3/queue.h"
 
 #define NOCLASSIFY 0xffffffff
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE("DiffServ");
-NS_OBJECT_ENSURE_REGISTERED (DiffServ);
+//NS_LOG_COMPONENT_DEFINE("DiffServ");
+//NS_OBJECT_ENSURE_REGISTERED (DiffServ);
 
 TypeId
 DiffServ::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::DiffServ")
-    .SetParent<QueueBase> ()
+    .SetParent<Queue<ns3::Packet>> ()
     .SetGroupName ("TrafficControl")
 		.AddConstructor<DiffServ> ()
   ;
   return tid;
 }
 
+bool
+DiffServ::Enqueue (Ptr<Packet> p)
+{
+	return false;
+}
+
+Ptr<Packet>
+DiffServ::Dequeue (void)
+{
+	return NULL;
+}
+
+Ptr<const Packet>
+DiffServ::Peek (void) const
+{
+	return NULL;
+}
+
+Ptr<Packet>
+DiffServ::Remove (void)
+{
+	return NULL;
+}
+
 DiffServ::DiffServ ()
 {
-	NS_LOG_FUNCTION (this);
+	//NS_LOG_FUNCTION (this);
 }
 
 DiffServ::~DiffServ ()
 {
-	NS_LOG_FUNCTION (this);
+	//NS_LOG_FUNCTION (this);
+}
+
+void
+DiffServ::AddTrafficClass (TrafficClass t)
+{
+	//NS_LOG_FUNCTION (this);
+	q_class.push_back (t);
 }
 
 bool
 DiffServ::DoEnqueue (Ptr<Packet> p)
 {
-	NS_LOG_FUNCTION (this);
+	//NS_LOG_FUNCTION (this);
 
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);
@@ -66,7 +98,7 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 Ptr<Packet>
 DiffServ::DoDequeue ()
 {
-	NS_LOG_FUNCTION (this);
+	//NS_LOG_FUNCTION (this);
 
 	Ptr<Packet> packet;
 
@@ -86,7 +118,7 @@ DiffServ::DoDequeue ()
 Ptr<Packet>
 DiffServ::DoRemove ()
 {
-	NS_LOG_FUNCTION (this);
+	//NS_LOG_FUNCTION (this);
 
 	// Actual logic should be same as DoDequeue
 	return DoDequeue ();
@@ -95,7 +127,7 @@ DiffServ::DoRemove ()
 Ptr<Packet>
 DiffServ::DoPeek ()
 {
-	NS_LOG_FUNCTION (this);
+	//NS_LOG_FUNCTION (this);
 
 	//same logic as DoDequeue () but we don't remove the packet
 	Ptr<Packet> packet;
@@ -115,7 +147,7 @@ DiffServ::DoPeek ()
 void
 DiffServ::SetMode (QueueMode mode)
 {
-	NS_LOG_FUNCTION (this);
+	//NS_LOG_FUNCTION (this);
 
 	m_mode = mode;
 }
@@ -123,14 +155,14 @@ DiffServ::SetMode (QueueMode mode)
 DiffServ::QueueMode
 DiffServ::GetMode ()
 {
-	NS_LOG_FUNCTION (this);
+	//NS_LOG_FUNCTION (this);
 	return m_mode;
 }
 
 Ptr<Packet>
 DiffServ::Schedule ()
 {
-	NS_LOG_FUNCTION (this);
+	//NS_LOG_FUNCTION (this);
 
 	// all we need to do here is call DoDequeue which should have QOS logic
 	return DoDequeue ();
@@ -139,7 +171,7 @@ DiffServ::Schedule ()
 uint32_t
 DiffServ::Classify (Ptr<Packet> p)
 {
-	NS_LOG_FUNCTION (this);
+	//NS_LOG_FUNCTION (this);
 
 	// default is max value to signify no match
 	uint32_t pos = NOCLASSIFY;

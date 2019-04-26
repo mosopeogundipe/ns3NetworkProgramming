@@ -10,8 +10,7 @@
 
 namespace ns3 {
 
-class DiffServ : public QueueBase
-{
+class DiffServ : public ns3::Queue<ns3::Packet> {
 public:
 	enum QueueMode { packet, byte };
 
@@ -19,10 +18,16 @@ public:
 	DiffServ ();
 	~DiffServ ();
 
+	void AddTrafficClass (TrafficClass t);
+
 	void SetMode (QueueMode mode);
 	QueueMode GetMode ();
 	virtual Ptr<Packet> Schedule (); //this only calls DoDequeue so....
 	uint32_t Classify (Ptr<Packet> p);
+	bool Enqueue (Ptr<Packet> p);
+	Ptr<Packet> Dequeue (void);
+	Ptr<const Packet> Peek (void) const;
+	Ptr<Packet> Remove (void);
 
 private:
 	std::vector<TrafficClass> q_class;
