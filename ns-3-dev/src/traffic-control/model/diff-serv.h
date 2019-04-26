@@ -10,7 +10,7 @@
 
 namespace ns3 {
 
-class DiffServ : public ns3::QueueBase {
+class DiffServ : public ns3::Queue<ns3::Packet> {
 public:
 	enum QueueMode { packet, byte };
 

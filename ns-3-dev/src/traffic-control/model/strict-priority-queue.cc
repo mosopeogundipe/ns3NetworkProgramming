@@ -22,13 +22,12 @@ StrictPriorityQueue::GetTypeId (void)
   ;
   return tid;
 }
-StrictPriorityQueue::StrictPriorityQueue(){
-	NS_LOG_FUNCTION (this);
-}
-StrictPriorityQueue::StrictPriorityQueue (std::string config_file_name)
+
+StrictPriorityQueue::StrictPriorityQueue ()
 {
 	NS_LOG_FUNCTION (this);
-    ReadFromConfig(config_file_name);   // ---->>>> HINT.SOPE: Add logic in this function!
+	configFile = "spq-config.txt";
+    ReadFromConfig(configFile);   // ---->>>> HINT.SOPE: Add logic in this function!
     if(number_of_queues == priority_levels.size()){
 		//sort in decreasing order of priority
 		std::sort(priority_levels.begin(), priority_levels.end(), std::greater<u_int32_t>()); 

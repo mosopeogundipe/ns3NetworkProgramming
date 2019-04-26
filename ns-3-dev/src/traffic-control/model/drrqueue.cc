@@ -13,6 +13,11 @@ namespace ns3 {
    NS_LOG_COMPONENT_DEFINE("DRR");
    NS_OBJECT_ENSURE_REGISTERED (DRR);
 
+DRR::DRR ()
+{
+	NS_LOG_FUNCTION (this);
+}
+
 DRR::DRR (std::string configFile)
 {
        	NS_LOG_FUNCTION (this);	
@@ -29,6 +34,11 @@ DRR::DRR (std::string configFile)
         	q_class.push_back(queue);
         	std::advance(iter, 1);
         }
+}
+
+DRR::~DRR ()
+{
+	NS_LOG_FUNCTION (this);
 }
 
 TypeId
@@ -52,7 +62,9 @@ DRR::DoEnqueue (Ptr<Packet> p)
 		return false;
 	}
 	TrafficClass drrQueue = q_class[queuePos];
+
 	return drrQueue.Enqueue(p);
+}
 
 Ptr<Packet>
 DRR::DoPeek ()
@@ -92,11 +104,18 @@ DRR::DoPeek ()
 // 	}
 // }
 
-			num_empty++;//put as condition for while loop
-			if (num_empty == num_queues) {//put as condition for while loop
+Ptr<Packet>
+DRR::DoDequeue() {
+	uint16_t num_empty = 0;
+	while(true) {
+		Ptr<Packet>p = q_class[curr_queue_index].Peek();
+		if (p==NULL) {
+			num_empty++;
+			if (num_empty == num_queues) {
 				return NULL;
 			}
 			curr_queue_index++;
+			continue;
 		}
 		if (p->GetSize()<=deficit[curr_queue_index]) {
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
