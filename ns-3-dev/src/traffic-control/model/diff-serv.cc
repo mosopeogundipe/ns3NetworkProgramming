@@ -24,6 +24,30 @@ DiffServ::GetTypeId (void)
   return tid;
 }
 
+bool
+DiffServ::Enqueue (Ptr<Packet> p)
+{
+	return false;
+}
+
+Ptr<Packet>
+DiffServ::Dequeue (void)
+{
+	return NULL;
+}
+
+Ptr<const Packet>
+DiffServ::Peek (void) const
+{
+	return NULL;
+}
+
+Ptr<Packet>
+DiffServ::Remove (void)
+{
+	return NULL;
+}
+
 DiffServ::DiffServ ()
 {
 	//NS_LOG_FUNCTION (this);
