@@ -17,12 +17,12 @@ namespace ns3 {
 
 DRR::DRR ()
 {
-	NS_LOG_FUNCTION (this);
+//	NS_LOG_FUNCTION (this);
 }
 
 DRR::DRR (std::string configFile)
 {
-    NS_LOG_FUNCTION (this);	
+//    NS_LOG_FUNCTION (this);	
 	num_queues = 0;	
 	ConfigReader (configFile);
 	FilterElement* fe;
@@ -59,12 +59,7 @@ DRR::DRR (std::string configFile)
 
 DRR::~DRR ()
 {
-	NS_LOG_FUNCTION (this);
-}
-
-DRR::DRR ()
-{
-        NS_LOG_FUNCTION (this);
+//	NS_LOG_FUNCTION (this);
 }
 
 TypeId
@@ -82,7 +77,7 @@ DRR::GetTypeId (void)
 bool
 DRR::DoEnqueue (Ptr<Packet> p)
 {
-	NS_LOG_FUNCTION (this);
+//	NS_LOG_FUNCTION (this);
  	uint32_t queuePos = Classify (p); //what logic should be in classify?
 	if (q_class.empty()){
 		return false;
@@ -95,7 +90,7 @@ DRR::DoEnqueue (Ptr<Packet> p)
 Ptr<Packet>
 DRR::DoPeek ()
 {
-	NS_LOG_FUNCTION (this);
+//	NS_LOG_FUNCTION (this);
 	Ptr<Packet> packet;
 
 	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
