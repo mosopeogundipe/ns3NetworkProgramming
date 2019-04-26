@@ -5,6 +5,7 @@
 #include "ns3/traffic-class.h"
 #include "drrqueue.h"
 #include <bits/stdc++.h>
+#include "dest-port-filter-element.h"
 
 #define NOCLASSIFY 0xffffffff
 
@@ -17,20 +18,30 @@ namespace ns3 {
 
 DRR::DRR (std::string configFile)
 {
-       	NS_LOG_FUNCTION (this);	
-	num_queues = 0;	   
+    NS_LOG_FUNCTION (this);	
+	num_queues = 0;	
 	ConfigReader (configFile);
-
+	FilterElement* fe;
 	std::vector<uint32_t>::iterator iter = quantum.begin();
-        for (int i=0; i<(int)num_queues; i++){
-	        TrafficClass queue;
-			//deficit.push_back(0);
-       		queue.SetWeight(*iter);
+    for (int i=0; i<(int)num_queues; i++){
+	    TrafficClass queue;
+		//deficit.push_back(0);
+       	queue.SetWeight(*iter);
 		deficit.push_back(queue.GetWeight());
-        	queue.SetDefault(false);
-        	q_class.push_back(queue);
-        	std::advance(iter, 1);
-        }
+        queue.SetDefault(false);
+        q_class.push_back(queue);
+        std::advance(iter, 1);
+		//destination port hard code
+		switch(i) {
+			case 0:
+			fe = (FilterElement*) new DestPortFilterElement(9999);
+			case 1:
+			fe = (FilterElement*) new DestPortFilterElement(5555);
+			case 2:
+			fe = (FilterElement*) new DestPortFilterElement(1111);
+		}
+    }
+
 }
 
 DRR::~DRR ()
@@ -86,27 +97,6 @@ DRR::DoPeek ()
 	return NULL;
 }
 
-// bool
-// DRR::Enqueue(TrafficClass drrQueue, Ptr<Packet> p){
-// 	//don't have a normal queue logic here, I put packets by order in rounds
-// 	int count = 0;
-// 	while (true)
-//                 for (int i=0; i<numQueues; i++){
-// 			if (!q_class.empty()){
-// 				q_class[i].Enqueue(p);
-// 			}
-// 			else if (q_class[i].size()<q_class[i+1].size()){
-// 				q_class[i].enqueue(p);
-// 			} else if (q_class[i].size()==q_class[i+1].size()) {
-// 				count++;
-// 			}
-// 		}
-// 	//all queues have the same size
-// 	if (count == numQueues) && (!q_class[0].empty()) {
-// 		q_class[0].enqueue(p);
-// 	}
-// }
-
 Ptr<Packet>
 DRR::DoDequeue() {
 	uint16_t num_empty = 0;
@@ -122,7 +112,6 @@ DRR::DoDequeue() {
 		}
 		if (p->GetSize()<=deficit[curr_queue_index]) {
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
-			//curr_queue_index++;
 			return q_class[curr_queue_index].Dequeue();
 		} else {
 			deficit[curr_queue_index]+=q_class[curr_queue_index].GetWeight();
@@ -141,11 +130,8 @@ DRR::ConfigReader(std::string configFile) {
 			uint8_t i = 0;
 			while (getline (readFile,line) )
 				{
-					
-
 					if ( i == 0 )
 					{
-						//quantum = new uint16_t [std::stoi (line)];
 						num_queues = std::stoi (line);
 					}
 					else
