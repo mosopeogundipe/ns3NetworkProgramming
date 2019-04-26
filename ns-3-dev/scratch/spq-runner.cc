@@ -77,12 +77,8 @@ main (int argc, char *argv[])
     //there's no way it's this easy
     //this sets all queues to SPQ. Do we only want to set the middle?
       //is there more that one queue?
-<<<<<<< HEAD
   //p2p.SetQueue(std::string("ns3::StrictPriorityQueue"));
   p2p.SetQueue(std::string("ns3::DropTailQueue"));
-=======
-  p2p.SetQueue("ns3::DropTailQueue");
->>>>>>> 8b85e66e85b7fa81cf2380e175a5fa448053925d
 
 
   //----------------------------------- add to internet -----------------------------------
