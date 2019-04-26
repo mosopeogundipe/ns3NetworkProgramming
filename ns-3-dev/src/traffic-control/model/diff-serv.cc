@@ -153,6 +153,7 @@ DiffServ::Classify (Ptr<Packet> p)
 				if (target.Match (p) && (pos == NOCLASSIFY || target.IsDefault ()))
 					{
 						pos = i;
+						break; // break out once matching queue class is found
 					}
 				i++;
 		}

@@ -25,6 +25,7 @@ public:
 private:
 	std::vector<TrafficClass> q_class;
 	std::string configFile;
+	std::vector<Filter> filters;
 	//QueueMode m_mode;
 
 	//need to overwrite all of these marked virtual
