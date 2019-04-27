@@ -40,7 +40,6 @@
  
    void SetPacketWindowSize (uint16_t size);
 
-   Time GetTimeDifference(void);
  protected:
    virtual void DoDispose (void);
  
@@ -56,19 +55,6 @@
    Ptr<Socket> m_socket6; 
    uint64_t m_received; 
    PacketLossCounter m_lossCounter; 
-
-   //variables used to test compression
-    Time first= Time();
-	  Time last= Time();
-    Time diff = Time();
-    //Time firstHigh= Time();
-	  //Time lastHigh= Time();
-
-    bool hasSeenFirstLowEntropyPacket = false;
-    bool hasSeenFirstHighEntropyPacket = false;
-    bool IsLowEntropyPacket(Ptr<Packet> packet);
-    void PrintResult();    
-    int64_t difference;
 
    TracedCallback<Ptr<const Packet> > m_rxTrace;
  

@@ -68,7 +68,6 @@ namespace ns3 {
 	DrrApplicationServer::DrrApplicationServer () : m_lossCounter (0)
 	{
 		NS_LOG_FUNCTION (this);
-		difference = 0;
 		m_received=0;
 	}
 	
@@ -103,12 +102,6 @@ namespace ns3 {
 	{
 		NS_LOG_FUNCTION (this);
 		return m_received;
-	}
-	
-	Time 
-	DrrApplicationServer::GetTimeDifference(void)
-	{
-		return diff;
 	}
 
 	void
@@ -158,7 +151,7 @@ namespace ns3 {
 	{
 		NS_LOG_FUNCTION (this);
 		//PrintResult();
-		diff = last - first;
+	
 		if (m_socket != 0)
 			{
 				m_socket->SetRecvCallback (MakeNullCallback<void, Ptr<Socket> > ());
@@ -180,79 +173,17 @@ namespace ns3 {
 				m_rxTraceWithAddresses (packet, from, localAddress);
 				if (packet->GetSize () > 0)
 					{
-						NS_LOG_INFO ("server recieved packet: "<< m_received << " on port "<< m_port);
+						NS_LOG_INFO ("server recieved packet: "<< m_received+1 << " on port "<< m_port);
 
 						SeqTsHeader seqTs;
 						packet->RemoveHeader (seqTs);
 						uint32_t currentSequenceNumber = seqTs.GetSeq ();
-
-						if(currentSequenceNumber == 0){
-							first = Simulator::Now();
-						}
-						last = Simulator::Now();
-						// if(!hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
-						// 	firstLow = Simulator::Now();
-						// 	hasSeenFirstLowEntropyPacket = true;
-						// }
-						// else if(hasSeenFirstLowEntropyPacket && IsLowEntropyPacket(packet)){
-						// 	lastLow = Simulator::Now();
-						// }
-						// else if(!hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
-						// 	firstHigh = Simulator::Now();
-						// 	hasSeenFirstHighEntropyPacket = true;
-						// }
-						// else if(hasSeenFirstHighEntropyPacket && !IsLowEntropyPacket(packet)){
-						// 	lastHigh = Simulator::Now();
-						// }
 						
-						m_lossCounter.NotifyReceived (currentSequenceNumber);
+						m_lossCounter.NotifyReceived(currentSequenceNumber);
 						m_received++;
 
 					}
 			}
-			// int64_t firstLowMs = firstLow.GetMilliSeconds();
-			// int64_t lastLowMs = lastLow.GetMilliSeconds();
-
-			// int64_t firstHighMs = firstHigh.GetMilliSeconds();
-			// int64_t lastHighMs = lastHigh.GetMilliSeconds();
-			// int64_t deltaLow = lastLowMs - firstLowMs;
-			// int64_t deltaHigh = lastHighMs - firstHighMs;
-
-			// difference = deltaHigh - deltaLow; 	//abs value was important to make it detect compression in links, was getting negative values for valid compression links
-	}
+}
 	
-	//checks if a packet's data contains only zeros. If so, it's a low entropy packet
-	//if we have >= 1100 zeros, then it's a low entropy packet
-	bool DrrApplicationServer::IsLowEntropyPacket(Ptr<Packet> packet){
-		int size = packet -> GetSize();
-		uint8_t raw_data[size];
-    	packet->CopyData(raw_data, size);
-		int numberOfZeros = 0;
-		for(int i=0; i<size; i++){
-			if((int)raw_data[i] == 0){
-				numberOfZeros ++;
-			}
-		}
-		if(numberOfZeros >= 1100){//1100 is our packet data size
-			return true;
-		}
-		return false;
-	}
-	
-	void DrrApplicationServer::PrintResult(){		
-		if(difference >= 100){
-			NS_LOG_INFO ("Compression detected!\n\tDifference In arrival times: "<< difference);
-		}
-		else{
-			NS_LOG_INFO ("No Compression detected!\n\tDifference In arrival times: "<< difference);
-			// NS_LOG_INFO ("No compression was detected.\n"
-			// <<"\tfirst low entropy packet time: " << firstLow << "\n"
-			// <<"\tlast low entropy packet time: " << lastLow << "\n"
-			// <<"\tfirst high entropy packet time: " << firstHigh << "\n"
-			// <<"\tlast high entropy packet time: " << lastHigh << "\n"
-			// <<"\t\tDifference In arrival times: "<< dif);
-		}
-		difference = 0;
-	} 
-
  } // Namespace ns3

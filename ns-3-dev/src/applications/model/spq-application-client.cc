@@ -11,7 +11,7 @@
 		4/16/19
 
 	Todo:
-
+		Remove option for high entropy, and just send empty packets
 */
 
 
@@ -54,7 +54,7 @@ namespace ns3 {
 			//Any additional attributes needed?
 			.AddAttribute ("MaxPackets",
 							"The maximum number of packets the application will send",
-							UintegerValue (6000), //changed to 12000, for num of packets to send
+							UintegerValue (20000), //changed to 20000, for num of packets to send
 							MakeUintegerAccessor (&SpqApplicationClient::m_count),
 							MakeUintegerChecker<uint32_t> ())
 			.AddAttribute ("Interval",
@@ -79,12 +79,6 @@ namespace ns3 {
 							MakeUintegerAccessor (&SpqApplicationClient::m_size),
 							//MakeUintegerChecker<uint32_t> (12,65507))
 							MakeUintegerChecker<uint32_t> ())
-			.AddAttribute ("SetEntropy",
-							"If true, create high entropy packets. If false, create low entropy packets",
-							BooleanValue (false), //additional 12 bytes added for header and timestamp, 1100 bytes of payload required
-							MakeBooleanAccessor (&SpqApplicationClient::m_set_entropy),
-							MakeBooleanChecker())
-
 		;
 		return tid;
 	}
@@ -96,8 +90,7 @@ namespace ns3 {
 		m_socket = 0;
 
 		//note: if we stop while they both have that same Id, that'll probably cause an error
-		m_sendTrain1 = EventId();
-		m_sendTrain2 = EventId();
+		m_sendEvent = EventId();
 	}
 	 
 	SpqApplicationClient::~SpqApplicationClient ()
@@ -187,41 +180,17 @@ SpqApplicationClient::StopApplication (void)
 }
 
 void
- SpqApplicationClient::createLowEntropyPackets (uint8_t*  buffer, uint32_t m_size)
- {
-  for (uint32_t i = 0; i < m_size; i++){
-    buffer[i] = 0x00;
-  }
- }
-
- //create high entropy
- void
- SpqApplicationClient::createHighEntropyPackets (uint8_t* buffer, uint32_t m_size)
- {
-	int fd = open("/dev/urandom", O_RDONLY);
-	read(fd, buffer, m_size);
-	 //buffer now contains the random data
- }
-
-void
 SpqApplicationClient::Send (void)
 {
-  //NS_LOG_FUNCTION (this);
-    SeqTsHeader seqTs;
-  //cout<<m_sent;
+  //create packet
+  SeqTsHeader seqTs;
   seqTs.SetSeq (m_sent);
-  uint8_t* buffer = new uint8_t[m_size+8+4];
-   Ptr<Packet> p;
-   //set entropy high and low done  
-  if (m_set_entropy == true) { //if true
-   createHighEntropyPackets(buffer, m_size+8+4);
-    p = Create<Packet> (buffer, m_size+8+4);
-  }else{ //false 
-    createLowEntropyPackets(buffer, m_size+8+4);
-    p = Create<Packet> (buffer, m_size+8+4);
-  }
-  //Ptr<Packet> p = Create<Packet> ((uint8_t*) str.str().c_str(), str.str().length() + 1); // 8+4 : the size of the seqTs header
-  p->AddHeader (seqTs);
+
+	//create packet
+  Ptr<Packet> p;
+  p = Create<Packet>();
+  
+  p->AddHeader(seqTs);
 
   std::stringstream peerAddressStringStream;
   if (Ipv4Address::IsMatchingType (m_peerAddress))
@@ -236,6 +205,8 @@ SpqApplicationClient::Send (void)
   if ((m_socket->Send (p)) >= 0)
     {
       ++m_sent;
+			NS_LOG_INFO ("client sent packet: "<< m_sent << " to port "<< m_peerPort);
+
       //NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
       //                              << peerAddressStringStream.str () << " Uid: "
       //                              << p->GetUid () << " Time: "
