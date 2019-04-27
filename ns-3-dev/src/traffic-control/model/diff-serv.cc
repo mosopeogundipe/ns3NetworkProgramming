@@ -78,12 +78,12 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 	TrafficClass target = q_class[queuePos];
 	uint32_t pSize = p->GetSize ();
 
-	if (m_mode == packet && target.GetPackets () < target.GetMaxPackets () - 1)
+	if (m_mode == packet && target.GetPackets () < target.GetMaxPackets ())
 		{
 			return target.Enqueue (p);
 		}
 
-	if (m_mode == byte && target.GetBytes () + pSize < target.GetMaxPackets ())
+	if (m_mode == byte && target.GetBytes () + pSize <= target.GetMaxPackets ())
 		{
 			return target.Enqueue (p);
 		}
