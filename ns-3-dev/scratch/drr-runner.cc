@@ -10,7 +10,6 @@
 #include "ns3/csma-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/strict-priority-queue.h"
 
 using namespace ns3;
 
@@ -82,7 +81,7 @@ main (int argc, char *argv[])
     //there's no way it's this easy
     //this sets all queues to DRR. Do we only want to set the middle?
       //is there more that one queue?
-  p2p.SetQueue(std::string("ns3::DropTailQueue"));
+  p2p.SetQueue(std::string("ns3::DRR"));
 
 
   //----------------------------------- add to internet -----------------------------------

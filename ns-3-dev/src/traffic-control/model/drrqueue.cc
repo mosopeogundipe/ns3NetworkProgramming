@@ -13,7 +13,7 @@
 
 namespace ns3 {
    NS_LOG_COMPONENT_DEFINE("DRR");
-   NS_OBJECT_ENSURE_REGISTERED (DRR);
+   NS_OBJECT_ENSURE_REGISTERED(DRR);
 
 DRR::DRR ()
 {
@@ -65,7 +65,7 @@ DRR::~DRR ()
 TypeId
 DRR::GetTypeId (void)
 {
-	static TypeId tid = TypeId ("ns3::DRR")
+	static TypeId tid = TypeId ("ns3::DRR<Packet>")
         .SetParent<Object> ()
         .SetGroupName ("TrafficControl")
 	.AddConstructor<DRR> ()

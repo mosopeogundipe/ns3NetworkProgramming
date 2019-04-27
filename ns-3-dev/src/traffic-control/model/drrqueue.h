@@ -1,5 +1,8 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+
 #ifndef DRR_H
 #define DRR_H
+
 #include <queue>
 #include <vector>
 #include "ns3/packet.h"
@@ -9,7 +12,8 @@
 #include "ns3/diff-serv.h"
 
 namespace ns3 {
-    class DRR : public DiffServ{
+
+  class DRR : public DiffServ{
 public:
 
   static TypeId GetTypeId (void);	
