@@ -16,6 +16,7 @@ namespace ns3 {
 TypeId
 DiffServ::GetTypeId (void)
 {
+	std::cout << "Entered DiffServ: GetTypeId";
   static TypeId tid = TypeId ("ns3::DiffServ")
     .SetParent<Queue<ns3::Packet>> ()
     .SetGroupName ("TrafficControl")
@@ -50,6 +51,7 @@ DiffServ::Remove (void)
 
 DiffServ::DiffServ ()
 {
+	std::cout << "Entered DiffServ";
 	//NS_LOG_FUNCTION (this);
 }
 

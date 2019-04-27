@@ -10,7 +10,6 @@
 #include "ns3/csma-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/strict-priority-queue.h"
 
 using namespace ns3;
 
@@ -60,7 +59,7 @@ main (int argc, char *argv[])
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
   NetDeviceContainer d01 = p2p.Install (c01);
   p2p.EnablePcap("UDPsender", d01.Get(0), BooleanValue(false));
-
+  
 
   //populate link 2
 	NS_LOG_INFO("Second link speed: 1Mbps");
@@ -77,8 +76,8 @@ main (int argc, char *argv[])
     //there's no way it's this easy
     //this sets all queues to SPQ. Do we only want to set the middle?
       //is there more that one queue?
-  //p2p.SetQueue(std::string("ns3::StrictPriorityQueue"));
-  p2p.SetQueue(std::string("ns3::DropTailQueue"));
+  p2p.SetQueue(std::string("ns3::StrictPrioirityQueue"));
+  //p2p.SetQueue(std::string("ns3::DropTailQueue"));
 
 
   //----------------------------------- add to internet -----------------------------------

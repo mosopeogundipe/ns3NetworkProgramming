@@ -13,6 +13,7 @@ public:
     
     static TypeId GetTypeId (void);	
 	StrictPriorityQueue ();
+	//StrictPriorityQueue (std::string config_file_name);
 	~StrictPriorityQueue ();
 
 	//void SetMode (QueueMode mode);
@@ -35,5 +36,6 @@ private:
 	Ptr<Packet> DoRemove (); // why is this here? it's the same as DoDequeue
 	Ptr<Packet> DoPeek (); // same logic as DoDequeue but no removal
     void ReadFromConfig(std::string config_file_name);
+	void CreateFilters();
     };
 }

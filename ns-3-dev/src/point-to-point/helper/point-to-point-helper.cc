@@ -42,6 +42,7 @@ NS_LOG_COMPONENT_DEFINE ("PointToPointHelper");
 PointToPointHelper::PointToPointHelper ()
 {
   m_queueFactory.SetTypeId ("ns3::DropTailQueue<Packet>");
+  //m_queueFactory.SetTypeId ("ns3::StrictPrioirityQueue<Packet>");
   m_deviceFactory.SetTypeId ("ns3::PointToPointNetDevice");
   m_channelFactory.SetTypeId ("ns3::PointToPointChannel");
   m_remoteChannelFactory.SetTypeId ("ns3::PointToPointRemoteChannel");
