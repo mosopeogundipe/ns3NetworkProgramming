@@ -94,6 +94,8 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 Ptr<Packet>
 DiffServ::DoDequeue (void)
 {
+	std::cout << "DiffServ" << std::endl;
+	exit (0);
 	Ptr<Packet> packet;
 
 	// Will use the first TrafficClass by default

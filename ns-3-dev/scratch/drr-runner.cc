@@ -10,7 +10,6 @@
 #include "ns3/csma-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/strict-priority-queue.h"
 
 using namespace ns3;
 
@@ -25,6 +24,8 @@ main (int argc, char *argv[])
   LogComponentEnable ("ControlTest", LOG_LEVEL_ALL);
   LogComponentEnable ("DrrApplicationClient", LOG_LEVEL_ALL);
   LogComponentEnable ("DrrApplicationServer", LOG_LEVEL_ALL);
+  //LogComponentEnable ("DRR", LOG_LEVEL_ALL); //log for the queue
+
   
   //create variables we will need
   std::string configPath = "";
@@ -35,6 +36,7 @@ main (int argc, char *argv[])
 
   //read command line argument
     //in this case, only config file
+    
   CommandLine cmd;
   cmd.AddValue ("config", "The path to the config file that will be read", configPath);
   cmd.Parse (argc, argv);
@@ -47,12 +49,14 @@ main (int argc, char *argv[])
   NodeContainer c;
   c.Create(3);
 
-  
+	PointToPointNetDevice p1;
+	PointToPointNetDevice p2;
+	PointToPointNetDevice p3;
   //----------------------------------- create links -----------------------------------
 
   // We create the channels first without any IP addressing information
   PointToPointHelper p2p;
-  std::string str;
+  //std::string str;
 
   // Point-to-point links
   NodeContainer c01 = NodeContainer(c.Get (0), c.Get (1)); //link 1
@@ -62,15 +66,14 @@ main (int argc, char *argv[])
   p2p.SetDeviceAttribute ("DataRate", StringValue ("4Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
   NetDeviceContainer d01 = p2p.Install (c01);
-  p2p.EnablePcap("UDPsender", d01.Get(0), BooleanValue(false));
+  p2p.EnablePcap("pre_DRR", d01.Get(0), BooleanValue(false));
 
 
   //populate link 2
-  NS_LOG_INFO("Second link speed: 1Mbps");
   p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
   NetDeviceContainer d12 = p2p.Install(c12);
-  p2p.EnablePcap("Receiver",d12.Get(0), BooleanValue(false));
+  p2p.EnablePcap("post_DRR",d12.Get(0), BooleanValue(false));
 
   //not quite sure what this does, tbh
   p2p.SetCompress (BooleanValue (false));
@@ -78,9 +81,9 @@ main (int argc, char *argv[])
   //----------------------------------- add queue to middle node -----------------------------------
   //todo:
     //there's no way it's this easy
-    //this sets all queues to SPQ. Do we only want to set the middle?
+    //this sets all queues to DRR. Do we only want to set the middle?
       //is there more that one queue?
-  //p2p.SetQueue("ns3::StrictPriorityQueue");
+  p2p.SetQueue(std::string("ns3::DRR"));
 
 
   //----------------------------------- add to internet -----------------------------------
@@ -106,41 +109,35 @@ main (int argc, char *argv[])
   DrrServerHelper highServer(portHigh);
   ApplicationContainer appsHigh = highServer.Install(c.Get (2));
   appsHigh.Start(Seconds (0.0));
-  appsHigh.Stop(Seconds (150.0));
+  appsHigh.Stop(Seconds (40.0));
 
   DrrServerHelper medServer(portMed);
   ApplicationContainer appsMed = medServer.Install(c.Get (2));
-  appsMed = medServer.Install(c.Get (2));
   appsMed.Start(Seconds (0.0));
-  appsMed.Stop(Seconds (150.0));
+  appsMed.Stop(Seconds (40.0));
 
   DrrServerHelper lowServer(portLow);
   ApplicationContainer appsLow = lowServer.Install(c.Get (2));
-  appsLow = lowServer.Install(c.Get (2));
   appsLow.Start(Seconds (0.0));
-  appsLow.Stop(Seconds (150.0));
-
+  appsLow.Stop(Seconds (40.0));
 
 
   // two clients, one for high priority, one for low
     //note: not sure that's the correct way to get the destination address
   DrrClientHelper highClient(i12.GetAddress(1), portHigh);
-  highClient.SetAttribute("SetEntropy", BooleanValue (false));
   appsHigh = highClient.Install (c.Get (0));
   appsHigh.Start (Seconds (0.0)); //all start at same time
-  appsHigh.Stop (Seconds (150.0));
+  appsHigh.Stop (Seconds (40.0));
 
   DrrClientHelper MedClient(i12.GetAddress(1), portMed);
-  MedClient.SetAttribute("SetEntropy", BooleanValue (false));
   appsMed = MedClient.Install (c.Get (0));
   appsMed.Start (Seconds (0.0)); //all start at same time
-  appsMed.Stop (Seconds (150.0));
+  appsMed.Stop (Seconds (40.0));
 
   DrrClientHelper lowClient(i12.GetAddress(1), portLow);
-  lowClient.SetAttribute("SetEntropy", BooleanValue (false));
   appsLow = lowClient.Install (c.Get (0));
   appsLow.Start (Seconds (0.0)); //all start at same time
-  appsLow.Stop (Seconds (150.0));
+  appsLow.Stop (Seconds (40.0));
 
 
   Simulator::Run ();

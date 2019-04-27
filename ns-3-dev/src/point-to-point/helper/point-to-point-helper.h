@@ -51,6 +51,8 @@ public:
   PointToPointHelper ();
   virtual ~PointToPointHelper () {}
 
+	void AddQueueToOne (std::string queue);
+
   /**
    * Each point to point net device must have a queue to pass packets through.
    * This method allows one to set the type of the queue that is automatically
