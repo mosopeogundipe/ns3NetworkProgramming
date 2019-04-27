@@ -31,11 +31,14 @@ StrictPriorityQueue::GetTypeId (void)
 StrictPriorityQueue::StrictPriorityQueue ()
 {
 	//NS_LOG_FUNCTION (this);
+	std::cout << "SPQ default constructor" << std::endl;
+	//exit (0);
 	configFile = "spq-config.txt";
 	
     ReadFromConfig(configFile);   // ---->>>> HINT.SOPE: Add logic in this function!
     if(number_of_queues == priority_levels.size()){
 		//sort in decreasing order of priority
+		std::cout << "Processing... " << number_of_queues << "queues" << std::endl;
 		std::sort(priority_levels.begin(), priority_levels.end(), std::greater<u_int32_t>()); 
         std::vector<uint32_t>::iterator iter = priority_levels.begin();
 		//std::vector<Filter>::iterator filterIter = filters.begin();
@@ -116,7 +119,8 @@ bool
 StrictPriorityQueue::DoEnqueue (Ptr<Packet> p)
 {
 	//NS_LOG_FUNCTION (this);
-
+	std::cout << "DoEnqueue: " << std::endl;
+	exit(0);
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
     TrafficClass target;    
@@ -158,15 +162,17 @@ Ptr<Packet>
 StrictPriorityQueue::DoDequeue ()
 {
 	//NS_LOG_FUNCTION (this);
-
+	std::cout << "DoDequeue: " << std::endl;
 	Ptr<Packet> packet;
 
 	// Will use the first TrafficClass by default
 	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
 		{
 			packet = it->Dequeue ();
+			std::cout << "DoDequeue || Checking queue of priority " << it->GetPriorityLevel() << std::endl;
 			if (packet != NULL)
 				{
+					std::cout << "DoDequeue || Returning packet from queue of priority " << it->GetPriorityLevel() << std::endl;
 					return packet;
 				}
 		}
@@ -216,20 +222,24 @@ void
 StrictPriorityQueue::ReadFromConfig(std::string config_file_name){
     //Logic that reads the number_of_queues and priority_levels from config goes here...
 	//Format: line 1 - number of queues, lines 2 - k contains priority levels, lines k - n contains filter details
+	std::cout << "Reading from Config File: " << config_file_name << std::endl;
 	std::string line;
 	std::ifstream readFile (config_file_name);
 	if (readFile.is_open ())
 		{
+			std::cout << "File is Open" << std::endl;
 			uint8_t i = 0;
 			while (getline (readFile,line) )
-				{		
+				{
+					std::cout << "i : " << int(i) << std::endl;		
 					if ( i == 0 )
 					{
 						number_of_queues = std::stoi (line);
 					}
 					else
 					{
-						priority_levels [i - 1] = std::stoi (line);
+						//priority_levels [i - 1] = std::stoi (line);
+						priority_levels.push_back(std::stoi (line));
 					}
 					i++;
 				}

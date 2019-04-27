@@ -16,7 +16,7 @@ NS_OBJECT_ENSURE_REGISTERED (DiffServ);
 TypeId
 DiffServ::GetTypeId (void)
 {
-	std::cout << "Entered DiffServ: GetTypeId";
+	std::cout << "Entered DiffServ: GetTypeId" << std::endl;
   static TypeId tid = TypeId ("ns3::DiffServ")
     .SetParent<Queue<ns3::Packet>> ()
     .SetGroupName ("TrafficControl")

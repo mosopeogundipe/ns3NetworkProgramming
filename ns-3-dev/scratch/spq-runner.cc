@@ -64,8 +64,10 @@ main (int argc, char *argv[])
   //populate link 2
   p2p.SetDeviceAttribute("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute("Delay", StringValue ("2ms"));
+  p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>"); //this allows code to hit StrictPriorityQueue constructor. Enqueue and Dequeue methods aren't reached still
   NetDeviceContainer d12 = p2p.Install(c12);
   p2p.EnablePcap("post_SPQ",d12.Get(0), BooleanValue(false));
+  //p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>");
 
   //not quite sure what this does, tbh
 	p2p.SetCompress(BooleanValue (false));
@@ -75,7 +77,7 @@ main (int argc, char *argv[])
     //there's no way it's this easy
     //this sets all queues to SPQ. Do we only want to set the middle?
       //is there more that one queue?
-  p2p.SetQueue(std::string("ns3::StrictPriorityQueue"));
+  p2p.SetQueue(std::string("ns3::StrictPriorityQueue<Packet>"));
   //p2p.SetQueue(std::string("ns3::DropTailQueue"));
 
 

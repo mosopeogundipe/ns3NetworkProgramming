@@ -67,7 +67,7 @@ DestPortFilterElement::Match (Ptr<Packet> packet) const
 	packet->PeekHeader (pppHeader);
 	packet->PeekHeader (ipHeader);
 	packet->PeekHeader (tcpHeader);
-
+  std::cout << "Packet Port is: " << tcpHeader.GetSourcePort () << std::endl;
 	return tcpHeader.GetDestinationPort () == port;
 }
 
