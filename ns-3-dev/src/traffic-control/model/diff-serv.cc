@@ -40,7 +40,7 @@ DiffServ::Dequeue (void)
 Ptr<const Packet>
 DiffServ::Peek (void) const
 {
-	
+	std::cout << "Don't call this function dude" << std::endl;
 	return NULL;
 }
 
@@ -93,7 +93,7 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 }
 
 Ptr<Packet>
-DiffServ::DoDequeue ()
+DiffServ::DoDequeue (void)
 {
 	Ptr<Packet> packet;
 
@@ -111,18 +111,17 @@ DiffServ::DoDequeue ()
 }
 
 Ptr<Packet>
-DiffServ::DoRemove ()
+DiffServ::DoRemove (void)
 {
 	// Actual logic should be same as DoDequeue
 	return DoDequeue ();
 }
 
-Ptr<const Packet>
-DiffServ::DoPeek ()
+Ptr<Packet>
+DiffServ::DoPeek (void)
 {
 	//same logic as DoDequeue () but we don't remove the packet
 	Ptr<Packet> packet;
-	Ptr<const Packet> c_packet;
 
 	// Will use the first TrafficClass by default
 	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
@@ -130,8 +129,7 @@ DiffServ::DoPeek ()
 			packet = it->Peek ();
 			if (packet != NULL)
 				{
-					c_packet = packet->Copy ();
-					return c_packet;
+					return packet;
 				}
 		}
 	return NULL;
@@ -144,13 +142,13 @@ DiffServ::SetMode (QueueMode mode)
 }
 
 DiffServ::QueueMode
-DiffServ::GetMode ()
+DiffServ::GetMode (void)
 {
 	return m_mode;
 }
 
 Ptr<Packet>
-DiffServ::Schedule ()
+DiffServ::Schedule (void)
 {
 	// all we need to do here is call DoDequeue which should have QOS logic
 	return DoDequeue ();
