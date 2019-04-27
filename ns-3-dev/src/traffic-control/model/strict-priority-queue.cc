@@ -159,21 +159,34 @@ StrictPriorityQueue::Schedule ()
 void
 StrictPriorityQueue::ReadFromConfig(std::string config_file_name){
     //Logic that reads the number_of_queues and priority_levels from config goes here...
+	//Format: line 1 - number of queues, lines 2 - k contains priority levels, lines k - n contains filter details
 	std::string line;
+	std::string delimiter = " ";
 	std::ifstream readFile (config_file_name);
+	uint32_t line_number = 0;
 	if (readFile.is_open ())
 		{
 			uint8_t i = 0;
 			while (getline (readFile,line) )
 				{		
-
+					line_number++;
 					if ( i == 0 )
 					{
 						number_of_queues = std::stoi (line);
 					}
-					else
+					else if (line_number <= number_of_queues + 1)
 					{
 						priority_levels [i - 1] = std::stoi (line);
+					}
+					else{//read filters. Taking one filter queue for SPQ for now...
+						//A fillter line is like : SourceIP SourcePort DestIP DestPort
+						size_t pos = 0;
+						std::string token;
+						while ((pos = line.find(delimiter)) != std::string::npos) {
+    						token = line.substr(0, pos);
+							//Ipv4Address addr;
+    						line.erase(0, pos + delimiter.length());
+							}
 					}
 					i++;
 				}
