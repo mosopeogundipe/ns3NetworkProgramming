@@ -1,3 +1,6 @@
+//#ifndef StrictPriorityQueue_H
+#define SPQ_H
+
 #include <queue>
 #include <vector>
 #include "ns3/packet.h"
@@ -26,16 +29,17 @@ public:
 private:
 	std::vector<TrafficClass> q_class;
 	std::string configFile;
-	std::vector<Filter> filters;
+	//std::vector<Filter> filters;
 	//QueueMode m_mode;
 
 	//need to overwrite all of these marked virtual
 	bool DoEnqueue (Ptr<Packet> p);
     bool IsEnqueuingSuccessful(TrafficClass queue, Ptr<Packet> p);
     Ptr<Packet> DoDequeue ();
-	Ptr<Packet> DoRemove (); // why is this here? it's the same as DoDequeue
+	//Ptr<Packet> DoRemove (); // why is this here? it's the same as DoDequeue
 	Ptr<Packet> DoPeek (); // same logic as DoDequeue but no removal
     void ReadFromConfig(std::string config_file_name);
-	void CreateFilters();
+	//void CreateFilters();
     };
 }
+//#endif

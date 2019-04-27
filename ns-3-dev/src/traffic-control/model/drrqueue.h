@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
-#ifndef DRR_H
+//#ifndef DRR_H
 #define DRR_H
 
 #include <queue>
@@ -28,6 +28,7 @@ public:
 private:
 	std::vector<TrafficClass> q_class;
 	std::vector<uint32_t> deficit;
+	std::string configFile;
 	uint8_t curr_queue_index;
 	bool DoEnqueue (Ptr<Packet> p);
     //virtual bool Enqueue(TrafficClass DRRQueue, Ptr<Packet> p);
@@ -38,5 +39,5 @@ private:
 };
 }
 
-#endif
+//#endif
 

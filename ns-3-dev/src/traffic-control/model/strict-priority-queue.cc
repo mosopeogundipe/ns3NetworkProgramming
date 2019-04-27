@@ -3,11 +3,12 @@
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
-#include "ns3/strict-priority-queue.h"
-#include "ns3/source-addr-filter-element.h"
-#include "ns3/source-port-filter-element.h"
-#include "ns3/dest-addr-filter-element.h"
-#include "ns3/dest-port-filter-element.h"
+#include "strict-priority-queue.h"
+//#include "ns3/source-addr-filter-element.h"
+//#include "ns3/source-port-filter-element.h"
+//#include "ns3/dest-addr-filter-element.h"
+#include "dest-port-filter-element.h"
+#include "filter.h"
 #include <bits/stdc++.h>
 
 #define NOCLASSIFY 0xffffffff
@@ -37,7 +38,7 @@ StrictPriorityQueue::StrictPriorityQueue ()
 		//sort in decreasing order of priority
 		std::sort(priority_levels.begin(), priority_levels.end(), std::greater<u_int32_t>()); 
         std::vector<uint32_t>::iterator iter = priority_levels.begin();
-		std::vector<Filter>::iterator filterIter = filters.begin();
+		//std::vector<Filter>::iterator filterIter = filters.begin();
 		FilterElement* fe;
 		Filter* filter;
 		//insert in decreasing order of priority. 
@@ -58,10 +59,10 @@ StrictPriorityQueue::StrictPriorityQueue ()
 		}
         queue.SetPriorityLevel(*iter);
         queue.SetDefault(false);
-		queue.filters.push_back(*filterIter);
+		//queue.filters.push_back(*filterIter);
         q_class.push_back(queue);
         std::advance(iter, 1);
-		std::advance(filterIter, 1);
+		//std::advance(filterIter, 1);
         }
         //creating default queue, where packets not matching any filters go:
         TrafficClass default_queue;
@@ -173,14 +174,14 @@ StrictPriorityQueue::DoDequeue ()
 	return NULL;
 }
 
-Ptr<Packet>
-StrictPriorityQueue::DoRemove ()
-{
-	//NS_LOG_FUNCTION (this);
+// Ptr<Packet>
+// StrictPriorityQueue::DoRemove ()
+// {
+// 	//NS_LOG_FUNCTION (this);
 
-	// Actual logic should be same as DoDequeue
-	return DoDequeue ();
-}
+// 	// Actual logic should be same as DoDequeue
+// 	return DoDequeue ();
+// }
 
 Ptr<Packet>
 StrictPriorityQueue::DoPeek ()

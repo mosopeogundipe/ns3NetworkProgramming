@@ -3,7 +3,7 @@
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
-#include "ns3/drrqueue.h"
+//#include "ns3/drrqueue.h"
 #include "drrqueue.h"
 #include <bits/stdc++.h>
 #include "dest-port-filter-element.h"
@@ -17,7 +17,45 @@ namespace ns3 {
 
 DRR::DRR ()
 {
-//	NS_LOG_FUNCTION (this);
+//    NS_LOG_FUNCTION (this);
+	std::cout << "Entered DRR constructor";	
+	num_queues = 0;		
+	configFile = "drr-config.txt";
+	ConfigReader (configFile);
+	//num_queues = 3;
+	//quantum.push_back(30);
+	//quantum.push_back(20);
+	//quantum.push_back(10);
+	FilterElement* fe;
+	Filter* filter;
+	std::vector<uint32_t>::iterator iter = quantum.begin();
+    for (int i=0; i<(int)num_queues; i++){
+	    TrafficClass queue;
+		//deficit.push_back(0);
+       	queue.SetWeight(*iter);
+		deficit.push_back(queue.GetWeight());
+        queue.SetDefault(false);
+        q_class.push_back(queue);
+        std::advance(iter, 1);
+		//destination port hard code
+		switch(i) {
+			case 0:
+			fe = (FilterElement*) new DestPortFilterElement(9999);
+			filter = new Filter();
+			filter->AddFilter(fe);
+			queue.filters.push_back(*filter);		
+			case 1:
+			fe = (FilterElement*) new DestPortFilterElement(5555);
+			filter = new Filter();
+			filter->AddFilter(fe);
+			queue.filters.push_back(*filter);	
+			case 2:
+			fe = (FilterElement*) new DestPortFilterElement(1111);
+			filter = new Filter();
+			filter->AddFilter(fe);
+			queue.filters.push_back(*filter);	
+		}
+    }
 }
 
 DRR::DRR (std::string configFile)
