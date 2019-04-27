@@ -40,8 +40,7 @@ DiffServ::Dequeue (void)
 Ptr<const Packet>
 DiffServ::Peek (void) const
 {
-	std::cout << "Don't call this function dude" << std::endl;
-	return NULL;
+	return DoPeek ();
 }
 
 Ptr<Packet>
@@ -117,14 +116,14 @@ DiffServ::DoRemove (void)
 	return DoDequeue ();
 }
 
-Ptr<Packet>
-DiffServ::DoPeek (void)
+Ptr<const Packet>
+DiffServ::DoPeek (void) const
 {
 	//same logic as DoDequeue () but we don't remove the packet
-	Ptr<Packet> packet;
+	Ptr<const Packet> packet;
 
 	// Will use the first TrafficClass by default
-	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
+	for (std::vector<TrafficClass>::const_iterator it = q_class.begin (); it != q_class.end (); ++it)
 		{
 			packet = it->Peek ();
 			if (packet != NULL)

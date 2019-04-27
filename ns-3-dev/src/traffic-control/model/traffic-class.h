@@ -34,17 +34,17 @@ public:
 	void SetWeight (double_t w);
 	void SetDefault (bool d);
 
-	uint32_t GetMaxBytes ();
-	uint32_t GetBytes ();
-	uint32_t GetMaxPackets ();
-	uint32_t GetPackets ();
-	uint32_t GetPriorityLevel ();
-	double_t GetWeight ();
-	bool IsDefault ();
+	uint32_t GetMaxBytes (void);
+	uint32_t GetBytes (void);
+	uint32_t GetMaxPackets (void);
+	uint32_t GetPackets (void);
+	uint32_t GetPriorityLevel (void);
+	double_t GetWeight (void);
+	bool IsDefault (void);
 
 	bool Enqueue (Ptr<ns3::Packet> p);
-	Ptr<ns3::Packet> Dequeue ();
-	Ptr<ns3::Packet> Peek ();
+	Ptr<ns3::Packet> Dequeue (void);
+	Ptr<const ns3::Packet> Peek (void) const;
 	bool Match (ns3::Ptr<ns3::Packet> p);
 
 private:
