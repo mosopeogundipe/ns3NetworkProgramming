@@ -55,7 +55,7 @@ namespace ns3 {
 			//Any additional attributes needed?
 			.AddAttribute ("MaxPackets",
 							"The maximum number of packets the application will send",
-							UintegerValue (6000), //changed to 12000, for num of packets to send
+							UintegerValue (20000), //changed to 12000, for num of packets to send
 							MakeUintegerAccessor (&DrrApplicationClient::m_count),
 							MakeUintegerChecker<uint32_t> ())
 			.AddAttribute ("Interval",
@@ -80,12 +80,6 @@ namespace ns3 {
 							MakeUintegerAccessor (&DrrApplicationClient::m_size),
 							//MakeUintegerChecker<uint32_t> (12,65507))
 							MakeUintegerChecker<uint32_t> ())
-			.AddAttribute ("SetEntropy",
-							"If true, create high entropy packets. If false, create low entropy packets",
-							BooleanValue (false), //additional 12 bytes added for header and timestamp, 1100 bytes of payload required
-							MakeBooleanAccessor (&DrrApplicationClient::m_set_entropy),
-							MakeBooleanChecker())
-
 		;
 		return tid;
 	}
@@ -97,8 +91,7 @@ namespace ns3 {
 		m_socket = 0;
 
 		//note: if we stop while they both have that same Id, that'll probably cause an error
-		m_sendTrain1 = EventId();
-		m_sendTrain2 = EventId();
+		m_sendEvent = EventId();
 	}
 	 
 	DrrApplicationClient::~DrrApplicationClient ()
@@ -178,63 +171,28 @@ namespace ns3 {
 		m_socket->SetRecvCallback (MakeNullCallback<void, Ptr<Socket> > ());
 		m_socket->SetAllowBroadcast (true);
 		m_sendEvent = Simulator::Schedule (Seconds (0.0), &DrrApplicationClient::Send, this);
-
-		//where the functions to send the two trains are called
-			//is a 5 sec delay good?
-		// if(m_set_entropy){
-		// 	NS_LOG_INFO ("Sending HIGH Entropy Packets...");
-		// 	m_sendTrain2 = Simulator::Schedule (Seconds (0.0), &DrrApplicationClient::SendRandomTrain, this);
-		// }else{
-		// 	NS_LOG_INFO ("Sending LOW Entropy Packets...");
-		// 	m_sendTrain1 = Simulator::Schedule (Seconds (0.0), &DrrApplicationClient::SendEmptyTrain, this);
-		// }
-		//m_sendTrain1 = Simulator::Schedule (Seconds (0.0), &DrrApplicationClient::SendEmptyTrain, this);
-		//m_sendTrain2 = Simulator::Schedule (Seconds (25.0), &DrrApplicationClient::SendRandomTrain, this);
-	}
+}
 	 
 	void
 	DrrApplicationClient::StopApplication (void)
 	{
 		NS_LOG_FUNCTION (this);
-		Simulator::Cancel (m_sendTrain1);
-		Simulator::Cancel (m_sendTrain2);
+		Simulator::Cancel (m_sendEvent);
 	}
 
-void
- DrrApplicationClient::createLowEntropyPackets (uint8_t*  buffer, uint32_t m_size)
- {
-  for (uint32_t i = 0; i < m_size; i++){
-    buffer[i] = 0x00;
-  }
- }
- //create high entropy
- void
- DrrApplicationClient::createHighEntropyPackets (uint8_t* buffer, uint32_t m_size)
- {
-	int fd = open("/dev/urandom", O_RDONLY);
-	read(fd, buffer, m_size);
-	 //buffer now contains the random data
- }
 
 	void
 DrrApplicationClient::Send (void)
 {
-  //NS_LOG_FUNCTION (this);
-    SeqTsHeader seqTs;
-  //cout<<m_sent;
+  //create packet
+  SeqTsHeader seqTs;
   seqTs.SetSeq (m_sent);
-  uint8_t* buffer = new uint8_t[m_size+8+4];
-   Ptr<Packet> p;
-   //set entropy high and low done  
-  if (m_set_entropy == true) { //if true
-   createHighEntropyPackets(buffer, m_size+8+4);
-    p = Create<Packet> (buffer, m_size+8+4);
-  }else{ //false 
-    createLowEntropyPackets(buffer, m_size+8+4);
-    p = Create<Packet> (buffer, m_size+8+4);
-  }
-  //Ptr<Packet> p = Create<Packet> ((uint8_t*) str.str().c_str(), str.str().length() + 1); // 8+4 : the size of the seqTs header
-  p->AddHeader (seqTs);
+
+	//create packet
+  Ptr<Packet> p;
+  p = Create<Packet>();
+  
+  p->AddHeader(seqTs);
 
   std::stringstream peerAddressStringStream;
   if (Ipv4Address::IsMatchingType (m_peerAddress))
@@ -249,10 +207,12 @@ DrrApplicationClient::Send (void)
   if ((m_socket->Send (p)) >= 0)
     {
       ++m_sent;
-      NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
-                                    << peerAddressStringStream.str () << " Uid: "
-                                    << p->GetUid () << " Time: "
-                                    << (Simulator::Now ()).GetSeconds ());
+			NS_LOG_INFO ("client sent packet: "<< m_sent << " to port "<< m_peerPort);
+
+      //NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
+      //                              << peerAddressStringStream.str () << " Uid: "
+      //                              << p->GetUid () << " Time: "
+      //                              << (Simulator::Now ()).GetSeconds ());
 
     }
   else

@@ -1,5 +1,8 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+
 #ifndef DRR_H
 #define DRR_H
+
 #include <queue>
 #include <vector>
 #include "ns3/packet.h"
@@ -9,8 +12,10 @@
 #include "ns3/diff-serv.h"
 
 namespace ns3 {
-    class DRR : public DiffServ{
+
+  class DRR : public DiffServ{
 public:
+
   static TypeId GetTypeId (void);	
 	DRR (std::string config);
 	DRR();
@@ -18,6 +23,7 @@ public:
 
 	uint32_t num_queues;
   std::vector<uint32_t> quantum;
+	
 	
 private:
 	std::vector<TrafficClass> q_class;
@@ -28,7 +34,9 @@ private:
    	Ptr<Packet> DoDequeue (void);
 	Ptr<Packet> DoPeek (void);
     void ConfigReader(std::string config_file_name);
+
 };
 }
 
 #endif
+

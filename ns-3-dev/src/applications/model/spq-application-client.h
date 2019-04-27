@@ -53,8 +53,6 @@ namespace ns3 {
 		void SendEmptyTrain(void);
 		void SendRandomTrain(void);
 		void Send(void);
-		void createLowEntropyPackets (uint8_t*  buffer, uint32_t m_size);
-		void createHighEntropyPackets (uint8_t* buffer, uint32_t m_size);
 
 		uint32_t m_count; 
 		Time m_interval; 
@@ -66,9 +64,6 @@ namespace ns3 {
 		Address m_peerAddress; 
 		uint16_t m_peerPort; 
 
-		//probably seed two sendEvents, one for each train
-		EventId m_sendTrain1;
-		EventId m_sendTrain2; 
 		EventId m_sendEvent;  
 
 	};
