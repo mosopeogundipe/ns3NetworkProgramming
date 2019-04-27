@@ -18,15 +18,11 @@ namespace ns3 {
 DRR::DRR ()
 {
 //	NS_LOG_FUNCTION (this);
-	std::cout << "default constructor" << std::endl;
-	exit (0);
 }
 
 DRR::DRR (std::string configFile)
 {
 //    NS_LOG_FUNCTION (this);	
-	std::cout << "config constructor" << std::endl;
-	exit (0);
 	num_queues = 0;	
 	ConfigReader (configFile);
 	configFile = "drr-config.txt";
@@ -142,7 +138,6 @@ DRR::DoDequeue() {
 	uint16_t num_empty = 0;
 	while(true) {
 		std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
-		exit (0);
 		Ptr<const Packet>p = q_class[curr_queue_index].Peek();
 		if (p==NULL) {
 			num_empty++;

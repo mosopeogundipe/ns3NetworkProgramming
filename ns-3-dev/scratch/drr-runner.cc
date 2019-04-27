@@ -48,10 +48,6 @@ main (int argc, char *argv[])
   //----------------------------------- create nodes -----------------------------------
   NodeContainer c;
   c.Create(3);
-
-	PointToPointNetDevice p1;
-	PointToPointNetDevice p2;
-	PointToPointNetDevice p3;
   //----------------------------------- create links -----------------------------------
 
   // We create the channels first without any IP addressing information
@@ -72,6 +68,7 @@ main (int argc, char *argv[])
   //populate link 2
   p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
+	p2p.AddQueueToOne ("ns3::DRR<Packet>");
   NetDeviceContainer d12 = p2p.Install(c12);
   p2p.EnablePcap("post_DRR",d12.Get(0), BooleanValue(false));
 

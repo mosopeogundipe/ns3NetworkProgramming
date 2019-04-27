@@ -51,6 +51,7 @@ public:
   PointToPointHelper ();
   virtual ~PointToPointHelper () {}
 
+	//this will add the desired queue to the first node on the next install
 	void AddQueueToOne (std::string queue);
 
   /**
@@ -191,6 +192,7 @@ private:
   ObjectFactory m_deviceFactory;        //!< Device Factory
 
 	bool compress;
+	std::string s_queue;
 };
 
 } // namespace ns3

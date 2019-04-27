@@ -24,7 +24,6 @@
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/point-to-point-channel.h"
 #include "ns3/point-to-point-remote-channel.h"
-#include "ns3/queue.h"
 #include "ns3/net-device-queue-interface.h"
 #include "ns3/config.h"
 #include "ns3/packet.h"
@@ -34,6 +33,9 @@
 
 #include "ns3/trace-helper.h"
 #include "point-to-point-helper.h"
+
+#include "ns3/drrqueue.h"
+#include "ns3/strict-priority-queue.h"
 
 namespace ns3 {
 
@@ -47,12 +49,13 @@ PointToPointHelper::PointToPointHelper ()
   m_channelFactory.SetTypeId ("ns3::PointToPointChannel");
   m_remoteChannelFactory.SetTypeId ("ns3::PointToPointRemoteChannel");
 	compress = false;
+	s_queue = "none";
 }
 
 void
 PointToPointHelper::AddQueueToOne (std::string queue)
 {
-  //devA->SetQueue (queueA);
+	s_queue = queue;
 }
 
 void 
@@ -247,7 +250,19 @@ PointToPointHelper::Install (Ptr<Node> a, Ptr<Node> b)
   Ptr<PointToPointNetDevice> devA = m_deviceFactory.Create<PointToPointNetDevice> ();
   devA->SetAddress (Mac48Address::Allocate ());
   a->AddDevice (devA);
-  Ptr<Queue<Packet> > queueA = m_queueFactory.Create<Queue<Packet> > ();
+	Ptr<Queue<Packet> > queueA;
+	if (s_queue.compare("none") != 0)
+		{
+			std::string oldQueue = m_queueFactory.GetTypeId ().GetName ();
+			m_queueFactory.SetTypeId (s_queue);
+			queueA = m_queueFactory.Create<Queue<Packet> > ();
+			m_queueFactory.SetTypeId (oldQueue);
+			s_queue = "none";
+		}
+	else
+		{
+			queueA = m_queueFactory.Create<Queue<Packet> > ();
+		}
   devA->SetQueue (queueA);
   Ptr<PointToPointNetDevice> devB = m_deviceFactory.Create<PointToPointNetDevice> ();
   devB->SetAddress (Mac48Address::Allocate ());
@@ -255,10 +270,12 @@ PointToPointHelper::Install (Ptr<Node> a, Ptr<Node> b)
   Ptr<Queue<Packet> > queueB = m_queueFactory.Create<Queue<Packet> > ();
   devB->SetQueue (queueB);
 
+
 	if (compress)
 		{
       NS_LOG_ERROR("Turn on compress");
 			devA->TurnOnCompress ();
+			compress = false;
 		}
 
   // Aggregate NetDeviceQueueInterface objects
