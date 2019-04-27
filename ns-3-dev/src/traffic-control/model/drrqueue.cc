@@ -25,6 +25,11 @@ DRR::DRR (std::string configFile)
 //    NS_LOG_FUNCTION (this);	
 	num_queues = 0;	
 	ConfigReader (configFile);
+	configFile = "drr-config.txt";
+	//num_queues = 3;
+	//quantum.push_back(30);
+	//quantum.push_back(20);
+	//quantum.push_back(10);
 	FilterElement* fe;
 	Filter* filter;
 	std::vector<uint32_t>::iterator iter = quantum.begin();
@@ -108,6 +113,7 @@ Ptr<Packet>
 DRR::DoDequeue() {
 	uint16_t num_empty = 0;
 	while(true) {
+		std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
 		Ptr<Packet>p = q_class[curr_queue_index].Peek();
 		if (p==NULL) {
 			num_empty++;
