@@ -58,13 +58,8 @@ main (int argc, char *argv[])
   p2p.SetDeviceAttribute("DataRate", StringValue ("4Mbps"));
   p2p.SetChannelAttribute("Delay", StringValue ("2ms"));
   NetDeviceContainer d01 = p2p.Install (c01);
-<<<<<<< HEAD
-  p2p.EnablePcap("UDPsender", d01.Get(0), BooleanValue(false));
-  
-=======
   p2p.EnablePcap("pre_SPQ", d01.Get(0), BooleanValue(false));
 
->>>>>>> 43764705ed9aeb553b66bd9882e2544a7b495e17
 
   //populate link 2
   p2p.SetDeviceAttribute("DataRate", StringValue("1Mbps"));
@@ -80,12 +75,8 @@ main (int argc, char *argv[])
     //there's no way it's this easy
     //this sets all queues to SPQ. Do we only want to set the middle?
       //is there more that one queue?
-<<<<<<< HEAD
   p2p.SetQueue(std::string("ns3::StrictPrioirityQueue"));
   //p2p.SetQueue(std::string("ns3::DropTailQueue"));
-=======
-  p2p.SetQueue(std::string("ns3::DropTailQueue"));
->>>>>>> 43764705ed9aeb553b66bd9882e2544a7b495e17
 
 
   //----------------------------------- add to internet -----------------------------------
