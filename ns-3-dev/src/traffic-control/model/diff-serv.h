@@ -37,7 +37,7 @@ private:
 	bool DoEnqueue (Ptr<Packet> p);
 	virtual Ptr<Packet> DoDequeue ();
 	virtual Ptr<Packet> DoRemove (); // why is this here? it's the same as DoDequeue
-	virtual Ptr<Packet> DoPeek (); // same logic as DoDequeue but no removal
+	virtual Ptr<const Packet> DoPeek (); // same logic as DoDequeue but no removal
 };
 
 }

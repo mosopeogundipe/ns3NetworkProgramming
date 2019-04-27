@@ -10,8 +10,8 @@
 
 namespace ns3 {
 
-//NS_LOG_COMPONENT_DEFINE("DiffServ");
-//NS_OBJECT_ENSURE_REGISTERED (DiffServ);
+NS_LOG_COMPONENT_DEFINE("DiffServ");
+NS_OBJECT_ENSURE_REGISTERED (DiffServ);
 
 TypeId
 DiffServ::GetTypeId (void)
@@ -24,52 +24,49 @@ DiffServ::GetTypeId (void)
   return tid;
 }
 
+//Methods that are virtual in Queue (parent)
 bool
 DiffServ::Enqueue (Ptr<Packet> p)
 {
-	return false;
+	return DoEnqueue (p);
 }
 
 Ptr<Packet>
 DiffServ::Dequeue (void)
 {
-	return NULL;
+	return DoDequeue ();
 }
 
 Ptr<const Packet>
 DiffServ::Peek (void) const
 {
+	
 	return NULL;
 }
 
 Ptr<Packet>
 DiffServ::Remove (void)
 {
-	return NULL;
+	return DoRemove ();
 }
 
 DiffServ::DiffServ ()
 {
-	//NS_LOG_FUNCTION (this);
 }
 
 DiffServ::~DiffServ ()
 {
-	//NS_LOG_FUNCTION (this);
 }
 
 void
 DiffServ::AddTrafficClass (TrafficClass t)
 {
-	//NS_LOG_FUNCTION (this);
 	q_class.push_back (t);
 }
 
 bool
 DiffServ::DoEnqueue (Ptr<Packet> p)
 {
-	//NS_LOG_FUNCTION (this);
-
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);
 
@@ -98,8 +95,6 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 Ptr<Packet>
 DiffServ::DoDequeue ()
 {
-	//NS_LOG_FUNCTION (this);
-
 	Ptr<Packet> packet;
 
 	// Will use the first TrafficClass by default
@@ -118,19 +113,16 @@ DiffServ::DoDequeue ()
 Ptr<Packet>
 DiffServ::DoRemove ()
 {
-	//NS_LOG_FUNCTION (this);
-
 	// Actual logic should be same as DoDequeue
 	return DoDequeue ();
 }
 
-Ptr<Packet>
+Ptr<const Packet>
 DiffServ::DoPeek ()
 {
-	//NS_LOG_FUNCTION (this);
-
 	//same logic as DoDequeue () but we don't remove the packet
 	Ptr<Packet> packet;
+	Ptr<const Packet> c_packet;
 
 	// Will use the first TrafficClass by default
 	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
@@ -138,7 +130,8 @@ DiffServ::DoPeek ()
 			packet = it->Peek ();
 			if (packet != NULL)
 				{
-					return packet;
+					c_packet = packet->Copy ();
+					return c_packet;
 				}
 		}
 	return NULL;
@@ -147,23 +140,18 @@ DiffServ::DoPeek ()
 void
 DiffServ::SetMode (QueueMode mode)
 {
-	//NS_LOG_FUNCTION (this);
-
 	m_mode = mode;
 }
 
 DiffServ::QueueMode
 DiffServ::GetMode ()
 {
-	//NS_LOG_FUNCTION (this);
 	return m_mode;
 }
 
 Ptr<Packet>
 DiffServ::Schedule ()
 {
-	//NS_LOG_FUNCTION (this);
-
 	// all we need to do here is call DoDequeue which should have QOS logic
 	return DoDequeue ();
 }
@@ -171,8 +159,6 @@ DiffServ::Schedule ()
 uint32_t
 DiffServ::Classify (Ptr<Packet> p)
 {
-	//NS_LOG_FUNCTION (this);
-
 	// default is max value to signify no match
 	uint32_t pos = NOCLASSIFY;
 	uint32_t i = 0;
