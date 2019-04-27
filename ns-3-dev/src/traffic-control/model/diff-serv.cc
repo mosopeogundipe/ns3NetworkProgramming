@@ -52,11 +52,6 @@ DiffServ::Remove (void)
 
 DiffServ::DiffServ ()
 {
-<<<<<<< HEAD
-	std::cout << "Entered DiffServ";
-	//NS_LOG_FUNCTION (this);
-=======
->>>>>>> 36b58395f837be7093a588cfaa49c751cd45d261
 }
 
 DiffServ::~DiffServ ()

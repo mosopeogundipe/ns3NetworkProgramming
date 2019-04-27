@@ -183,16 +183,16 @@ StrictPriorityQueue::DoDequeue ()
 // 	return DoDequeue ();
 // }
 
-Ptr<Packet>
-StrictPriorityQueue::DoPeek ()
+Ptr<const ns3::Packet>
+StrictPriorityQueue::DoPeek () const
 {
 	//NS_LOG_FUNCTION (this);
 
 	//same logic as DoDequeue () but we don't remove the packet
-	Ptr<Packet> packet;
+	Ptr<const ns3::Packet> packet;
 
 	// Will use the first TrafficClass by default
-	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
+	for (std::vector<TrafficClass>::const_iterator it = q_class.begin (); it != q_class.end (); ++it)
 		{
 			packet = it->Peek ();
 			if (packet != NULL)
