@@ -17,6 +17,7 @@ namespace ns3 {
 
 DRR::DRR ()
 {
+<<<<<<< HEAD
 //    NS_LOG_FUNCTION (this);
 	std::cout << "Entered DRR constructor";	
 	num_queues = 0;		
@@ -56,11 +57,18 @@ DRR::DRR ()
 			queue.filters.push_back(*filter);	
 		}
     }
+=======
+//	NS_LOG_FUNCTION (this);
+	std::cout << "default constructor" << std::endl;
+	exit (0);
+>>>>>>> 36b58395f837be7093a588cfaa49c751cd45d261
 }
 
 DRR::DRR (std::string configFile)
 {
 //    NS_LOG_FUNCTION (this);	
+	std::cout << "config constructor" << std::endl;
+	exit (0);
 	num_queues = 0;	
 	ConfigReader (configFile);
 	configFile = "drr-config.txt";
@@ -116,6 +124,29 @@ DRR::GetTypeId (void)
 	return tid;
 }
 
+Ptr<Packet>
+DRR::Dequeue (void)
+{
+	return DoDequeue ();
+}
+
+Ptr<const Packet>
+DRR::Peek (void) const
+{
+	return DoPeek ();
+}
+
+Ptr<Packet>
+DRR::Remove (void)
+{
+	return DRR::DoRemove ();
+}
+
+Ptr<Packet>
+DRR::DoRemove (void)
+{
+	return DoDequeue ();
+}
 
 bool
 DRR::DoEnqueue (Ptr<Packet> p)
@@ -130,13 +161,14 @@ DRR::DoEnqueue (Ptr<Packet> p)
 	return drrQueue.Enqueue(p);
 }
 
-Ptr<Packet>
-DRR::DoPeek ()
+Ptr<const Packet>
+DRR::DoPeek (void) const
 {
-//	NS_LOG_FUNCTION (this);
-	Ptr<Packet> packet;
+	//same logic as DoDequeue () but we don't remove the packet
+	Ptr<const Packet> packet;
 
-	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
+	// Will use the first TrafficClass by default
+	for (std::vector<TrafficClass>::const_iterator it = q_class.begin (); it != q_class.end (); ++it)
 		{
 			packet = it->Peek ();
 			if (packet != NULL)
@@ -152,7 +184,8 @@ DRR::DoDequeue() {
 	uint16_t num_empty = 0;
 	while(true) {
 		std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
-		Ptr<Packet>p = q_class[curr_queue_index].Peek();
+		exit (0);
+		Ptr<const Packet>p = q_class[curr_queue_index].Peek();
 		if (p==NULL) {
 			num_empty++;
 			if (num_empty == num_queues) {

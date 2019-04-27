@@ -49,7 +49,9 @@ main (int argc, char *argv[])
   NodeContainer c;
   c.Create(3);
 
-  
+	PointToPointNetDevice p1;
+	PointToPointNetDevice p2;
+	PointToPointNetDevice p3;
   //----------------------------------- create links -----------------------------------
 
   // We create the channels first without any IP addressing information

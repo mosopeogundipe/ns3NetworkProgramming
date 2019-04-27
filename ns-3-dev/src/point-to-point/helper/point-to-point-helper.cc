@@ -49,6 +49,12 @@ PointToPointHelper::PointToPointHelper ()
 	compress = false;
 }
 
+void
+PointToPointHelper::AddQueueToOne (std::string queue)
+{
+  //devA->SetQueue (queueA);
+}
+
 void 
 PointToPointHelper::SetQueue (std::string type,
                               std::string n1, const AttributeValue &v1,

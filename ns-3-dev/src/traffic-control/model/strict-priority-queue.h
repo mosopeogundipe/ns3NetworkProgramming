@@ -1,5 +1,5 @@
 //#ifndef StrictPriorityQueue_H
-#define SPQ_H
+#define StrictPriorityQueue_H
 
 #include <queue>
 #include <vector>

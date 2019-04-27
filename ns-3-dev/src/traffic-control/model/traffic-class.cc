@@ -204,8 +204,8 @@ TrafficClass::Dequeue ()
 	return packet;
 }
 
-Ptr<ns3::Packet>
-TrafficClass::Peek ()
+Ptr<const ns3::Packet>
+TrafficClass::Peek () const
 {
 	NS_LOG_FUNCTION (this);
 
@@ -215,7 +215,10 @@ TrafficClass::Peek ()
 			return NULL;
 		}
 
-	return m_queue.front ();
+	Packet* packet = PeekPointer (m_queue.front ());
+	Ptr<const Packet> c_packet = packet->Copy ();
+
+	return c_packet;
 }
 
 bool
