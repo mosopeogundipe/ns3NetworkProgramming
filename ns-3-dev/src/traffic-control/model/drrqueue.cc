@@ -15,6 +15,11 @@ namespace ns3 {
 //#include 
 //ns3/traffic-class.h
 
+DRR::DRR(){
+	std::cout<<("Got to constructor");
+	NS_LOG_INFO ("IN DRR constructor");
+}
+
 DRR::DRR (std::string configFile)
 {
        	NS_LOG_FUNCTION (this);	
@@ -51,7 +56,7 @@ DRR::GetTypeId (void)
 
 
 bool
-DRR:DoEnqueue (Ptr<Packet> p)
+DRR::DoEnqueue (Ptr<Packet> p)
 {
 	NS_LOG_FUNCTION (this);
  	uint32_t queuePos = Classify (p); //what logic should be in classify?

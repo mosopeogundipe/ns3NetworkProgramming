@@ -25,7 +25,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("ControlTest", LOG_LEVEL_ALL);
   LogComponentEnable ("DrrApplicationClient", LOG_LEVEL_ALL);
   LogComponentEnable ("DrrApplicationServer", LOG_LEVEL_ALL);
-  //LogComponentEnable ("DRR", LOG_LEVEL_ALL); //log for the queue
+  LogComponentEnable ("DRR", LOG_LEVEL_ALL); //log for the queue
 
   
   //create variables we will need
