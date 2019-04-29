@@ -15,17 +15,15 @@ namespace ns3 {
    NS_LOG_COMPONENT_DEFINE("DRR");
    NS_OBJECT_ENSURE_REGISTERED(DRR);
 
+
 DRR::DRR ()
 {
-//	NS_LOG_FUNCTION (this);
-}
-
-DRR::DRR (std::string configFile)
-{
-//    NS_LOG_FUNCTION (this);	
-	num_queues = 0;	
+//    NS_LOG_FUNCTION (this);
+	std::cout<<"DRR CONTRUCTOR"<<std::endl;	
+	num_queues = 0;
+	std::string configFile = "drr-config.txt";
 	ConfigReader (configFile);
-	configFile = "drr-config.txt";
+	
 	//num_queues = 3;
 	//quantum.push_back(30);
 	//quantum.push_back(20);
@@ -102,18 +100,18 @@ DRR::DoRemove (void)
 	return DoDequeue ();
 }
 
-bool
-DRR::DoEnqueue (Ptr<Packet> p)
-{
+//bool
+//DRR::DoEnqueue (Ptr<Packet> p)
+//{
 //	NS_LOG_FUNCTION (this);
- 	uint32_t queuePos = Classify (p); //what logic should be in classify?
-	if (q_class.empty()){
-		return false;
-	}
-	TrafficClass drrQueue = q_class[queuePos];
+ //	uint32_t queuePos = Classify (p); //what logic should be in classify?
+//	if (q_class.empty()){
+//		return false;
+//	}
+//	TrafficClass drrQueue = q_class[queuePos];
 
-	return drrQueue.Enqueue(p);
-}
+//	return drrQueue.Enqueue(p);
+///}
 
 Ptr<const Packet>
 DRR::DoPeek (void) const

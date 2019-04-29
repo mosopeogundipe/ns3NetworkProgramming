@@ -10,6 +10,10 @@
 #include "ns3/csma-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-static-routing-helper.h"
+#include "ns3/drrqueue.h"
+#include <ns3/queue.h>
+#include "ns3/diff-serv.h"
+
 
 using namespace ns3;
 
@@ -68,7 +72,7 @@ main (int argc, char *argv[])
   //populate link 2
   p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
-	p2p.AddQueueToOne ("ns3::DRR<Packet>");
+	//p2p.AddQueueToOne ("ns3::DRR<Packet>");
   NetDeviceContainer d12 = p2p.Install(c12);
   p2p.EnablePcap("post_DRR",d12.Get(0), BooleanValue(false));
 
@@ -76,13 +80,12 @@ main (int argc, char *argv[])
   p2p.SetCompress (BooleanValue (false));
 
   //----------------------------------- add queue to middle node -----------------------------------
-  //todo:
-    //there's no way it's this easy
-    //this sets all queues to DRR. Do we only want to set the middle?
-      //is there more that one queue?
-  p2p.SetQueue(std::string("ns3::DRR"));
+  //we should initialize it and then pass to SetQueue
 
-
+  Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
+  Ptr<DRR> qu = new DRR();
+  net_device->SetQueue(qu);
+  
   //----------------------------------- add to internet -----------------------------------
   InternetStackHelper internet;
   internet.Install (c);
