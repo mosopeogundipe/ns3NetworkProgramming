@@ -24,8 +24,9 @@ DRR::DRR (std::string configFile)
 	std::vector<uint32_t>::iterator iter = quantum.begin();
         for (int i=0; i<(int)num_queues; i++){
 	        TrafficClass queue;
-			deficit.push_back(0);
+			//deficit.push_back(0);
        		queue.SetWeight(*iter);
+            deficit.push_back(queue.GetWeight());
         	queue.SetDefault(false);
         	q_class.push_back(queue);
         	std::advance(iter, 1);
@@ -50,7 +51,7 @@ DRR::GetTypeId (void)
 
 
 bool
-DiffServ::DoEnqueue (Ptr<Packet> p)
+DRR:DoEnqueue (Ptr<Packet> p)
 {
 	NS_LOG_FUNCTION (this);
  	uint32_t queuePos = Classify (p); //what logic should be in classify?
@@ -64,7 +65,7 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 
 
 Ptr<Packet>
-DiffServ::DoPeek ()
+DRR::DoPeek ()
 {
 	NS_LOG_FUNCTION (this);
 	Ptr<Packet> packet;
@@ -105,7 +106,6 @@ Ptr<Packet>
 DRR::DoDequeue() {
 	uint16_t num_empty = 0;
 	while(true) {
-		deficit[curr_queue_index]+=q_class[curr_queue_index].GetWeight();
 		Ptr<Packet>p = q_class[curr_queue_index].Peek();
 		if (p==NULL) {
 			num_empty++;
@@ -115,11 +115,12 @@ DRR::DoDequeue() {
 			curr_queue_index++;
 			continue;
 		}
-		if (p->GetSize()<deficit[curr_queue_index]) {
+		if (p->GetSize()<=deficit[curr_queue_index]) {
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
-			curr_queue_index++;
+			//curr_queue_index++;
 			return q_class[curr_queue_index].Dequeue();
 		} else {
+			deficit[curr_queue_index]+=q_class[curr_queue_index].GetWeight();
 			curr_queue_index++;
 		}
 	}

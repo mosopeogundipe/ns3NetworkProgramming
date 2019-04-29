@@ -319,6 +319,7 @@ P2PClient::Send (void)
     }
   Address localAddress;
   m_socket->GetSockName (localAddress);
+
   // call to the trace sinks before the packet is actually sent,
   // so that tags added to the packet can be sent as well
   m_txTrace (p);
