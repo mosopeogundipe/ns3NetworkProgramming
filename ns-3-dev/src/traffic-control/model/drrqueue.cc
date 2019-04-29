@@ -81,6 +81,8 @@ DRR::GetTypeId (void)
 Ptr<Packet>
 DRR::Dequeue (void)
 {
+	std::cout << "drr dequeue" << std::endl;
+	exit (0);
 	return DoDequeue ();
 }
 
@@ -100,19 +102,6 @@ Ptr<Packet>
 DRR::DoRemove (void)
 {
 	return DoDequeue ();
-}
-
-bool
-DRR::DoEnqueue (Ptr<Packet> p)
-{
-//	NS_LOG_FUNCTION (this);
- 	uint32_t queuePos = Classify (p); //what logic should be in classify?
-	if (q_class.empty()){
-		return false;
-	}
-	TrafficClass drrQueue = q_class[queuePos];
-
-	return drrQueue.Enqueue(p);
 }
 
 Ptr<const Packet>
@@ -138,6 +127,7 @@ DRR::DoDequeue() {
 	uint16_t num_empty = 0;
 	while(true) {
 		std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
+		exit (0);
 		Ptr<const Packet>p = q_class[curr_queue_index].Peek();
 		if (p==NULL) {
 			num_empty++;

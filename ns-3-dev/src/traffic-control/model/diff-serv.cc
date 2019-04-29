@@ -28,12 +28,15 @@ DiffServ::GetTypeId (void)
 bool
 DiffServ::Enqueue (Ptr<Packet> p)
 {
+	std::cout << "enqueue" << std::endl;
 	return DoEnqueue (p);
 }
 
 Ptr<Packet>
 DiffServ::Dequeue (void)
 {
+	std::cout << "default dequeue" << std::endl;
+	exit (0);
 	return DoDequeue ();
 }
 
