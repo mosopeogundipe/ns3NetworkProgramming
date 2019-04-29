@@ -114,6 +114,23 @@ StrictPriorityQueue::~StrictPriorityQueue ()
 // 	lowPriority.AddFilter(&destPortLow); 
 // 	filters.push_back(lowPriority);
 // }
+Ptr<Packet>
+StrictPriorityQueue::Dequeue (void)
+{
+	return DoDequeue ();
+}
+
+Ptr<const Packet>
+StrictPriorityQueue::Peek (void) const
+{
+	return DoPeek ();
+}
+
+Ptr<Packet>
+StrictPriorityQueue::Remove (void)
+{
+	return StrictPriorityQueue::DoRemove ();
+}
 
 bool
 StrictPriorityQueue::DoEnqueue (Ptr<Packet> p)
@@ -180,14 +197,14 @@ StrictPriorityQueue::DoDequeue ()
 	return NULL;
 }
 
-// Ptr<Packet>
-// StrictPriorityQueue::DoRemove ()
-// {
-// 	//NS_LOG_FUNCTION (this);
+Ptr<Packet>
+StrictPriorityQueue::DoRemove ()
+{
+	//NS_LOG_FUNCTION (this);
 
-// 	// Actual logic should be same as DoDequeue
-// 	return DoDequeue ();
-// }
+	// Actual logic should be same as DoDequeue
+	return DoDequeue ();
+}
 
 Ptr<const ns3::Packet>
 StrictPriorityQueue::DoPeek () const

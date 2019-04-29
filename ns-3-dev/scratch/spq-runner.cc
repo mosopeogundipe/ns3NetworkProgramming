@@ -10,6 +10,7 @@
 #include "ns3/csma-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-static-routing-helper.h"
+#include "ns3/strict-priority-queue.h"
 
 using namespace ns3;
 
@@ -48,6 +49,10 @@ main (int argc, char *argv[])
 
   // We create the channels first without any IP addressing information
   PointToPointHelper p2p;
+  PointToPointNetDevice p1;
+  Ptr<PointToPointNetDevice> p2;
+  Ptr<StrictPriorityQueue> queue = new StrictPriorityQueue();
+  p1.SetQueue(queue);
 	//std::string str;
 
   // Point-to-point links
@@ -60,15 +65,22 @@ main (int argc, char *argv[])
   NetDeviceContainer d01 = p2p.Install (c01);
   p2p.EnablePcap("pre_SPQ", d01.Get(0), BooleanValue(false));
 
-
+  
   //populate link 2
   p2p.SetDeviceAttribute("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute("Delay", StringValue ("2ms"));
-  p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>"); //this allows code to hit StrictPriorityQueue constructor. Enqueue and Dequeue methods aren't reached still
+  //p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>"); //this allows code to hit StrictPriorityQueue constructor. Enqueue and Dequeue methods aren't reached still
   NetDeviceContainer d12 = p2p.Install(c12);
+  Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
+  Ptr<StrictPriorityQueue> SPQ = new StrictPriorityQueue();
+  net_device->SetQueue(SPQ);
   p2p.EnablePcap("post_SPQ",d12.Get(0), BooleanValue(false));
-  //p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>");
 
+  //p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>");
+  //p2p.SetDeviceAttribute("TxQueue", StringValue("ns3::StrictPriorityQueue<Packet>"));
+
+  // p2 = d12.Get(0);
+  // p2->SetQueue(queue);
   //not quite sure what this does, tbh
 	p2p.SetCompress(BooleanValue (false));
 
