@@ -38,18 +38,23 @@ Ptr<Packet>
 DiffServ::Dequeue (void)
 {
 	std::cout << "Dequeue in Diffserv" << std::endl;
+	exit (0);
 	return DoDequeue ();
 }
 
 Ptr<const Packet>
 DiffServ::Peek (void) const
 {
+	std::cout << "diffserv Peek" << std::endl;
+	exit (0);
 	return DoPeek ();
 }
 
 Ptr<Packet>
 DiffServ::Remove (void)
 {
+	std::cout << "diffserv Remove" << std::endl;
+	exit (0);
 	return DoRemove ();
 }
 
@@ -61,17 +66,12 @@ DiffServ::~DiffServ ()
 {
 }
 
-void
-DiffServ::AddTrafficClass (TrafficClass t)
-{
-	q_class.push_back (t);
-}
-
 bool
 DiffServ::DoEnqueue (Ptr<Packet> p)
 {
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);
+	std::cout << "diffserv classify = " << queuePos << std::endl;
 
 	if (q_class.empty () || queuePos == NOCLASSIFY)
 	{
@@ -98,7 +98,7 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 Ptr<Packet>
 DiffServ::DoDequeue (void)
 {
-	std::cout << "DiffServ" << std::endl;
+	std::cout << "DiffServ DoDequeue" << std::endl;
 	exit (0);
 	Ptr<Packet> packet;
 
@@ -118,6 +118,8 @@ DiffServ::DoDequeue (void)
 Ptr<Packet>
 DiffServ::DoRemove (void)
 {
+	std::cout << "diffserv DoRemove" << std::endl;
+	exit (0);
 	// Actual logic should be same as DoDequeue
 	return DoDequeue ();
 }
@@ -125,6 +127,8 @@ DiffServ::DoRemove (void)
 Ptr<const Packet>
 DiffServ::DoPeek (void) const
 {
+	std::cout << "diffserv DoPeek" << std::endl;
+	exit (0);
 	//same logic as DoDequeue () but we don't remove the packet
 	Ptr<const Packet> packet;
 
@@ -155,6 +159,8 @@ DiffServ::GetMode (void)
 Ptr<Packet>
 DiffServ::Schedule (void)
 {
+	std::cout << "diffserv Schedule" << std::endl;
+	exit (0);
 	// all we need to do here is call DoDequeue which should have QOS logic
 	return DoDequeue ();
 }
@@ -169,11 +175,13 @@ DiffServ::Classify (Ptr<Packet> p)
 
 	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
 		{
+			std::cout << "classify i = " << i << std::endl;
 				target = (*it);
 				// we want the default class, otherwise, the first matching class
 				if (target.Match (p) || target.IsDefault ())
 					{
-						std::cout << "matched packet at: " << i << std::endl;
+						std::cout << "matched with queue at: " << i << std::endl;
+						//exit (0);
 						pos = i;
 						break; // break out once matching queue class is found
 					}

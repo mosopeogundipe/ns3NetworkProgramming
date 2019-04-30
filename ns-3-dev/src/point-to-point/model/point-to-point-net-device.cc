@@ -317,8 +317,10 @@ PointToPointNetDevice::TransmitComplete (void)
   m_currentPkt = 0;
 
   Ptr<Packet> p = m_queue->Dequeue ();
+	std::cout << "just called Dequeue" << std::endl;
   if (p == 0)
     {
+			std::cout << "p == 0" << std::endl;
       NS_LOG_LOGIC ("No pending packets in device queue after tx complete");
       return;
     }

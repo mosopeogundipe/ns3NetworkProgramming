@@ -33,7 +33,6 @@ def build(bld):
 			'model/traffic-class.cc',
 			'model/diff-serv.cc',
       'model/strict-priority-queue.cc',
-			'model/drrqueue.cc',
       'helper/traffic-control-helper.cc',
       'helper/queue-disc-container.cc'
         ]
@@ -78,7 +77,6 @@ def build(bld):
 			'model/traffic-class.h',
 			'model/diff-serv.h',
       'model/strict-priority-queue.h',
-			'model/drrqueue.h',
       'helper/traffic-control-helper.h',
       'helper/queue-disc-container.h'
         ]

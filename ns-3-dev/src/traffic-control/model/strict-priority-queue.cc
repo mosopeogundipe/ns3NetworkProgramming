@@ -21,7 +21,7 @@ TypeId
 StrictPriorityQueue::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::StrictPriorityQueue<Packet>")
-    .SetParent<Object> ()
+    .SetParent<DiffServ> ()
     .SetGroupName ("TrafficControl")
 		.AddConstructor<StrictPriorityQueue> ()
   ;
@@ -117,6 +117,8 @@ StrictPriorityQueue::~StrictPriorityQueue ()
 Ptr<Packet>
 StrictPriorityQueue::Dequeue (void)
 {
+	std::cout << "SPQ Dequeue Called" << std::endl;
+	exit (0);
 	return DoDequeue ();
 }
 
@@ -133,18 +135,11 @@ StrictPriorityQueue::Remove (void)
 }
 
 bool
-StrictPriorityQueue::Enqueue (Ptr<Packet> p)
-{
-	std::cout << "Enqueue in SPQ" << std::endl;
-	return DoEnqueue (p);
-}
-
-bool
 StrictPriorityQueue::DoEnqueue (Ptr<Packet> p)
 {
 	//NS_LOG_FUNCTION (this);
-	std::cout << "DoEnqueue: " << std::endl;
-	//exit(0);
+	std::cout << "DoEnqueue: SPQ" << std::endl;
+	exit(0);
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
     TrafficClass target;    
