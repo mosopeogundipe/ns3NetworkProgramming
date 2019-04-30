@@ -4,6 +4,7 @@
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
 #include "strict-priority-queue.h"
+#include <vector>
 //#include "ns3/source-addr-filter-element.h"
 //#include "ns3/source-port-filter-element.h"
 //#include "ns3/dest-addr-filter-element.h"
@@ -40,42 +41,57 @@ StrictPriorityQueue::StrictPriorityQueue ()
 		//sort in decreasing order of priority
 		std::cout << "Processing... " << number_of_queues << "queues" << std::endl;
 		std::sort(priority_levels.begin(), priority_levels.end(), std::greater<u_int32_t>()); 
-        std::vector<uint32_t>::iterator iter = priority_levels.begin();
+		std::vector<uint32_t>::iterator iter = priority_levels.begin();
 		//std::vector<Filter>::iterator filterIter = filters.begin();
 		FilterElement* fe;
 		Filter* filter;
+		// for (uint32_t priority : priority_levels) {
+		// 	packet = tc->Dequeue ();
+		// 	if (packet != NULL)
+		// 		{
+		// 			return packet;
+		// 		}
+		// }
 		//insert in decreasing order of priority. 
 		//Highest priority is the first queue in list, defualt queue is the last one in list
         for (int i=0; i<(int)number_of_queues; i++){
-        TrafficClass queue;   //traffic class represents our queue in this case
+        TrafficClass* queue = new TrafficClass();   //traffic class represents our queue in this case		
 		switch(i) {
 			case 0:
 			fe = (FilterElement*) new DestPortFilterElement(9999);
+			//fe = new DestPortFilterElement(9999);
 			filter = new Filter();
 			filter->AddFilter(fe);
-			queue.filters.push_back(*filter);	
+			queue->filters.push_back(filter);
+			//std::cout << "Got Here..." << std::endl;
+			//queue.filters.push_back(*filter);	
 			case 1:
 			fe = (FilterElement*) new DestPortFilterElement(1111);
+			//fe = new DestPortFilterElement(1111);
 			filter = new Filter();
 			filter->AddFilter(fe);
-			queue.filters.push_back(*filter);	
-		}
-        queue.SetPriorityLevel(*iter);
-        queue.SetDefault(false);
+			//queue.filters.push_back(*filter);	
+			queue->filters.push_back(filter);
+		}		
+        queue->SetPriorityLevel(*iter);
+        queue->SetDefault(false);
 		//queue.filters.push_back(*filterIter);
         q_class.push_back(queue);
         std::advance(iter, 1);
 		//std::advance(filterIter, 1);
         }
         //creating default queue, where packets not matching any filters go:
-        TrafficClass default_queue;
-        default_queue.SetDefault(true);
+        TrafficClass* default_queue = new TrafficClass();
+        default_queue->SetDefault(true);
 		//default_queue.filters.push_back(filters.back());//add low priority filter to default queue. Low priority filter is the last one in list, based on this design
         fe = (FilterElement*) new DestPortFilterElement(1111);
+		//fe = new DestPortFilterElement(1111);
 		filter = new Filter();
 		filter->AddFilter(fe);
-		default_queue.filters.push_back(*filter);
+		//default_queue.filters.push_back(*filter);
+		default_queue->filters.push_back(filter);
 		q_class.push_back(default_queue);
+		std::cout << "Exiting SPQ constructor..." << std::endl;
     }else{
         NS_ABORT_MSG("'Number of Queues' doesn't match 'Priority levels' in Config file!");
     }
@@ -142,7 +158,7 @@ StrictPriorityQueue::DoEnqueue (Ptr<Packet> p)
 	exit(0);
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
-    TrafficClass target;    
+    TrafficClass* target;    
 
 	if (q_class.empty ())
 	{
@@ -163,16 +179,19 @@ StrictPriorityQueue::DoEnqueue (Ptr<Packet> p)
 }
 
 bool
-StrictPriorityQueue::IsEnqueuingSuccessful(TrafficClass queue, Ptr<Packet> p){
+StrictPriorityQueue::IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p){
     uint32_t pSize = p->GetSize ();
-    if (GetMode () == packet && queue.GetPackets () < queue.GetMaxPackets () - 1)
+	std::cout << "Packet size: " << pSize << "Queue Mode: "<< GetMode()<< std::endl;
+    if (GetMode () == packet && queue->GetPackets () < queue->GetMaxPackets () - 1)
 		{
-			return queue.Enqueue (p);
+			std::cout << "Entered condition 1: DiffServ" << std::endl;
+			return queue->Enqueue (p);
 		}
 
-	if (GetMode () == byte && queue.GetBytes () + pSize < queue.GetMaxPackets ())
+	if (GetMode () == byte && queue->GetBytes () + pSize < queue->GetMaxPackets ())
 		{
-			return queue.Enqueue (p);
+			std::cout << "Entered condition 2: DiffServ" << std::endl;
+			return queue->Enqueue (p);
 		}
     return false;
 }
@@ -181,20 +200,30 @@ Ptr<Packet>
 StrictPriorityQueue::DoDequeue ()
 {
 	//NS_LOG_FUNCTION (this);
-	std::cout << "DoDequeue: " << std::endl;
+	std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
 	Ptr<Packet> packet;
 
-	// Will use the first TrafficClass by default
-	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
-		{
-			packet = it->Dequeue ();
-			std::cout << "DoDequeue || Checking queue of priority " << it->GetPriorityLevel() << std::endl;
+	for (TrafficClass* tc : q_class) {
+		packet = tc->Dequeue ();
+		std::cout << "DoDequeue || Checking queue of priority " << tc->GetPriorityLevel() << std::endl;
 			if (packet != NULL)
 				{
-					std::cout << "DoDequeue || Returning packet from queue of priority " << it->GetPriorityLevel() << std::endl;
+					std::cout << "DoDequeue || Returning packet from queue of priority " << tc->GetPriorityLevel() << std::endl;
 					return packet;
 				}
-		}
+	}
+
+	// Will use the first TrafficClass by default
+	// for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
+	// 	{
+	// 		packet = it->Dequeue ();
+	// 		std::cout << "DoDequeue || Checking queue of priority " << it->GetPriorityLevel() << std::endl;
+	// 		if (packet != NULL)
+	// 			{
+	// 				std::cout << "DoDequeue || Returning packet from queue of priority " << it->GetPriorityLevel() << std::endl;
+	// 				return packet;
+	// 			}
+	// 	}
 
 	return NULL;
 }
@@ -216,15 +245,25 @@ StrictPriorityQueue::DoPeek () const
 	//same logic as DoDequeue () but we don't remove the packet
 	Ptr<const ns3::Packet> packet;
 
-	// Will use the first TrafficClass by default
-	for (std::vector<TrafficClass>::const_iterator it = q_class.begin (); it != q_class.end (); ++it)
-		{
-			packet = it->Peek ();
+	for (TrafficClass* tc : q_class) {
+		packet = tc->Peek ();
+		std::cout << "DoPeek || Checking queue of priority " << tc->GetPriorityLevel() << std::endl;
 			if (packet != NULL)
 				{
+					std::cout << "DoPeek || Returning packet from queue of priority " << tc->GetPriorityLevel() << std::endl;
 					return packet;
 				}
-		}
+	}
+
+	// Will use the first TrafficClass by default
+	// for (std::vector<TrafficClass>::const_iterator it = q_class.begin (); it != q_class.end (); ++it)
+	// 	{
+	// 		packet = it->Peek ();
+	// 		if (packet != NULL)
+	// 			{
+	// 				return packet;
+	// 			}
+	// 	}
 	return NULL;
 }
 

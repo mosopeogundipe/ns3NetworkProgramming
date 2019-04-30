@@ -35,13 +35,13 @@ private:
 	QueueMode m_mode;
 
 	//need to overwrite all of these marked virtual
-	bool IsEnqueuingSuccessful(TrafficClass queue, Ptr<Packet> p);
+	bool IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p);
 	bool DoEnqueue (Ptr<Packet> p);
 	virtual Ptr<Packet> DoDequeue (void);
 	virtual Ptr<Packet> DoRemove (void); // why is this here? it's the same as DoDequeue
 	virtual Ptr<const Packet> DoPeek (void) const; // same logic as DoDequeue but no removal
 protected:
-	std::vector<TrafficClass> q_class;
+	std::vector<TrafficClass*> q_class;
 };
 
 }

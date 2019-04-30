@@ -41,7 +41,7 @@ Filter::Unref ()
 }
 
 void
-Filter::AddFilter (Ptr<FilterElement> element)
+Filter::AddFilter (FilterElement* element)
 {
 	NS_LOG_FUNCTION (this);
 	elements.push_back (element);
