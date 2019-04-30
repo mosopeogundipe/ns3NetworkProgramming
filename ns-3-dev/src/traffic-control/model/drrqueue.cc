@@ -3,17 +3,22 @@
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
+//#include "ns3/drrqueue.h"
 #include "drrqueue.h"
 #include <bits/stdc++.h>
+#include "dest-port-filter-element.h"
+#include "filter.h"
 
 #define NOCLASSIFY 0xffffffff
 
 namespace ns3 {
    NS_LOG_COMPONENT_DEFINE("DRR");
-   NS_OBJECT_ENSURE_REGISTERED (DRR);
+   NS_OBJECT_ENSURE_REGISTERED(DRR);
 
-//#include 
-//ns3/traffic-class.h
+DRR::DRR ()
+{
+//	NS_LOG_FUNCTION (this);
+}
 
 DRR::DRR(){
 	std::cout<<("Got to constructor");
@@ -22,11 +27,18 @@ DRR::DRR(){
 
 DRR::DRR (std::string configFile)
 {
-       	NS_LOG_FUNCTION (this);	
-	num_queues = 0;	   
+//    NS_LOG_FUNCTION (this);	
+	num_queues = 0;	
 	ConfigReader (configFile);
-
+	configFile = "drr-config.txt";
+	//num_queues = 3;
+	//quantum.push_back(30);
+	//quantum.push_back(20);
+	//quantum.push_back(10);
+	FilterElement* fe;
+	Filter* filter;
 	std::vector<uint32_t>::iterator iter = quantum.begin();
+<<<<<<< HEAD
         for (int i=0; i<(int)num_queues; i++){
 	        TrafficClass queue;
 			//deficit.push_back(0);
@@ -36,17 +48,46 @@ DRR::DRR (std::string configFile)
         	q_class.push_back(queue);
         	std::advance(iter, 1);
         }
+=======
+    for (int i=0; i<(int)num_queues; i++){
+	    TrafficClass queue;
+		//deficit.push_back(0);
+       	queue.SetWeight(*iter);
+		deficit.push_back(queue.GetWeight());
+        queue.SetDefault(false);
+        q_class.push_back(queue);
+        std::advance(iter, 1);
+		//destination port hard code
+		switch(i) {
+			case 0:
+			fe = (FilterElement*) new DestPortFilterElement(9999);
+			filter = new Filter();
+			filter->AddFilter(fe);
+			queue.filters.push_back(*filter);		
+			case 1:
+			fe = (FilterElement*) new DestPortFilterElement(5555);
+			filter = new Filter();
+			filter->AddFilter(fe);
+			queue.filters.push_back(*filter);	
+			case 2:
+			fe = (FilterElement*) new DestPortFilterElement(1111);
+			filter = new Filter();
+			filter->AddFilter(fe);
+			queue.filters.push_back(*filter);	
+		}
+    }
+>>>>>>> origin/sope-p2
 }
 
 DRR::~DRR ()
 {
-        NS_LOG_FUNCTION (this);
+//	NS_LOG_FUNCTION (this);
 }
 
 TypeId
 DRR::GetTypeId (void)
 {
-	static TypeId tid = TypeId ("ns3::DRR")
+	static TypeId tid = TypeId ("ns3::DRR<Packet>")
         .SetParent<Object> ()
         .SetGroupName ("TrafficControl")
 	.AddConstructor<DRR> ()
@@ -54,28 +95,50 @@ DRR::GetTypeId (void)
 	return tid;
 }
 
+<<<<<<< HEAD
 
 bool
 DRR::DoEnqueue (Ptr<Packet> p)
+=======
+Ptr<Packet>
+DRR::Dequeue (void)
+>>>>>>> origin/sope-p2
 {
-	NS_LOG_FUNCTION (this);
- 	uint32_t queuePos = Classify (p); //what logic should be in classify?
-	if (q_class.empty()){
-		return false;
-	}
-	TrafficClass drrQueue = q_class[queuePos];
-
-	return drrQueue.Enqueue(p);
+	std::cout << "drr dequeue" << std::endl;
+	exit (0);
+	return DoDequeue ();
 }
 
+Ptr<const Packet>
+DRR::Peek (void) const
+{
+	return DoPeek ();
+}
 
 Ptr<Packet>
-DRR::DoPeek ()
+DRR::Remove (void)
 {
-	NS_LOG_FUNCTION (this);
-	Ptr<Packet> packet;
+	return DRR::DoRemove ();
+}
 
-	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
+Ptr<Packet>
+<<<<<<< HEAD
+DRR::DoPeek ()
+=======
+DRR::DoRemove (void)
+>>>>>>> origin/sope-p2
+{
+	return DoDequeue ();
+}
+
+Ptr<const Packet>
+DRR::DoPeek (void) const
+{
+	//same logic as DoDequeue () but we don't remove the packet
+	Ptr<const Packet> packet;
+
+	// Will use the first TrafficClass by default
+	for (std::vector<TrafficClass>::const_iterator it = q_class.begin (); it != q_class.end (); ++it)
 		{
 			packet = it->Peek ();
 			if (packet != NULL)
@@ -86,32 +149,17 @@ DRR::DoPeek ()
 	return NULL;
 }
 
-// bool
-// DRR::Enqueue(TrafficClass drrQueue, Ptr<Packet> p){
-// 	//don't have a normal queue logic here, I put packets by order in rounds
-// 	int count = 0;
-// 	while (true)
-//                 for (int i=0; i<numQueues; i++){
-// 			if (!q_class.empty()){
-// 				q_class[i].Enqueue(p);
-// 			}
-// 			else if (q_class[i].size()<q_class[i+1].size()){
-// 				q_class[i].enqueue(p);
-// 			} else if (q_class[i].size()==q_class[i+1].size()) {
-// 				count++;
-// 			}
-// 		}
-// 	//all queues have the same size
-// 	if (count == numQueues) && (!q_class[0].empty()) {
-// 		q_class[0].enqueue(p);
-// 	}
-// }
-
 Ptr<Packet>
 DRR::DoDequeue() {
 	uint16_t num_empty = 0;
 	while(true) {
+<<<<<<< HEAD
 		Ptr<Packet>p = q_class[curr_queue_index].Peek();
+=======
+		std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
+		exit (0);
+		Ptr<const Packet>p = q_class[curr_queue_index].Peek();
+>>>>>>> origin/sope-p2
 		if (p==NULL) {
 			num_empty++;
 			if (num_empty == num_queues) {
@@ -122,7 +170,6 @@ DRR::DoDequeue() {
 		}
 		if (p->GetSize()<=deficit[curr_queue_index]) {
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
-			//curr_queue_index++;
 			return q_class[curr_queue_index].Dequeue();
 		} else {
 			deficit[curr_queue_index]+=q_class[curr_queue_index].GetWeight();
@@ -141,11 +188,8 @@ DRR::ConfigReader(std::string configFile) {
 			uint8_t i = 0;
 			while (getline (readFile,line) )
 				{
-					
-
 					if ( i == 0 )
 					{
-						//quantum = new uint16_t [std::stoi (line)];
 						num_queues = std::stoi (line);
 					}
 					else

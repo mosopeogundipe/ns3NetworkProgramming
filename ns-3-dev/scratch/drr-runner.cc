@@ -10,7 +10,6 @@
 #include "ns3/csma-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-static-routing-helper.h"
-#include "ns3/strict-priority-queue.h"
 
 using namespace ns3;
 
@@ -25,7 +24,11 @@ main (int argc, char *argv[])
   LogComponentEnable ("ControlTest", LOG_LEVEL_ALL);
   LogComponentEnable ("DrrApplicationClient", LOG_LEVEL_ALL);
   LogComponentEnable ("DrrApplicationServer", LOG_LEVEL_ALL);
+<<<<<<< HEAD
   LogComponentEnable ("DRR", LOG_LEVEL_ALL); //log for the queue
+=======
+  //LogComponentEnable ("DRR", LOG_LEVEL_ALL); //log for the queue
+>>>>>>> origin/sope-p2
 
   
   //create variables we will need
@@ -49,8 +52,6 @@ main (int argc, char *argv[])
   //----------------------------------- create nodes -----------------------------------
   NodeContainer c;
   c.Create(3);
-
-  
   //----------------------------------- create links -----------------------------------
 
   // We create the channels first without any IP addressing information
@@ -71,6 +72,7 @@ main (int argc, char *argv[])
   //populate link 2
   p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
+	p2p.AddQueueToOne ("ns3::DRR<Packet>");
   NetDeviceContainer d12 = p2p.Install(c12);
   p2p.EnablePcap("post_DRR",d12.Get(0), BooleanValue(false));
 
@@ -82,7 +84,11 @@ main (int argc, char *argv[])
     //there's no way it's this easy
     //this sets all queues to DRR. Do we only want to set the middle?
       //is there more that one queue?
+<<<<<<< HEAD
   p2p.SetQueue(std::string("ns3::DropTailQueue"));
+=======
+  p2p.SetQueue(std::string("ns3::DRR"));
+>>>>>>> origin/sope-p2
 
 
   //----------------------------------- add to internet -----------------------------------
@@ -145,4 +151,3 @@ main (int argc, char *argv[])
 
   return 0;
 }
-

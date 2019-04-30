@@ -51,6 +51,9 @@ public:
   PointToPointHelper ();
   virtual ~PointToPointHelper () {}
 
+	//this will add the desired queue to the first node on the next install
+	void AddQueueToOne (std::string queue);
+
   /**
    * Each point to point net device must have a queue to pass packets through.
    * This method allows one to set the type of the queue that is automatically
@@ -189,6 +192,7 @@ private:
   ObjectFactory m_deviceFactory;        //!< Device Factory
 
 	bool compress;
+	std::string s_queue;
 };
 
 } // namespace ns3

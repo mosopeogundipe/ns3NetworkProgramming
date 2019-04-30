@@ -23,16 +23,15 @@
 #include "ns3/inet-socket-address.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/packet.h"
+#include "ns3/filter-element.h"
 
 namespace ns3 {
-
-class FilterElement;
 
 /**
  * \ingroup traffic-control
  *
  */
-class DestAddrFilterElement: public Object {
+class DestAddrFilterElement: public FilterElement {
 public:
   /**
    * \brief Get the type ID.
