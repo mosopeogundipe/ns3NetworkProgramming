@@ -21,6 +21,7 @@ public:
 	Ptr<Packet> Schedule (); //this only calls DoDequeue so....
 	uint32_t number_of_queues;
     std::vector<uint32_t> priority_levels;
+	bool Enqueue (Ptr<Packet> p);
 	Ptr<Packet> Dequeue (void);
 	Ptr<const Packet> Peek (void) const;
 	Ptr<Packet> Remove (void);

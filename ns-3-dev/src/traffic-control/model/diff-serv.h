@@ -10,6 +10,7 @@
 
 namespace ns3 {
 
+
 class DiffServ : public ns3::Queue<ns3::Packet> {
 public:
 	enum QueueMode { packet, byte };
@@ -24,13 +25,12 @@ public:
 	QueueMode GetMode ();
 	virtual Ptr<Packet> Schedule (void); //this only calls DoDequeue so....
 	uint32_t Classify (Ptr<Packet> p);
-	bool Enqueue (Ptr<Packet> p);
+	virtual bool Enqueue (Ptr<Packet> p);
 	virtual Ptr<Packet> Dequeue (void);
 	virtual Ptr<const Packet> Peek (void) const;
 	virtual Ptr<Packet> Remove (void);
 
-private:
-	std::vector<TrafficClass> q_class;
+private:	
 	QueueMode m_mode;
 
 	//need to overwrite all of these marked virtual
@@ -38,6 +38,9 @@ private:
 	virtual Ptr<Packet> DoDequeue (void);
 	virtual Ptr<Packet> DoRemove (void); // why is this here? it's the same as DoDequeue
 	virtual Ptr<const Packet> DoPeek (void) const; // same logic as DoDequeue but no removal
+
+protected:
+	std::vector<TrafficClass> q_class;
 };
 
 }

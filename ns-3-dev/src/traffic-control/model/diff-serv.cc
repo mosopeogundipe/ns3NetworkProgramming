@@ -13,6 +13,7 @@ namespace ns3 {
 NS_LOG_COMPONENT_DEFINE("DiffServ");
 NS_OBJECT_ENSURE_REGISTERED (DiffServ);
 
+
 TypeId
 DiffServ::GetTypeId (void)
 {
@@ -170,8 +171,9 @@ DiffServ::Classify (Ptr<Packet> p)
 		{
 				target = (*it);
 				// we want the default class, otherwise, the first matching class
-				if (target.Match (p) && (pos == NOCLASSIFY || target.IsDefault ()))
+				if (target.Match (p) || target.IsDefault ())
 					{
+						std::cout << "matched packet at: " << i << std::endl;
 						pos = i;
 						break; // break out once matching queue class is found
 					}

@@ -133,11 +133,18 @@ StrictPriorityQueue::Remove (void)
 }
 
 bool
+StrictPriorityQueue::Enqueue (Ptr<Packet> p)
+{
+	std::cout << "Enqueue in SPQ" << std::endl;
+	return DoEnqueue (p);
+}
+
+bool
 StrictPriorityQueue::DoEnqueue (Ptr<Packet> p)
 {
 	//NS_LOG_FUNCTION (this);
 	std::cout << "DoEnqueue: " << std::endl;
-	exit(0);
+	//exit(0);
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
     TrafficClass target;    
