@@ -158,7 +158,7 @@ bool
 TrafficClass::Enqueue (Ptr<ns3::Packet> p)
 {
 	NS_LOG_FUNCTION (this);
-
+	std::cout << "Entered Trafficclass enqueue" << std::endl;
 	// if this queue is already full, we can't add more
 	if (bytes >= maxBytes || packets >= maxPackets)
 		{
