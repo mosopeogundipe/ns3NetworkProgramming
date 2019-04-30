@@ -3,7 +3,7 @@
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
-#include "ns3/drrqueue.h"
+//#include "ns3/drrqueue.h"
 #include "drrqueue.h"
 #include <bits/stdc++.h>
 #include "dest-port-filter-element.h"
@@ -79,6 +79,8 @@ DRR::GetTypeId (void)
 Ptr<Packet>
 DRR::Dequeue (void)
 {
+	std::cout << "drr dequeue" << std::endl;
+	exit (0);
 	return DoDequeue ();
 }
 
@@ -136,6 +138,7 @@ DRR::DoDequeue() {
 	uint16_t num_empty = 0;
 	while(true) {
 		std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
+		exit (0);
 		Ptr<const Packet>p = q_class[curr_queue_index].Peek();
 		if (p==NULL) {
 			num_empty++;
