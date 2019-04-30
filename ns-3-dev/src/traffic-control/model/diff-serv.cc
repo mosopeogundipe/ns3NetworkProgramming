@@ -103,7 +103,7 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
     std::cout << "Diffserv classify: "<< queuePos << std::endl;
-	TrafficClass target;    
+	TrafficClass* target;    
 
 	if (q_class.empty ())
 	{
@@ -124,19 +124,19 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 }
 
 bool
-DiffServ::IsEnqueuingSuccessful(TrafficClass queue, Ptr<Packet> p){
+DiffServ::IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p){
     uint32_t pSize = p->GetSize ();
-	std::cout << "Packet size: " << pSize << "Queue Mode: "<< GetMode() << std::endl;
-    if (GetMode () == packet && queue.GetPackets () < queue.GetMaxPackets () - 1)
+	std::cout << "Packet size: " << pSize << "Queue Mode: "<< GetMode()<< std::endl;
+    if (GetMode () == packet && queue->GetPackets () < queue->GetMaxPackets () - 1)
 		{
 			std::cout << "Entered condition 1: DiffServ" << std::endl;
-			return queue.Enqueue (p);
+			return queue->Enqueue (p);
 		}
 
-	if (GetMode () == byte && queue.GetBytes () + pSize < queue.GetMaxPackets ())
+	if (GetMode () == byte && queue->GetBytes () + pSize < queue->GetMaxPackets ())
 		{
 			std::cout << "Entered condition 2: DiffServ" << std::endl;
-			return queue.Enqueue (p);
+			return queue->Enqueue (p);
 		}
     return false;
 }
@@ -148,15 +148,22 @@ DiffServ::DoDequeue (void)
 	exit (0);
 	Ptr<Packet> packet;
 
-	// Will use the first TrafficClass by default
-	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
-		{
-			packet = it->Dequeue ();
+	for (TrafficClass* tc : q_class) {
+		packet = tc->Dequeue ();
 			if (packet != NULL)
 				{
 					return packet;
 				}
-		}
+	}
+	// Will use the first TrafficClass by default
+	// for (std::vector<TrafficClass*>::iterator it = q_class->begin (); it != q_class.end (); ++it)
+	// 	{
+	// 		packet = it->Dequeue ();
+	// 		if (packet != NULL)
+	// 			{
+	// 				return packet;
+	// 			}
+	// 	}
 
 	return NULL;
 }
@@ -177,16 +184,22 @@ DiffServ::DoPeek (void) const
 	exit (0);
 	//same logic as DoDequeue () but we don't remove the packet
 	Ptr<const Packet> packet;
-
-	// Will use the first TrafficClass by default
-	for (std::vector<TrafficClass>::const_iterator it = q_class.begin (); it != q_class.end (); ++it)
-		{
-			packet = it->Peek ();
+	for (TrafficClass* tc : q_class) {
+		packet = tc->Peek ();
 			if (packet != NULL)
 				{
 					return packet;
 				}
-		}
+	}
+	// Will use the first TrafficClass by default
+	// for (std::vector<TrafficClass>::const_iterator it = q_class.begin (); it != q_class.end (); ++it)
+	// 	{
+	// 		packet = it->Peek ();
+	// 		if (packet != NULL)
+	// 			{
+	// 				return packet;
+	// 			}
+	// 	}
 	return NULL;
 }
 
@@ -217,22 +230,35 @@ DiffServ::Classify (Ptr<Packet> p)
 	// default is max value to signify no match
 	uint32_t pos = NOCLASSIFY;
 	uint32_t i = 0;
-	TrafficClass target;
+	//TrafficClass* target;
+	std::cout << "q_class size: "<< q_class.size() << std::endl;
+	for (TrafficClass* tc : q_class) {
+		std::cout << "classify i = " << i << std::endl;
+		// we want the default class, otherwise, the first matching class
+		if (tc->Match (p) || tc->IsDefault ())
+			{
+				std::cout << "matched with queue at: " << i << std::endl;
+				//exit (0);
+				pos = i;
+				break; // break out once matching queue class is found
+			}
+		i++;
+	}
 
-	for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
-		{
-			std::cout << "classify i = " << i << std::endl;
-				target = (*it);
-				// we want the default class, otherwise, the first matching class
-				if (target.Match (p) || target.IsDefault ())
-					{
-						std::cout << "matched with queue at: " << i << std::endl;
-						//exit (0);
-						pos = i;
-						break; // break out once matching queue class is found
-					}
-				i++;
-		}
+	// for (std::vector<TrafficClass>::iterator it = q_class.begin (); it != q_class.end (); ++it)
+	// 	{
+	// 		std::cout << "classify i = " << i << std::endl;
+	// 			target = (*it);
+	// 			// we want the default class, otherwise, the first matching class
+	// 			if (target.Match (p) || target.IsDefault ())
+	// 				{
+	// 					std::cout << "matched with queue at: " << i << std::endl;
+	// 					//exit (0);
+	// 					pos = i;
+	// 					break; // break out once matching queue class is found
+	// 				}
+	// 			i++;
+	// 	}
 
 	return pos;
 }
