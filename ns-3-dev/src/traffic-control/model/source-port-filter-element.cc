@@ -67,7 +67,7 @@ SourcePortFilterElement::Match (Ptr<Packet> packet) const
 
 	packet->PeekHeader (pppHeader);
 	packet->PeekHeader (ipHeader);
-	packet->PeekHeader (tcpHeader);
+	packet->PeekHeader (tcpHeader); 
 	return tcpHeader.GetSourcePort () == port;
 }
 

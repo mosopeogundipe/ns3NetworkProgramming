@@ -3,7 +3,7 @@
 #include "ns3/uinteger.h"
 #include "diff-serv.h"
 #include "ns3/traffic-class.h"
-#include "ns3/drrqueue.h"
+//#include "ns3/drrqueue.h"
 #include "drrqueue.h"
 #include <bits/stdc++.h>
 #include "dest-port-filter-element.h"
