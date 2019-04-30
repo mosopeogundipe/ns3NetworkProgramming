@@ -35,7 +35,7 @@ public:
 	Filter ();
 	~Filter ();
 
-	void AddFilter (Ptr<FilterElement> element);
+	void AddFilter (FilterElement* element);
 	bool Match (Ptr<Packet> packet);
 
 	/**

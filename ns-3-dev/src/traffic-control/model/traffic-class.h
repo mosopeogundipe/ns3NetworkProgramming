@@ -15,7 +15,7 @@ namespace ns3 {
 
 class TrafficClass:public Object {
 public:
-	std::vector<Filter> filters;
+	std::vector<Filter*> filters;
 
 	void Unref (); //required for pointers
 
