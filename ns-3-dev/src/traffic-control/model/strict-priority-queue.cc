@@ -21,7 +21,7 @@ TypeId
 StrictPriorityQueue::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::StrictPriorityQueue<Packet>")
-    .SetParent<Object> ()
+    .SetParent<DiffServ> ()
     .SetGroupName ("TrafficControl")
 		.AddConstructor<StrictPriorityQueue> ()
   ;
@@ -78,7 +78,6 @@ StrictPriorityQueue::StrictPriorityQueue ()
 		q_class.push_back(default_queue);
     }else{
         NS_ABORT_MSG("'Number of Queues' doesn't match 'Priority levels' in Config file!");
-				exit (0);
     }
     
 }
