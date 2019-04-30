@@ -10,6 +10,7 @@
 
 namespace ns3 {
 
+
 class DiffServ : public ns3::Queue<ns3::Packet> {
 public:
 	enum QueueMode { packet, byte };
@@ -29,6 +30,7 @@ public:
 	virtual Ptr<const Packet> Peek (void) const;
 	virtual Ptr<Packet> Remove (void);
 
+	using Queue<Packet>::Dequeue;
 private:
 	QueueMode m_mode;
 

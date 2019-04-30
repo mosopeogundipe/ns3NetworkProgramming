@@ -13,6 +13,7 @@ namespace ns3 {
 NS_LOG_COMPONENT_DEFINE("DiffServ");
 NS_OBJECT_ENSURE_REGISTERED (DiffServ);
 
+
 TypeId
 DiffServ::GetTypeId (void)
 {
