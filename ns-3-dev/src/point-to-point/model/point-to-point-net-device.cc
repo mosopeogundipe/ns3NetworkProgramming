@@ -595,6 +595,7 @@ PointToPointNetDevice::Send (
       //
       // If the channel is ready for transition we send the packet right now
       // 
+      std::cout << "PointToPoint: Enqueue is successful" << std::endl;
       if (m_txMachineState == READY)
         {
           newPacket = m_queue->Dequeue ();
@@ -604,6 +605,8 @@ PointToPointNetDevice::Send (
           return ret;
         }
       return true;
+    }else{
+      std::cout << "PointToPoint: Enqueue failed" << std::endl;
     }
 
   // Enqueue may fail (overflow)

@@ -69,6 +69,7 @@ main (int argc, char *argv[])
   NetDeviceContainer d12 = p2p.Install(c12);
   Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
   Ptr<StrictPriorityQueue> SPQ = new StrictPriorityQueue();
+  SPQ->SetMode(DiffServ::packet);
   net_device->SetQueue(SPQ);
   p2p.EnablePcap("post_SPQ",d12.Get(0), BooleanValue(false));
 
