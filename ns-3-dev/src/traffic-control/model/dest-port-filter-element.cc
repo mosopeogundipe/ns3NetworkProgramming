@@ -63,12 +63,20 @@ DestPortFilterElement::Match (Ptr<Packet> packet) const
 	ns3::PppHeader pppHeader;
 	ns3::Ipv4Header ipHeader;
 	ns3::TcpHeader tcpHeader;
+  bool value = false;
 
-	packet->PeekHeader (pppHeader);
-	packet->PeekHeader (ipHeader);
-	packet->PeekHeader (tcpHeader);
-  std::cout << "Packet Port is: " << tcpHeader.GetSourcePort () << std::endl;
-	return tcpHeader.GetDestinationPort () == port;
+	packet->RemoveHeader (pppHeader);
+	packet->RemoveHeader (ipHeader);
+	packet->RemoveHeader (tcpHeader);
+  std::cout << "Packet Port is: " << tcpHeader.GetDestinationPort () << std::endl;
+  std::cout << "Filter element Port is: " << port << std::endl;
+  if(tcpHeader.GetDestinationPort () == port){
+    value = true;
+  }
+  packet->AddHeader (tcpHeader);
+  packet->AddHeader (ipHeader);
+  packet->AddHeader (pppHeader);
+  return value;
 }
 
 } // namespace ns3

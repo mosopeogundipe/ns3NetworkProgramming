@@ -66,33 +66,79 @@ DiffServ::~DiffServ ()
 {
 }
 
+// bool
+// DiffServ::DoEnqueue (Ptr<Packet> p)
+// {
+// 	// this needs actual logic from QOS class
+// 	uint32_t queuePos = Classify (p);
+// 	std::cout << "diffserv classify = " << queuePos << std::endl;
+
+// 	if (q_class.empty () || queuePos == NOCLASSIFY)
+// 	{
+// 		// there is nothing in the queue, or the packet does not belong in any
+// 		return false;
+// 	}
+
+// 	TrafficClass target = q_class[queuePos];
+// 	uint32_t pSize = p->GetSize ();
+
+// 	if (m_mode == packet && target.GetPackets () < target.GetMaxPackets ())
+// 		{
+// 			return target.Enqueue (p);
+// 		}
+
+// 	if (m_mode == byte && target.GetBytes () + pSize <= target.GetMaxPackets ())
+// 		{
+// 			return target.Enqueue (p);
+// 		}
+
+// 	return false;
+// }
+
 bool
 DiffServ::DoEnqueue (Ptr<Packet> p)
 {
+	//NS_LOG_FUNCTION (this);
+	std::cout << "DoEnqueue: DiffServ" << std::endl;
 	// this needs actual logic from QOS class
-	uint32_t queuePos = Classify (p);
-	std::cout << "diffserv classify = " << queuePos << std::endl;
+	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
+    std::cout << "Diffserv classify: "<< queuePos << std::endl;
+	TrafficClass target;    
 
-	if (q_class.empty () || queuePos == NOCLASSIFY)
+	if (q_class.empty ())
 	{
-		// there is nothing in the queue, or the packet does not belong in any
+		// there is nothing in the queue
 		return false;
 	}
 
-	TrafficClass target = q_class[queuePos];
-	uint32_t pSize = p->GetSize ();
+    if (queuePos == NOCLASSIFY)
+	{
+		//the packet does not belong in any queue, add to default queue
+        target = q_class.back();   //default queue is always last in list, according to my design
+		IsEnqueuingSuccessful(target, p);
+	}else{
+		target = q_class[queuePos];		//HINT.SOPE: Should I change this and get queue where queuePos == queue's priority?
+	}
 
-	if (m_mode == packet && target.GetPackets () < target.GetMaxPackets ())
+    return IsEnqueuingSuccessful(target, p);		
+}
+
+bool
+DiffServ::IsEnqueuingSuccessful(TrafficClass queue, Ptr<Packet> p){
+    uint32_t pSize = p->GetSize ();
+	std::cout << "Packet size: " << pSize << "Queue Mode: "<< GetMode() << std::endl;
+    if (GetMode () == packet && queue.GetPackets () < queue.GetMaxPackets () - 1)
 		{
-			return target.Enqueue (p);
+			std::cout << "Entered condition 1: DiffServ" << std::endl;
+			return queue.Enqueue (p);
 		}
 
-	if (m_mode == byte && target.GetBytes () + pSize <= target.GetMaxPackets ())
+	if (GetMode () == byte && queue.GetBytes () + pSize < queue.GetMaxPackets ())
 		{
-			return target.Enqueue (p);
+			std::cout << "Entered condition 2: DiffServ" << std::endl;
+			return queue.Enqueue (p);
 		}
-
-	return false;
+    return false;
 }
 
 Ptr<Packet>

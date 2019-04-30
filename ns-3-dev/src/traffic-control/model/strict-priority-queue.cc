@@ -118,7 +118,7 @@ Ptr<Packet>
 StrictPriorityQueue::Dequeue (void)
 {
 	std::cout << "SPQ Dequeue Called" << std::endl;
-	exit (0);
+	//exit (0);
 	return DoDequeue ();
 }
 
