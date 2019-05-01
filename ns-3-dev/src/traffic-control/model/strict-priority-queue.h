@@ -25,6 +25,7 @@ public:
 	Ptr<Packet> Dequeue (void);
 	Ptr<const Packet> Peek (void) const;
 	Ptr<Packet> Remove (void);
+	bool Enqueue (Ptr<Packet> p);
 
 private:
 	std::string configFile;
@@ -33,7 +34,7 @@ private:
 
 	//need to overwrite all of these marked virtual
 	bool DoEnqueue (Ptr<Packet> p);
-    bool IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p);
+    //bool IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p);
     Ptr<Packet> DoDequeue ();
 	Ptr<Packet> DoRemove (); // why is this here? it's the same as DoDequeue
 	Ptr<const ns3::Packet> DoPeek () const; // same logic as DoDequeue but no removal
