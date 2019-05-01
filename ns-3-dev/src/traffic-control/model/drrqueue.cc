@@ -93,6 +93,7 @@ DRR::Dequeue (void)
 Ptr<const Packet>
 DRR::Peek (void) const
 {
+	std::cout << "drr peek" << std::endl;
 	return DoPeek();
 }
 
@@ -112,6 +113,7 @@ Ptr<const Packet>
 DRR::DoPeek (void) const
 {
 	//same logic as DoDequeue () but we don't remove the packet
+	std::cout<<"DoPeek1"<< std::endl;
 	Ptr<const Packet> packet;
 
 	// // Will use the first TrafficClass by default
@@ -129,6 +131,7 @@ DRR::DoPeek (void) const
 	for (TrafficClass* tc : q_class) 
 		{
 			packet = tc->Peek ();
+			std::cout<<"DoPeek2"<< std::endl;
 			if (packet != NULL)
 				{
 					return packet;
@@ -146,7 +149,9 @@ DRR::DoDequeue() {
 		std::cout<<"DoDequeueeeeeeeeee3"<< std::endl;
 		//std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
 		//exit (0);
+		std::cout<<q_class[curr_queue_index]<<std::endl;
 		Ptr<const Packet>p = q_class[curr_queue_index]->Peek();
+		
 		if (p==NULL) {
 			num_empty++;
 			if (num_empty == num_queues) {
