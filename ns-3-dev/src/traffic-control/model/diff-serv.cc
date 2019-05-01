@@ -1,4 +1,3 @@
-
 #include <queue>
 #include "ns3/enum.h"
 #include "ns3/uinteger.h"

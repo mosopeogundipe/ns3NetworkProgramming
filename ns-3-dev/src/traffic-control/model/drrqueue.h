@@ -17,10 +17,9 @@ namespace ns3 {
 public:
 
   static TypeId GetTypeId (void);	
-	DRR (std::string config);
+//	DRR (std::string config);
 	DRR();
 	~DRR ();
-
 	uint32_t num_queues;
   std::vector<uint32_t> quantum;
 	Ptr<Packet> Dequeue (void);
@@ -28,7 +27,7 @@ public:
 	Ptr<Packet> Remove (void);
 
 private:
-	std::vector<TrafficClass> q_class;
+	//std::vector<TrafficClass> q_class;
 	std::vector<uint32_t> deficit;
 	std::string configFile;
 	uint8_t curr_queue_index;
@@ -36,10 +35,10 @@ private:
     //virtual bool Enqueue(TrafficClass DRRQueue, Ptr<Packet> p);
 	Ptr<Packet> DoDequeue (void);
 	Ptr<Packet> DoRemove (void);
-	Ptr<const Packet> DoPeek (void) const;
-	void ConfigReader(std::string config_file_name);
-
+	Ptr<const ns3::Packet> DoPeek () const; // same logic as DoDequeue but no removal
+	void ReadFromConfig(std::string config_file_name);
+	void CreateFilters();
 };
 }
 
-#endif
+//#endif

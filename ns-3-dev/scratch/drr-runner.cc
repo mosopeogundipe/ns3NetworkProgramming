@@ -72,8 +72,12 @@ main (int argc, char *argv[])
   //populate link 2
   p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
-	//p2p.AddQueueToOne ("ns3::DRR<Packet>");
+	//p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>");
   NetDeviceContainer d12 = p2p.Install(c12);
+  Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
+  Ptr<DRR> drr_queue = new DRR();
+  drr_queue->SetMode(DiffServ::packet);
+  net_device->SetQueue(drr_queue);
   p2p.EnablePcap("post_DRR",d12.Get(0), BooleanValue(false));
 
   //not quite sure what this does, tbh
@@ -82,9 +86,9 @@ main (int argc, char *argv[])
   //----------------------------------- add queue to middle node -----------------------------------
   //we should initialize it and then pass to SetQueue
 
-  Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
-  Ptr<DRR> qu = new DRR();
-  net_device->SetQueue(qu);
+  //Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
+  //Ptr<DRR> qu = new DRR();
+  //net_device->SetQueue(qu);
   
   //----------------------------------- add to internet -----------------------------------
   InternetStackHelper internet;

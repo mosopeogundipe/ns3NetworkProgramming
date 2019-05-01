@@ -32,6 +32,7 @@ def build(bld):
 			'model/filter.cc',
 			'model/traffic-class.cc',
 			'model/diff-serv.cc',
+      'model/drrqueue.cc',
       'model/strict-priority-queue.cc',
       'helper/traffic-control-helper.cc',
       'helper/queue-disc-container.cc'
@@ -76,6 +77,7 @@ def build(bld):
 			'model/filter.h',
 			'model/traffic-class.h',
 			'model/diff-serv.h',
+      'model/drrqueue.h',
       'model/strict-priority-queue.h',
       'helper/traffic-control-helper.h',
       'helper/queue-disc-container.h'

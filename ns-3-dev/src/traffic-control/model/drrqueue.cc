@@ -15,49 +15,55 @@ namespace ns3 {
    NS_LOG_COMPONENT_DEFINE("DRR");
    NS_OBJECT_ENSURE_REGISTERED(DRR);
 
-
 DRR::DRR ()
 {
-//    NS_LOG_FUNCTION (this);
-	std::cout<<"DRR CONTRUCTOR"<<std::endl;	
-	num_queues = 0;
-	std::string configFile = "drr-config.txt";
-	ConfigReader (configFile);
+//    NS_LOG_FUNCTION (this);	
+	//num_queues = 0;	
+	//configFile = "drr-config.txt";
+	//ReadFromConfig (configFile);
+	curr_queue_index = 0;
+	CreateFilters();
+	num_queues = 3;
+	quantum.push_back(30);
+	quantum.push_back(20);
+	quantum.push_back(10);
+}
+
+void
+DRR::CreateFilters(){
+	TrafficClass* highqueue = new TrafficClass();
+	TrafficClass* middlequeue = new TrafficClass();
+	TrafficClass* lowqueue = new TrafficClass();
+
+	FilterElement* destPortHigh = (FilterElement*) new DestPortFilterElement(9999);
+
+	Filter* highPriority = new Filter();
+	highPriority -> AddFilter(destPortHigh); 
+	highqueue->filters.push_back(highPriority);
+	highqueue->SetPriorityLevel(2);
+	//highpriorityqueue -> SetMaxPackets(1000);
+    highqueue->SetDefault(false);
+	q_class.push_back(highqueue);
+
+	FilterElement* destPortMiddle = (FilterElement*) new DestPortFilterElement(5555);
+
+	Filter* middlePriority = new Filter();
+	middlePriority-> AddFilter(destPortMiddle); 
+	middlequeue->filters.push_back(middlePriority);
+	//defaultqueue -> SetMaxPackets(1000);
+	middlequeue->SetDefault(true);
+	q_class.push_back(middlequeue);
 	
-	//num_queues = 3;
-	//quantum.push_back(30);
-	//quantum.push_back(20);
-	//quantum.push_back(10);
-	FilterElement* fe;
-	Filter* filter;
-	std::vector<uint32_t>::iterator iter = quantum.begin();
-    for (int i=0; i<(int)num_queues; i++){
-	    TrafficClass queue;
-		//deficit.push_back(0);
-       	queue.SetWeight(*iter);
-		deficit.push_back(queue.GetWeight());
-        queue.SetDefault(false);
-        q_class.push_back(queue);
-        std::advance(iter, 1);
-		//destination port hard code
-		switch(i) {
-			case 0:
-			fe = (FilterElement*) new DestPortFilterElement(9999);
-			filter = new Filter();
-			filter->AddFilter(fe);
-			queue.filters.push_back(*filter);		
-			case 1:
-			fe = (FilterElement*) new DestPortFilterElement(5555);
-			filter = new Filter();
-			filter->AddFilter(fe);
-			queue.filters.push_back(*filter);	
-			case 2:
-			fe = (FilterElement*) new DestPortFilterElement(1111);
-			filter = new Filter();
-			filter->AddFilter(fe);
-			queue.filters.push_back(*filter);	
-		}
-    }
+	FilterElement* destPortLow = (FilterElement*) new DestPortFilterElement(1111);
+
+	Filter* lowPriority = new Filter();
+	lowPriority-> AddFilter(destPortLow); 
+	lowqueue->filters.push_back(lowPriority);
+	lowqueue->SetPriorityLevel(1);
+	//lowpriorityqueue -> SetMaxPackets(1000);
+    lowqueue->SetDefault(false);
+	q_class.push_back(lowqueue);
+
 }
 
 DRR::~DRR ()
@@ -80,14 +86,14 @@ Ptr<Packet>
 DRR::Dequeue (void)
 {
 	std::cout << "drr dequeue" << std::endl;
-	exit (0);
+	//exit (0);
 	return DoDequeue ();
 }
 
 Ptr<const Packet>
 DRR::Peek (void) const
 {
-	return DoPeek ();
+	return DoPeek();
 }
 
 Ptr<Packet>
@@ -102,29 +108,27 @@ DRR::DoRemove (void)
 	return DoDequeue ();
 }
 
-//bool
-//DRR::DoEnqueue (Ptr<Packet> p)
-//{
-//	NS_LOG_FUNCTION (this);
- //	uint32_t queuePos = Classify (p); //what logic should be in classify?
-//	if (q_class.empty()){
-//		return false;
-//	}
-//	TrafficClass drrQueue = q_class[queuePos];
-
-//	return drrQueue.Enqueue(p);
-///}
-
 Ptr<const Packet>
 DRR::DoPeek (void) const
 {
 	//same logic as DoDequeue () but we don't remove the packet
 	Ptr<const Packet> packet;
 
+	// // Will use the first TrafficClass by default
+	// for (std::vector<TrafficClass>::const_iterator it = q_class.begin(); it != q_class.end (); ++it)
+	// 	{
+	// 		packet = it->Peek ();
+	// 		if (packet != NULL)
+	// 			{
+	// 				return packet;
+	// 			}
+	// 	}
+	// return NULL;
+
 	// Will use the first TrafficClass by default
-	for (std::vector<TrafficClass>::const_iterator it = q_class.begin (); it != q_class.end (); ++it)
+	for (TrafficClass* tc : q_class) 
 		{
-			packet = it->Peek ();
+			packet = tc->Peek ();
 			if (packet != NULL)
 				{
 					return packet;
@@ -135,11 +139,14 @@ DRR::DoPeek (void) const
 
 Ptr<Packet>
 DRR::DoDequeue() {
+	std::cout<<"DoDequeueeeeeeeeee"<< std::endl;
 	uint16_t num_empty = 0;
+	std::cout<<"DoDequeueeeeeeeeee2"<< std::endl;
 	while(true) {
-		std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
-		exit (0);
-		Ptr<const Packet>p = q_class[curr_queue_index].Peek();
+		std::cout<<"DoDequeueeeeeeeeee3"<< std::endl;
+		//std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
+		//exit (0);
+		Ptr<const Packet>p = q_class[curr_queue_index]->Peek();
 		if (p==NULL) {
 			num_empty++;
 			if (num_empty == num_queues) {
@@ -150,9 +157,9 @@ DRR::DoDequeue() {
 		}
 		if (p->GetSize()<=deficit[curr_queue_index]) {
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
-			return q_class[curr_queue_index].Dequeue();
+			return q_class[curr_queue_index]->Dequeue();
 		} else {
-			deficit[curr_queue_index]+=q_class[curr_queue_index].GetWeight();
+			deficit[curr_queue_index]+=q_class[curr_queue_index]->GetWeight();
 			curr_queue_index++;
 		}
 	}
@@ -160,7 +167,7 @@ DRR::DoDequeue() {
 
 //the number of queues and the corresponding quantum value for each queue
 void
-DRR::ConfigReader(std::string configFile) {
+DRR::ReadFromConfig(std::string configFile) {
 	std::string line;
 	std::ifstream readFile (configFile);
 	if (readFile.is_open ())
