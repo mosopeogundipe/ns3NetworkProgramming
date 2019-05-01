@@ -46,6 +46,7 @@ public:
 	Ptr<ns3::Packet> Dequeue (void);
 	Ptr<const ns3::Packet> Peek (void) const;
 	bool Match (ns3::Ptr<ns3::Packet> p);
+	std::queue<Ptr<ns3::Packet>> m_queue; //TODO: make private and have getters and setters
 
 private:
 	uint32_t bytes;
@@ -55,7 +56,7 @@ private:
 	uint32_t priority_level;
 	double_t weight;
 	bool isDefault;
-	std::queue<Ptr<ns3::Packet>> m_queue;
+	//std::queue<Ptr<ns3::Packet>> m_queue;
 };
 
 } // namespace ns3

@@ -38,7 +38,7 @@ private:
 	Ptr<Packet> DoRemove (); // why is this here? it's the same as DoDequeue
 	Ptr<const ns3::Packet> DoPeek () const; // same logic as DoDequeue but no removal
     void ReadFromConfig(std::string config_file_name);
-	//void CreateFilters();
+	void CreateFilters();
     };
 }
 //#endif
