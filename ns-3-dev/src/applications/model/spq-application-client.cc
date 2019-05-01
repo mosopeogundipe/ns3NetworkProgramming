@@ -54,7 +54,7 @@ namespace ns3 {
 			//Any additional attributes needed?
 			.AddAttribute ("MaxPackets",
 							"The maximum number of packets the application will send",
-							UintegerValue (100), //changed to 20000, for num of packets to send
+							UintegerValue (1000), //changed to 20000, for num of packets to send
 							MakeUintegerAccessor (&SpqApplicationClient::m_count),
 							MakeUintegerChecker<uint32_t> ())
 			.AddAttribute ("Interval",

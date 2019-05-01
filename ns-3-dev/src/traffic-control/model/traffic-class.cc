@@ -189,7 +189,7 @@ TrafficClass::Dequeue ()
 {
 	NS_LOG_FUNCTION (this);
 	std::cout << "Entered Traffic class dequeue" << std::endl;
-	exit(0);
+	//exit(0);
 	// if queue is empty return null
 	if (packets == 0)
 		{
@@ -230,7 +230,7 @@ TrafficClass::Match (ns3::Ptr<ns3::Packet> p)
 
 	// specification says ANY filter should match, so if only 1 does
 	// we should return true
-	//std::cout << "trafiic_filters size: "<< filters.size() << std::endl;
+	std::cout << "trafiic_filters size: "<< filters.size() << std::endl;
 	for (Filter* filter : filters)
 		{
 			if (filter->Match (p))
