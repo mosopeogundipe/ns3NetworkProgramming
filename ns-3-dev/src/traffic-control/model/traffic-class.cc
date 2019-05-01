@@ -160,25 +160,25 @@ TrafficClass::Enqueue (Ptr<ns3::Packet> p)
 	NS_LOG_FUNCTION (this);
 	std::cout << "Entered Trafficclass enqueue" << std::endl;
 	// if this queue is already full, we can't add more
-	if (bytes >= maxBytes || packets >= maxPackets)
-		{
-			return false;
-		}
+	// if (bytes >= maxBytes || packets >= maxPackets)
+	// 	{
+	// 		return false;
+	// 	}
 
-	uint32_t packetBytes = p->GetSize ();
+	// uint32_t packetBytes = p->GetSize ();
 
-	// if adding this packet would result in too many bytes, return false
-	// TODO does user call match or do we?
-	if (bytes + packetBytes > maxBytes)
-		{
-			return false;
-		}
+	// // if adding this packet would result in too many bytes, return false
+	// // TODO does user call match or do we?
+	// if (bytes + packetBytes > maxBytes)
+	// 	{
+	// 		return false;
+	// 	}
 	
 	// at this point we know that the packet can fit in the queue
 	m_queue.push (p);
 
-	bytes += packetBytes;
-	packets++;
+	//bytes += packetBytes;
+	//packets++;
 
 	// method was allowed to run to completion, packet is now in queue
 	return true;

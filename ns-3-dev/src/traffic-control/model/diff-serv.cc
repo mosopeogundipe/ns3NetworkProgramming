@@ -127,6 +127,7 @@ bool
 DiffServ::IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p){
     uint32_t pSize = p->GetSize ();
 	std::cout << "Packet size: " << pSize << "Queue Mode: "<< GetMode()<< std::endl;
+	std::cout << "GetPackets: " << queue->GetPackets () << "MaxPackets: " << queue->GetMaxPackets () <<std::endl;
     if (GetMode () == packet && queue->GetPackets () < queue->GetMaxPackets () - 1)
 		{
 			std::cout << "Entered condition 1: DiffServ" << std::endl;
