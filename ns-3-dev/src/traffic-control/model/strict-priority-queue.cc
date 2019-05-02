@@ -164,7 +164,7 @@ StrictPriorityQueue::Remove (void)
 bool
 StrictPriorityQueue::Enqueue (Ptr<Packet> p)
 {
-	std::cout << "DoEnqueue: SPQ" << std::endl;
+	//std::cout << "DoEnqueue: SPQ" << std::endl;
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
     q_class[queuePos]->Enqueue(p);
@@ -266,10 +266,13 @@ Ptr<Packet>
 StrictPriorityQueue::Schedule ()
 {
 	//NS_LOG_FUNCTION (this);
-	std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
+	//std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
 	Ptr<Packet> packet;
+	if(q_class[0]->m_queue.empty()){
+		std::cout << "High is empty. Sending Low"<<std::endl;
+	}
 	if (!q_class[0]->m_queue.empty() && q_class[0] -> GetPriorityLevel() == 2){
-		std::cout << "DoDequeue: entered 1"<<std::endl;
+		//std::cout << "DoDequeue: entered 1"<<std::endl;
 			packet = q_class[0]->Dequeue();
 			return packet;
 	}else if (!q_class[1]->m_queue.empty() && q_class[1] -> GetPriorityLevel() == 1){
@@ -277,10 +280,12 @@ StrictPriorityQueue::Schedule ()
 			packet = q_class[1]->Dequeue();
 			return packet;
 	}else{
-			// std::cout << "DoDequeue: entered 3"<<std::endl;
-			// packet = q_class[2]->Dequeue();
-			// return packet;
-		}
+		if(!q_class[2]->m_queue.empty()){
+			//std::cout << "DoDequeue: entered 3"<<std::endl;
+			packet = q_class[2]->Dequeue();
+			return packet;
+		}			
+	}
 
 	return NULL;
 }
