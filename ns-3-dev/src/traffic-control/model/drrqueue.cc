@@ -17,66 +17,53 @@ namespace ns3 {
 
 DRR::DRR ()
 {
-//	NS_LOG_FUNCTION (this);
-}
-
-DRR::DRR(){
-	std::cout<<("Got to constructor");
-	NS_LOG_INFO ("IN DRR constructor");
-}
-
-DRR::DRR (std::string configFile)
-{
 //    NS_LOG_FUNCTION (this);	
-	num_queues = 0;	
-	ConfigReader (configFile);
-	configFile = "drr-config.txt";
-	//num_queues = 3;
-	//quantum.push_back(30);
-	//quantum.push_back(20);
-	//quantum.push_back(10);
-	FilterElement* fe;
-	Filter* filter;
-	std::vector<uint32_t>::iterator iter = quantum.begin();
-<<<<<<< HEAD
-        for (int i=0; i<(int)num_queues; i++){
-	        TrafficClass queue;
-			//deficit.push_back(0);
-       		queue.SetWeight(*iter);
-            deficit.push_back(queue.GetWeight());
-        	queue.SetDefault(false);
-        	q_class.push_back(queue);
-        	std::advance(iter, 1);
-        }
-=======
-    for (int i=0; i<(int)num_queues; i++){
-	    TrafficClass queue;
-		//deficit.push_back(0);
-       	queue.SetWeight(*iter);
-		deficit.push_back(queue.GetWeight());
-        queue.SetDefault(false);
-        q_class.push_back(queue);
-        std::advance(iter, 1);
-		//destination port hard code
-		switch(i) {
-			case 0:
-			fe = (FilterElement*) new DestPortFilterElement(9999);
-			filter = new Filter();
-			filter->AddFilter(fe);
-			queue.filters.push_back(*filter);		
-			case 1:
-			fe = (FilterElement*) new DestPortFilterElement(5555);
-			filter = new Filter();
-			filter->AddFilter(fe);
-			queue.filters.push_back(*filter);	
-			case 2:
-			fe = (FilterElement*) new DestPortFilterElement(1111);
-			filter = new Filter();
-			filter->AddFilter(fe);
-			queue.filters.push_back(*filter);	
-		}
-    }
->>>>>>> origin/sope-p2
+	//num_queues = 0;	
+	//configFile = "drr-config.txt";
+	//ReadFromConfig (configFile);
+	curr_queue_index = 0;
+	CreateFilters();
+	num_queues = 3;
+	quantum.push_back(30);
+	quantum.push_back(20);
+	quantum.push_back(10);
+}
+
+void
+DRR::CreateFilters(){
+	TrafficClass* highqueue = new TrafficClass();
+	TrafficClass* middlequeue = new TrafficClass();
+	TrafficClass* lowqueue = new TrafficClass();
+
+	FilterElement* destPortHigh = (FilterElement*) new DestPortFilterElement(9999);
+
+	Filter* highPriority = new Filter();
+	highPriority -> AddFilter(destPortHigh); 
+	highqueue->filters.push_back(highPriority);
+	highqueue->SetPriorityLevel(2);
+	//highpriorityqueue -> SetMaxPackets(1000);
+    highqueue->SetDefault(false);
+	q_class.push_back(highqueue);
+
+	FilterElement* destPortMiddle = (FilterElement*) new DestPortFilterElement(5555);
+
+	Filter* middlePriority = new Filter();
+	middlePriority-> AddFilter(destPortMiddle); 
+	middlequeue->filters.push_back(middlePriority);
+	//defaultqueue -> SetMaxPackets(1000);
+	middlequeue->SetDefault(true);
+	q_class.push_back(middlequeue);
+	
+	FilterElement* destPortLow = (FilterElement*) new DestPortFilterElement(1111);
+
+	Filter* lowPriority = new Filter();
+	lowPriority-> AddFilter(destPortLow); 
+	lowqueue->filters.push_back(lowPriority);
+	lowqueue->SetPriorityLevel(1);
+	//lowpriorityqueue -> SetMaxPackets(1000);
+    lowqueue->SetDefault(false);
+	q_class.push_back(lowqueue);
+
 }
 
 DRR::~DRR ()
@@ -88,7 +75,7 @@ TypeId
 DRR::GetTypeId (void)
 {
 	static TypeId tid = TypeId ("ns3::DRR<Packet>")
-        .SetParent<Object> ()
+        .SetParent<DiffServ> ()
         .SetGroupName ("TrafficControl")
 	.AddConstructor<DRR> ()
 	;
@@ -105,14 +92,15 @@ DRR::Dequeue (void)
 >>>>>>> origin/sope-p2
 {
 	std::cout << "drr dequeue" << std::endl;
-	exit (0);
+	//exit (0);
 	return DoDequeue ();
 }
 
 Ptr<const Packet>
 DRR::Peek (void) const
 {
-	return DoPeek ();
+	std::cout << "drr peek" << std::endl;
+	return DoPeek();
 }
 
 Ptr<Packet>
@@ -135,12 +123,25 @@ Ptr<const Packet>
 DRR::DoPeek (void) const
 {
 	//same logic as DoDequeue () but we don't remove the packet
+	std::cout<<"DoPeek1"<< std::endl;
 	Ptr<const Packet> packet;
 
+	// // Will use the first TrafficClass by default
+	// for (std::vector<TrafficClass>::const_iterator it = q_class.begin(); it != q_class.end (); ++it)
+	// 	{
+	// 		packet = it->Peek ();
+	// 		if (packet != NULL)
+	// 			{
+	// 				return packet;
+	// 			}
+	// 	}
+	// return NULL;
+
 	// Will use the first TrafficClass by default
-	for (std::vector<TrafficClass>::const_iterator it = q_class.begin (); it != q_class.end (); ++it)
+	for (TrafficClass* tc : q_class) 
 		{
-			packet = it->Peek ();
+			packet = tc->Peek ();
+			std::cout<<"DoPeek2"<< std::endl;
 			if (packet != NULL)
 				{
 					return packet;
@@ -151,15 +152,19 @@ DRR::DoPeek (void) const
 
 Ptr<Packet>
 DRR::DoDequeue() {
+	std::cout<<"DoDequeueeeeeeeeee"<< std::endl;
 	uint16_t num_empty = 0;
+	std::cout<<"DoDequeueeeeeeeeee2"<< std::endl;
 	while(true) {
-<<<<<<< HEAD
-		Ptr<Packet>p = q_class[curr_queue_index].Peek();
-=======
-		std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
-		exit (0);
-		Ptr<const Packet>p = q_class[curr_queue_index].Peek();
->>>>>>> origin/sope-p2
+		std::cout<<"DoDequeueeeeeeeeee3"<< std::endl;
+		//std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
+		//exit (0);
+		if (curr_queue_index>num_queues){
+			curr_queue_index = 0;
+		}
+		std::cout<<q_class[curr_queue_index]<<std::endl;
+		Ptr<const Packet>p = q_class[curr_queue_index]->Peek();
+		
 		if (p==NULL) {
 			num_empty++;
 			if (num_empty == num_queues) {
@@ -170,9 +175,9 @@ DRR::DoDequeue() {
 		}
 		if (p->GetSize()<=deficit[curr_queue_index]) {
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
-			return q_class[curr_queue_index].Dequeue();
+			return q_class[curr_queue_index]->Dequeue();
 		} else {
-			deficit[curr_queue_index]+=q_class[curr_queue_index].GetWeight();
+			deficit[curr_queue_index]+=q_class[curr_queue_index]->GetWeight();
 			curr_queue_index++;
 		}
 	}
@@ -180,7 +185,7 @@ DRR::DoDequeue() {
 
 //the number of queues and the corresponding quantum value for each queue
 void
-DRR::ConfigReader(std::string configFile) {
+DRR::ReadFromConfig(std::string configFile) {
 	std::string line;
 	std::ifstream readFile (configFile);
 	if (readFile.is_open ())

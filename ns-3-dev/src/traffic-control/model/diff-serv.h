@@ -23,7 +23,7 @@ public:
 	void SetMode (QueueMode mode);
 	QueueMode GetMode ();
 	uint32_t Classify (Ptr<Packet> p);
-	bool Enqueue (Ptr<Packet> p);
+	virtual bool Enqueue (Ptr<Packet> p);
 
 	virtual Ptr<Packet> Schedule (void); //this only calls DoDequeue so....
 	Ptr<Packet> Dequeue (void);

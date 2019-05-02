@@ -34,7 +34,6 @@
 #include "ns3/trace-helper.h"
 #include "point-to-point-helper.h"
 
-#include "ns3/drrqueue.h"
 #include "ns3/strict-priority-queue.h"
 
 namespace ns3 {

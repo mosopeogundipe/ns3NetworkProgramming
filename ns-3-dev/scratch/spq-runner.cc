@@ -49,9 +49,6 @@ main (int argc, char *argv[])
 
   // We create the channels first without any IP addressing information
   PointToPointHelper p2p;
-<<<<<<< HEAD
-	//std::string str;
-=======
   //std::string str;
 >>>>>>> origin/sope-p2
 
@@ -60,24 +57,15 @@ main (int argc, char *argv[])
   NodeContainer c12 = NodeContainer(c.Get (1), c.Get (2)); //link 2
 
   // populate link 1 
-  p2p.SetDeviceAttribute("DataRate", StringValue ("4Mbps"));
-  p2p.SetChannelAttribute("Delay", StringValue ("2ms"));
+  p2p.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("1ms"));
   NetDeviceContainer d01 = p2p.Install (c01);
   p2p.EnablePcap("pre_SPQ", d01.Get(0), BooleanValue(false));
 
 
   //populate link 2
-<<<<<<< HEAD
-  p2p.SetDeviceAttribute("DataRate", StringValue("1Mbps"));
-  p2p.SetChannelAttribute("Delay", StringValue ("2ms"));
-  NetDeviceContainer d12 = p2p.Install(c12);
-  p2p.EnablePcap("post_SPQ",d12.Get(0), BooleanValue(false));
-
-  //not quite sure what this does, tbh
-	p2p.SetCompress(BooleanValue (false));
-=======
-  p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
-  p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
+  p2p.SetDeviceAttribute ("DataRate", StringValue("500bps"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("1ms"));
 	//p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>");
   NetDeviceContainer d12 = p2p.Install(c12);
   Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
@@ -140,7 +128,7 @@ main (int argc, char *argv[])
     //note: not sure that's the correct way to get the destination address
   SpqClientHelper highClient(i12.GetAddress(1), portHigh);
   appsHigh = highClient.Install (c.Get (0));
-  appsHigh.Start (Seconds (12.0)); //start sending at 12s
+  appsHigh.Start (Seconds (10.0)); //start sending at 12s
   appsHigh.Stop (Seconds (40.0));
 
   SpqClientHelper lowClient(i12.GetAddress(1), portLow);
