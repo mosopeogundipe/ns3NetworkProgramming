@@ -21,7 +21,7 @@ DRR::DRR ()
 	configFile = "drr-config.txt";
 	ReadFromConfig (configFile);
 	curr_queue_index = 0;
-	CreateFilters();
+//	CreateFilters();
 }
 
 void
