@@ -82,14 +82,8 @@ DRR::GetTypeId (void)
 	return tid;
 }
 
-<<<<<<< HEAD
-
-bool
-DRR::DoEnqueue (Ptr<Packet> p)
-=======
 Ptr<Packet>
 DRR::Dequeue (void)
->>>>>>> origin/sope-p2
 {
 	std::cout << "drr dequeue" << std::endl;
 	//exit (0);
@@ -110,11 +104,7 @@ DRR::Remove (void)
 }
 
 Ptr<Packet>
-<<<<<<< HEAD
-DRR::DoPeek ()
-=======
 DRR::DoRemove (void)
->>>>>>> origin/sope-p2
 {
 	return DoDequeue ();
 }

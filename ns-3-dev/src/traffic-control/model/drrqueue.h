@@ -33,19 +33,12 @@ private:
 	uint8_t curr_queue_index;
 	bool DoEnqueue (Ptr<Packet> p);
     //virtual bool Enqueue(TrafficClass DRRQueue, Ptr<Packet> p);
-<<<<<<< HEAD
-   	Ptr<Packet> DoDequeue (void);
-	Ptr<Packet> DoPeek (void);
-    void ConfigReader(std::string config_file_name);
-    };
-=======
 	Ptr<Packet> DoDequeue (void);
 	Ptr<Packet> DoRemove (void);
 	Ptr<const ns3::Packet> DoPeek () const; // same logic as DoDequeue but no removal
 	void ReadFromConfig(std::string config_file_name);
 	void CreateFilters();
 };
->>>>>>> origin/sope-p2
 }
 
 //#endif

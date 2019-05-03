@@ -54,12 +54,12 @@ namespace ns3 {
 			//Any additional attributes needed?
 			.AddAttribute ("MaxPackets",
 							"The maximum number of packets the application will send",
-							UintegerValue (20000), //changed to 20000, for num of packets to send
+							UintegerValue (80000), //changed to 20000, for num of packets to send
 							MakeUintegerAccessor (&SpqApplicationClient::m_count),
 							MakeUintegerChecker<uint32_t> ())
 			.AddAttribute ("Interval",
 							"The time to wait between packets",
-							TimeValue (Seconds (0.001)), //0.00001 gives good results
+							TimeValue (Seconds (0.0001)), //0.00001 gives good results
 							MakeTimeAccessor (&SpqApplicationClient::m_interval),
 							MakeTimeChecker ())
 			.AddAttribute ("RemoteAddress",
@@ -188,7 +188,7 @@ SpqApplicationClient::Send (void)
 
 	//create packet
   Ptr<Packet> p;
-  p = Create<Packet>();
+  p = Create<Packet>(500);
   
   p->AddHeader(seqTs);
 

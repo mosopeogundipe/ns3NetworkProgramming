@@ -50,21 +50,20 @@ main (int argc, char *argv[])
   // We create the channels first without any IP addressing information
   PointToPointHelper p2p;
   //std::string str;
->>>>>>> origin/sope-p2
 
   // Point-to-point links
   NodeContainer c01 = NodeContainer(c.Get (0), c.Get (1)); //link 1
   NodeContainer c12 = NodeContainer(c.Get (1), c.Get (2)); //link 2
 
   // populate link 1 
-  p2p.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  p2p.SetDeviceAttribute ("DataRate", StringValue ("4Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("1ms"));
   NetDeviceContainer d01 = p2p.Install (c01);
   p2p.EnablePcap("pre_SPQ", d01.Get(0), BooleanValue(false));
 
 
   //populate link 2
-  p2p.SetDeviceAttribute ("DataRate", StringValue("500bps"));
+  p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("1ms"));
 	//p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>");
   NetDeviceContainer d12 = p2p.Install(c12);
@@ -76,19 +75,14 @@ main (int argc, char *argv[])
 
   //not quite sure what this does, tbh
   p2p.SetCompress (BooleanValue (false));
->>>>>>> origin/sope-p2
 
   //----------------------------------- add queue to middle node -----------------------------------
   //todo:
     //there's no way it's this easy
     //this sets all queues to SPQ. Do we only want to set the middle?
       //is there more that one queue?
-<<<<<<< HEAD
-  p2p.SetQueue(std::string("ns3::DropTailQueue"));
-=======
   //p2p.SetQueue(std::string("ns3::StrictPriorityQueue<Packet>"));
   //p2p.SetQueue(std::string("ns3::DropTailQueue"));
->>>>>>> origin/sope-p2
 
 
   //----------------------------------- add to internet -----------------------------------

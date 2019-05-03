@@ -24,11 +24,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("ControlTest", LOG_LEVEL_ALL);
   LogComponentEnable ("DrrApplicationClient", LOG_LEVEL_ALL);
   LogComponentEnable ("DrrApplicationServer", LOG_LEVEL_ALL);
-<<<<<<< HEAD
-  LogComponentEnable ("DRR", LOG_LEVEL_ALL); //log for the queue
-=======
   //LogComponentEnable ("DRR", LOG_LEVEL_ALL); //log for the queue
->>>>>>> origin/sope-p2
 
   
   //create variables we will need
@@ -84,11 +80,7 @@ main (int argc, char *argv[])
     //there's no way it's this easy
     //this sets all queues to DRR. Do we only want to set the middle?
       //is there more that one queue?
-<<<<<<< HEAD
-  p2p.SetQueue(std::string("ns3::DropTailQueue"));
-=======
   p2p.SetQueue(std::string("ns3::DRR"));
->>>>>>> origin/sope-p2
 
 
   //----------------------------------- add to internet -----------------------------------
