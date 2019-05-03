@@ -584,18 +584,20 @@ PointToPointNetDevice::Send (
 		{
 			// need to compress this uncompressed packet
       NS_LOG_ERROR("Packet being encoded");
+      std::cout << "COMPRESSING" << std::endl;
 			newPacket = EncodePacket(packet);    //Enconde the packet and put the value in original packet
 		}
 
   //
   // We should enqueue and dequeue the packet to hit the tracing hooks.
   //
+  //std::cout << "Before enqueue packet size: "  << newPacket->GetSize() << std::endl;
   if (m_queue->Enqueue (newPacket))
     {
       //
       // If the channel is ready for transition we send the packet right now
       // 
-      std::cout << "PointToPoint: Enqueue is successful" << std::endl;
+      //std::cout << "PointToPoint: Enqueue is successful" << std::endl;
       if (m_txMachineState == READY)
         {
           newPacket = m_queue->Dequeue ();

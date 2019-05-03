@@ -188,7 +188,7 @@ SpqApplicationClient::Send (void)
 
 	//create packet
   Ptr<Packet> p;
-  p = Create<Packet>();
+  p = Create<Packet>(500);
   
   p->AddHeader(seqTs);
 

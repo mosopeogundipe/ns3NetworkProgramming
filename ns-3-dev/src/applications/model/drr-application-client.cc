@@ -55,7 +55,7 @@ namespace ns3 {
 			//Any additional attributes needed?
 			.AddAttribute ("MaxPackets",
 							"The maximum number of packets the application will send",
-							UintegerValue (20000), //changed to 12000, for num of packets to send
+							UintegerValue (2000), //changed to 12000, for num of packets to send
 							MakeUintegerAccessor (&DrrApplicationClient::m_count),
 							MakeUintegerChecker<uint32_t> ())
 			.AddAttribute ("Interval",
@@ -190,7 +190,7 @@ DrrApplicationClient::Send (void)
 
 	//create packet
   Ptr<Packet> p;
-  p = Create<Packet>();
+  p = Create<Packet>(500);
   
   p->AddHeader(seqTs);
 
