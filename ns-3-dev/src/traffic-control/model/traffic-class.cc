@@ -175,6 +175,7 @@ TrafficClass::Enqueue (Ptr<ns3::Packet> p)
 	// 	}
 	
 	// at this point we know that the packet can fit in the queue
+	std::cout << "Packet Size in enqueue: " << p->GetSize() << std::endl;
 	m_queue.push (p);
 
 	//bytes += packetBytes;
@@ -210,17 +211,11 @@ Ptr<const ns3::Packet>
 TrafficClass::Peek () const
 {
 	NS_LOG_FUNCTION (this);
-
-	// if queue is empty return null
-	if (packets == 0)
-		{
-			return NULL;
-		}
-
-	Packet* packet = PeekPointer (m_queue.front ());
-	Ptr<const Packet> c_packet = packet->Copy ();
-
-	return c_packet;
+	std::cout << "Queue size is: " << m_queue.size() << std::endl;
+	if (m_queue.size() > 0){
+		return m_queue.front();
+	}
+	return NULL;
 }
 
 bool

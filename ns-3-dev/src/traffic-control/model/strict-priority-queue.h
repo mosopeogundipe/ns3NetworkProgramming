@@ -25,7 +25,7 @@ public:
 	Ptr<Packet> Dequeue (void);
 	Ptr<const Packet> Peek (void) const;
 	Ptr<Packet> Remove (void);
-	bool Enqueue (Ptr<Packet> p);
+	//bool Enqueue (Ptr<Packet> p);
 
 private:
 	std::string configFile;
