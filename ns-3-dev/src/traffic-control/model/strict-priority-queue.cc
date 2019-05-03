@@ -161,15 +161,15 @@ StrictPriorityQueue::Remove (void)
 	return StrictPriorityQueue::DoRemove ();
 }
 
-bool
-StrictPriorityQueue::Enqueue (Ptr<Packet> p)
-{
-	std::cout << "DoEnqueue: SPQ" << std::endl;
-	// this needs actual logic from QOS class
-	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
-    q_class[queuePos]->Enqueue(p);
-	return true;
-}
+// bool
+// StrictPriorityQueue::Enqueue (Ptr<Packet> p)
+// {
+// 	//std::cout << "DoEnqueue: SPQ" << std::endl;
+// 	// this needs actual logic from QOS class
+// 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
+//     q_class[queuePos]->Enqueue(p);
+// 	return true;
+// }
  
 bool
 StrictPriorityQueue::DoEnqueue (Ptr<Packet> p)
@@ -182,41 +182,12 @@ StrictPriorityQueue::DoEnqueue (Ptr<Packet> p)
 	return true;    	
 }
 
-// bool
-// StrictPriorityQueue::IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p){
-//     uint32_t pSize = p->GetSize ();
-// 	std::cout << "Packet size: " << pSize << "Queue Mode: "<< GetMode()<< std::endl;
-//     if (GetMode () == packet && queue->GetPackets () < queue->GetMaxPackets () - 1)
-// 		{
-// 			std::cout << "Entered condition 1: DiffServ" << std::endl;
-// 			return queue->Enqueue (p);
-// 		}
-
-// 	if (GetMode () == byte && queue->GetBytes () + pSize < queue->GetMaxPackets ())
-// 		{
-// 			std::cout << "Entered condition 2: DiffServ" << std::endl;
-// 			return queue->Enqueue (p);
-// 		}
-//     return false;
-// }
-
 Ptr<Packet>
 StrictPriorityQueue::DoDequeue ()
 {
 	//NS_LOG_FUNCTION (this);
 	std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
 	Ptr<Packet> packet;
-
-	// for (TrafficClass* tc : q_class) {
-		
-	// 	packet = tc->Dequeue ();
-	// 	std::cout << "DoDequeue || Checking queue of priority " << tc->GetPriorityLevel() << std::endl;
-	// 		if (packet != NULL)
-	// 			{
-	// 				std::cout << "DoDequeue || Returning packet from queue of priority " << tc->GetPriorityLevel() << std::endl;
-	// 				return packet;
-	// 			}
-	// }
 
 	if (!q_class[0]->m_queue.empty() && q_class[0] -> GetPriorityLevel() == 2){
 		std::cout << "DoDequeue: entered 1"<<std::endl;
@@ -266,10 +237,13 @@ Ptr<Packet>
 StrictPriorityQueue::Schedule ()
 {
 	//NS_LOG_FUNCTION (this);
-	std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
+	//std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
 	Ptr<Packet> packet;
+	if(q_class[0]->m_queue.empty()){
+		std::cout << "High is empty. Sending Low"<<std::endl;
+	}
 	if (!q_class[0]->m_queue.empty() && q_class[0] -> GetPriorityLevel() == 2){
-		std::cout << "DoDequeue: entered 1"<<std::endl;
+		//std::cout << "DoDequeue: entered 1"<<std::endl;
 			packet = q_class[0]->Dequeue();
 			return packet;
 	}else if (!q_class[1]->m_queue.empty() && q_class[1] -> GetPriorityLevel() == 1){
@@ -277,10 +251,12 @@ StrictPriorityQueue::Schedule ()
 			packet = q_class[1]->Dequeue();
 			return packet;
 	}else{
-			// std::cout << "DoDequeue: entered 3"<<std::endl;
-			// packet = q_class[2]->Dequeue();
-			// return packet;
-		}
+		if(!q_class[2]->m_queue.empty()){
+			//std::cout << "DoDequeue: entered 3"<<std::endl;
+			packet = q_class[2]->Dequeue();
+			return packet;
+		}			
+	}
 
 	return NULL;
 }

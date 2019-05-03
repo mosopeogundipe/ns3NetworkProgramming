@@ -11,9 +11,12 @@
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-static-routing-helper.h"
 #include "ns3/drrqueue.h"
+<<<<<<< HEAD
 #include <ns3/queue.h>
 #include "ns3/diff-serv.h"
 
+=======
+>>>>>>> origin/sope-p2
 
 using namespace ns3;
 
@@ -72,19 +75,37 @@ main (int argc, char *argv[])
   //populate link 2
   p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
+<<<<<<< HEAD
 	//p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>");
   NetDeviceContainer d12 = p2p.Install(c12);
   Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
   Ptr<DRR> drr_queue = new DRR();
   drr_queue->SetMode(DiffServ::packet);
   net_device->SetQueue(drr_queue);
+=======
+	//p2p.AddQueueToOne ("ns3::DRR<Packet>");
+  NetDeviceContainer d12 = p2p.Install(c12);
+  Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
+  Ptr<DRR> drr = new DRR();
+  drr->SetMode(DiffServ::packet);
+  net_device->SetQueue(drr);
+>>>>>>> origin/sope-p2
   p2p.EnablePcap("post_DRR",d12.Get(0), BooleanValue(false));
 
   //not quite sure what this does, tbh
   p2p.SetCompress (BooleanValue (false));
 
   //----------------------------------- add queue to middle node -----------------------------------
+<<<<<<< HEAD
   //we should initialize it and then pass to SetQueue
+=======
+  //todo:
+    //there's no way it's this easy
+    //this sets all queues to DRR. Do we only want to set the middle?
+      //is there more that one queue?
+  //p2p.SetQueue(std::string("ns3::DRR"));
+
+>>>>>>> origin/sope-p2
 
   //Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
   //Ptr<DRR> qu = new DRR();
@@ -113,35 +134,38 @@ main (int argc, char *argv[])
   DrrServerHelper highServer(portHigh);
   ApplicationContainer appsHigh = highServer.Install(c.Get (2));
   appsHigh.Start(Seconds (0.0));
-  appsHigh.Stop(Seconds (40.0));
+  appsHigh.Stop(Seconds (200.0));
 
   DrrServerHelper medServer(portMed);
   ApplicationContainer appsMed = medServer.Install(c.Get (2));
   appsMed.Start(Seconds (0.0));
-  appsMed.Stop(Seconds (40.0));
+  appsMed.Stop(Seconds (200.0));
 
   DrrServerHelper lowServer(portLow);
   ApplicationContainer appsLow = lowServer.Install(c.Get (2));
   appsLow.Start(Seconds (0.0));
-  appsLow.Stop(Seconds (40.0));
+  appsLow.Stop(Seconds (200.0));
 
 
   // two clients, one for high priority, one for low
     //note: not sure that's the correct way to get the destination address
   DrrClientHelper highClient(i12.GetAddress(1), portHigh);
+  highClient.SetAttribute("MaxPackets", UintegerValue(2000));
   appsHigh = highClient.Install (c.Get (0));
   appsHigh.Start (Seconds (0.0)); //all start at same time
-  appsHigh.Stop (Seconds (40.0));
+  appsHigh.Stop (Seconds (200.0));
 
   DrrClientHelper MedClient(i12.GetAddress(1), portMed);
+  MedClient.SetAttribute("MaxPackets", UintegerValue(2000));
   appsMed = MedClient.Install (c.Get (0));
   appsMed.Start (Seconds (0.0)); //all start at same time
-  appsMed.Stop (Seconds (40.0));
+  appsMed.Stop (Seconds (200.0));
 
   DrrClientHelper lowClient(i12.GetAddress(1), portLow);
+  lowClient.SetAttribute("MaxPackets", UintegerValue(2000));
   appsLow = lowClient.Install (c.Get (0));
   appsLow.Start (Seconds (0.0)); //all start at same time
-  appsLow.Stop (Seconds (40.0));
+  appsLow.Stop (Seconds (200.0));
 
 
   Simulator::Run ();

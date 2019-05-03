@@ -45,6 +45,7 @@ public:
 	bool Enqueue (Ptr<ns3::Packet> p);
 	Ptr<ns3::Packet> Dequeue (void);
 	Ptr<const ns3::Packet> Peek (void) const;
+	//Ptr<ns3::Packet> Peek (void);
 	bool Match (ns3::Ptr<ns3::Packet> p);
 	std::queue<Ptr<ns3::Packet>> m_queue; //TODO: make private and have getters and setters
 

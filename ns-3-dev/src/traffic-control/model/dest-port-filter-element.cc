@@ -68,8 +68,8 @@ DestPortFilterElement::Match (Ptr<Packet> packet) const
 	packet->RemoveHeader (pppHeader);
 	packet->RemoveHeader (ipHeader);
 	packet->RemoveHeader (tcpHeader);
-  std::cout << "Packet Port is: " << tcpHeader.GetDestinationPort () << std::endl;
-  std::cout << "Filter element Port is: " << port << std::endl;
+  //std::cout << "Packet Port is: " << tcpHeader.GetDestinationPort () << std::endl;
+  //std::cout << "Filter element Port is: " << port << std::endl;
   if(tcpHeader.GetDestinationPort () == port){
     value = true;
   }
