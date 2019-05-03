@@ -35,7 +35,7 @@ StrictPriorityQueue::StrictPriorityQueue ()
 	// std::cout << "num "<< number_of_queues << std::endl;
 	// std::cout << "priority_levels "<< priority_levels[0] << std::endl;
 	// std::cout << "priority_levels "<< priority_levels[1] << std::endl;
-	CreateFilters();    
+	// CreateFilters();    
 }
 
 StrictPriorityQueue::~StrictPriorityQueue ()
@@ -161,17 +161,15 @@ StrictPriorityQueue::Schedule ()
 	if(q_class[0]->m_queue.empty()){
 		std::cout << "High is empty. Sending Low"<<std::endl;
 	}
-	if (!q_class[0]->m_queue.empty() && q_class[0] -> GetPriorityLevel() == 2){
+	if (!q_class[0]->m_queue.empty() && q_class[0] -> GetPriorityLevel() == 1){
 			packet = q_class[0]->Dequeue();
 			return packet;
-	}else if (!q_class[1]->m_queue.empty() && q_class[1] -> GetPriorityLevel() == 1){
+	}else if (!q_class[1]->m_queue.empty() && q_class[1] -> GetPriorityLevel() == 2){
 			packet = q_class[1]->Dequeue();
 			return packet;
-	}else{
-		if(!q_class[2]->m_queue.empty()){
+	}else if(!q_class[2]->m_queue.empty()){
 			packet = q_class[2]->Dequeue();
-			return packet;
-		}			
+			return packet;		
 	}
 
 	return NULL;
@@ -184,6 +182,7 @@ StrictPriorityQueue::ReadFromConfig(std::string config_file_name){
 	std::cout << "Reading from Config File: " << config_file_name << std::endl;
 	std::string line;
 	std::ifstream readFile (config_file_name);
+
 	if (readFile.is_open ())
 		{
 			std::cout << "File is Open" << std::endl;
@@ -196,10 +195,32 @@ StrictPriorityQueue::ReadFromConfig(std::string config_file_name){
 					}
 					else
 					{
+						TrafficClass* tc = new TrafficClass ();
+						tc->SetPriorityLevel (std::stoi (line));
+						tc->SetDefault (false);
+						
 						priority_levels.push_back(std::stoi (line));
+						
+						getline (readFile,line);
+						FilterElement* fe = new DestPortFilterElement(std::stoi (line));
+						Filter* filt = new Filter ();
+
+						filt->AddFilter (fe);
+						tc->filters.push_back (filt);
+						q_class.push_back (tc);
 					}
 					i++;
 				}
+
+			TrafficClass* defaultqueue = new TrafficClass ();
+			FilterElement* destPortDefault = new DestPortFilterElement(1111);
+
+			Filter* defaultPriority = new Filter();
+			defaultPriority-> AddFilter(destPortDefault); 
+			defaultqueue->filters.push_back(defaultPriority);
+			defaultqueue->SetPriorityLevel (3);
+			defaultqueue->SetDefault(true);
+			q_class.push_back(defaultqueue);
 		}
 }
 

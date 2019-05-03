@@ -209,6 +209,17 @@ DRR::ReadFromConfig(std::string configFile) {
 					{
 						quantum.push_back(std::stoi (line));
 						deficit.push_back(std::stoi (line));
+
+						TrafficClass* tc = new TrafficClass ();
+						tc->SetWeight (stoi (line));
+						tc->SetDefault (false);
+
+						getline (readFile,line);
+						Filter* filt = new Filter();
+						FilterElement* fe = new DestPortFilterElement (stoi (line));
+						filt->AddFilter (fe);
+						tc->filters.push_back (filt);
+						q_class.push_back (tc);
 					}
 					i++;
 				}
