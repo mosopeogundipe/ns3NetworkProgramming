@@ -31,6 +31,10 @@ StrictPriorityQueue::StrictPriorityQueue ()
 	//NS_LOG_FUNCTION (this);
 	std::cout << "SPQ default constructor" << std::endl;
 	configFile = "spq-config.txt";
+	ReadFromConfig(configFile);
+	// std::cout << "num "<< number_of_queues << std::endl;
+	// std::cout << "priority_levels "<< priority_levels[0] << std::endl;
+	// std::cout << "priority_levels "<< priority_levels[1] << std::endl;
 	CreateFilters();    
 }
 
@@ -50,7 +54,7 @@ StrictPriorityQueue::CreateFilters(){
 	Filter* highPriority = new Filter();
 	highPriority -> AddFilter(destPortHigh); 
 	highpriorityqueue->filters.push_back(highPriority);
-	highpriorityqueue->SetPriorityLevel(2);
+	highpriorityqueue->SetPriorityLevel(priority_levels[1]);
 	//highpriorityqueue -> SetMaxPackets(1000);
     highpriorityqueue->SetDefault(false);
 	q_class.push_back(highpriorityqueue);
@@ -61,7 +65,7 @@ StrictPriorityQueue::CreateFilters(){
 	Filter* lowPriority = new Filter();
 	lowPriority-> AddFilter(destPortLow); 
 	lowpriorityqueue->filters.push_back(lowPriority);
-	lowpriorityqueue->SetPriorityLevel(1);
+	lowpriorityqueue->SetPriorityLevel(priority_levels[0]);
 	//lowpriorityqueue -> SetMaxPackets(1000);
     lowpriorityqueue->SetDefault(false);
 	q_class.push_back(lowpriorityqueue);
@@ -186,7 +190,6 @@ StrictPriorityQueue::ReadFromConfig(std::string config_file_name){
 			uint8_t i = 0;
 			while (getline (readFile,line) )
 				{
-					std::cout << "i : " << int(i) << std::endl;		
 					if ( i == 0 )
 					{
 						number_of_queues = std::stoi (line);
