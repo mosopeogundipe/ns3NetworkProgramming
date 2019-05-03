@@ -27,19 +27,19 @@ DRR::DRR ()
 //	quantum.push_back(300);
 //	quantum.push_back(200);
 //	quantum.push_back(100);
-	deficit.push_back(300);
-	deficit.push_back(200);
-	deficit.push_back(100);
+	deficit.push_back(50);
+	deficit.push_back(50);
+	deficit.push_back(50);
 }
 
 void
 DRR::CreateFilters(){
 	TrafficClass* highqueue = new TrafficClass();
-	highqueue->SetWeight(300);
+	highqueue->SetWeight(50);
 	TrafficClass* middlequeue = new TrafficClass();
-	middlequeue->SetWeight(200);
+	middlequeue->SetWeight(50);
 	TrafficClass* lowqueue = new TrafficClass();
-	lowqueue->SetWeight(100);
+	lowqueue->SetWeight(50);
 //	deficit.push_back(300);
 //	deficit.push_back(200);
 //	deficit.push_back(100);
@@ -48,7 +48,6 @@ DRR::CreateFilters(){
 	Filter* highPriority = new Filter();
 	highPriority -> AddFilter(destPortHigh);
 	highqueue->filters.push_back(highPriority);
-//	highqueue->SetPriorityLevel(3);
     highqueue->SetDefault(false);
 	q_class.push_back(highqueue);
 
@@ -63,7 +62,6 @@ DRR::CreateFilters(){
 	Filter* lowPriority = new Filter();
 	lowPriority-> AddFilter(destPortLow); 
 	lowqueue->filters.push_back(lowPriority);
-//	lowqueue->SetPriorityLevel(1);
 	lowqueue->SetDefault(false);
 	q_class.push_back(lowqueue);
 }
@@ -132,49 +130,80 @@ DRR::DoPeek (void) const
 
 Ptr<Packet>
 DRR::DoDequeue() {
-	std::cout << "DoDequeue DRR" << std::endl;
-	uint16_t num_empty = 0;
-	uint16_t size = 0;
-	std::cout << "num_empty is: " << num_empty << std::endl;
-	while(true) {
-		if (curr_queue_index >= q_class.size ()) {
-			std::cout << "curr_queue_index got reset to 0" << std::endl;
-			curr_queue_index = 0;
-		}
-		//std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << std::endl;
-		//exit (0);
-		Ptr<const Packet>p = q_class[curr_queue_index]->Peek();
-		std::cout << "got packet with size: " << p->GetSize () << "from index: " << curr_queue_index << std::endl;
-		if (p==NULL) {
-			std::cout << "Empty queue in DRR at index: " << curr_queue_index << std::endl;
-			num_empty++;
-			if (num_empty == num_queues) {
-				std::cout << "num_empty == num_queues at: " << num_empty << std::endl;
-				return NULL;
-			}
-			curr_queue_index++;
-			continue;
-		}
-		deficit[curr_queue_index] = q_class[curr_queue_index]->GetWeight();
-		size = p->GetSize ();
-		std::cout << "DoDequeue Info" << std::endl;
-		std::cout << p->GetSize () << std::endl;
-		std::cout << deficit[curr_queue_index] << std::endl;
-		std::cout << q_class[curr_queue_index]->GetWeight() << std::endl;
-		bool i = size<=deficit[curr_queue_index];
-		std::cout << "boolean is " << i << std::endl;
-		if (size<=deficit[curr_queue_index]) {
-			std::cout << "Sending packet with size: " << p->GetSize () << std::endl;
-			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
-			return q_class[curr_queue_index]->Dequeue();
-		} else {
-			deficit[curr_queue_index]+=q_class[curr_queue_index]->GetWeight();
-			curr_queue_index++;
-			std::cout << "Deficit too small, is now: " <<deficit[curr_queue_index - 1]<< std::endl;
-			exit (0);
-		}
+
+	//TODO: check null packet
+	
+	if (curr_queue_index >= q_class.size ()) {
+	 		std::cout << "curr_queue_index got reset to 0" << std::endl;
+	 		curr_queue_index = 0;
+	 	}
+	return DoDequeueNewQueue(curr_queue_index);
+	// std::cout << "DoDequeue DRR" << std::endl;
+	// uint16_t num_empty = 0;
+	// uint16_t size = 0;
+	// std::cout << "num_empty is: " << num_empty << std::endl;
+	// while(true) {
+	// 	if (curr_queue_index >= q_class.size ()) {
+	// 		std::cout << "curr_queue_index got reset to 0" << std::endl;
+	// 		curr_queue_index = 0;
+	// 	}
+	// 	Ptr<const Packet>p = q_class[curr_queue_index]->Peek();
+	// 	std::cout << "got packet with size: " << p->GetSize () << "from index: " << curr_queue_index << std::endl;
+	// 	if (p==NULL) {
+	// 		std::cout << "Empty queue in DRR at index: " << curr_queue_index << std::endl;
+	// 		num_empty++;
+	// 		if (num_empty == num_queues) {
+	// 			std::cout << "num_empty == num_queues at: " << num_empty << std::endl;
+	// 			return NULL;
+	// 		}
+	// 		curr_queue_index++;
+	// 		continue;
+	// 	}
+	// 	deficit[curr_queue_index] = q_class[curr_queue_index]->GetWeight();
+	// 	size = p->GetSize ();
+	// 	std::cout << "DoDequeue Info" << std::endl;
+	// 	std::cout << p->GetSize () << std::endl;
+	// 	std::cout << deficit[curr_queue_index] << std::endl;
+	// 	std::cout << q_class[curr_queue_index]->GetWeight() << std::endl;
+	// 	bool i = size<=deficit[curr_queue_index];
+	// 	std::cout << "boolean is " << i << std::endl;
+	// 	if (size<=deficit[curr_queue_index]) {
+	// 		std::cout << "Sending packet with size: " << p->GetSize () << std::endl;
+	// 		deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
+	// 		return q_class[curr_queue_index]->Dequeue();
+	// 	} else {
+	// 		deficit[curr_queue_index]+=q_class[curr_queue_index]->GetWeight();
+	// 		curr_queue_index++;
+	// 		std::cout << "Deficit too small, is now: " <<deficit[curr_queue_index - 1]<< std::endl;
+	// 		exit (0);
+	// 	}
+	// }
+}
+
+Ptr<Packet>
+DRR::DoDequeueNewQueue(int index) {
+	std::cout<<"==========================================="<<std::endl;
+	Ptr<const Packet>p = q_class[index]->Peek();
+	int size = p->GetSize();
+	std::cout<<"Deficit in the beginning = "<<deficit[index]<<std::endl;
+	//int deficit = deficit[index];
+	//error: comparison between signed and unsigned integer expressions [-Werror=sign-compare]
+		if ((unsigned)size <= deficit[index]){
+		deficit[index] = deficit[index]-size;
+		std::cout<<"Should send the packet with size = "<<size<<std::endl;
+		std::cout<<"Deficit now is = "<<deficit[index]<<std::endl;
+		std::cout<<"==========================================="<<std::endl;
+		return q_class[index]->Dequeue();;
+	} else {
+		deficit[index] = deficit[index] + q_class[curr_queue_index]->GetWeight();
+		std::cout<<"Too big packet with size = "<<size<<std::endl;
+		std::cout<<"Deficit now is = "<<deficit[index]<<std::endl;
+		std::cout<<"==========================================="<<std::endl;
+		curr_queue_index = index++;
+		return DoDequeueNewQueue(index++);
 	}
 }
+
 
 //the number of queues and the corresponding quantum value for each queue
 void

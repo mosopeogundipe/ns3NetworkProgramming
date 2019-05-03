@@ -32,6 +32,7 @@ private:
 	std::string configFile;
 	uint8_t curr_queue_index;
 	bool DoEnqueue (Ptr<Packet> p);
+	Ptr<Packet> DoDequeueNewQueue (int index);
     //virtual bool Enqueue(TrafficClass DRRQueue, Ptr<Packet> p);
 	Ptr<Packet> DoDequeue (void);
 	Ptr<Packet> DoRemove (void);
