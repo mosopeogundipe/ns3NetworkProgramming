@@ -11,33 +11,24 @@
 
 namespace ns3 {
     class StrictPriorityQueue : public DiffServ{
-public:
-	//enum QueueMode { packet, byte };
-    
+public:    
     static TypeId GetTypeId (void);	
 	StrictPriorityQueue ();
-	//StrictPriorityQueue (std::string config_file_name);
 	~StrictPriorityQueue ();
-	Ptr<Packet> Schedule (); //this only calls DoDequeue so....
+	Ptr<Packet> Schedule ();
 	uint32_t number_of_queues;
     std::vector<uint32_t> priority_levels;
 	using Queue<Packet>::Dequeue;
 	Ptr<Packet> Dequeue (void);
 	Ptr<const Packet> Peek (void) const;
 	Ptr<Packet> Remove (void);
-	//bool Enqueue (Ptr<Packet> p);
 
 private:
 	std::string configFile;
-	//std::vector<Filter> filters;
-	//QueueMode m_mode;
-
-	//need to overwrite all of these marked virtual
 	bool DoEnqueue (Ptr<Packet> p);
-    //bool IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p);
     Ptr<Packet> DoDequeue ();
-	Ptr<Packet> DoRemove (); // why is this here? it's the same as DoDequeue
-	Ptr<const ns3::Packet> DoPeek () const; // same logic as DoDequeue but no removal
+	Ptr<Packet> DoRemove ();
+	Ptr<const ns3::Packet> DoPeek () const;
     void ReadFromConfig(std::string config_file_name);
 	void CreateFilters();
     };

@@ -5,9 +5,6 @@
 #include "ns3/traffic-class.h"
 #include "strict-priority-queue.h"
 #include <vector>
-//#include "ns3/source-addr-filter-element.h"
-//#include "ns3/source-port-filter-element.h"
-//#include "ns3/dest-addr-filter-element.h"
 #include "dest-port-filter-element.h"
 #include "filter.h"
 #include <bits/stdc++.h>
@@ -33,67 +30,8 @@ StrictPriorityQueue::StrictPriorityQueue ()
 {
 	//NS_LOG_FUNCTION (this);
 	std::cout << "SPQ default constructor" << std::endl;
-	//exit (0);
 	configFile = "spq-config.txt";
-	CreateFilters();
-
-    //ReadFromConfig(configFile);   // ---->>>> HINT.SOPE: Add logic in this function!
-
-	//BUGS IN CODE BELOW!!!
-
-    // if(number_of_queues == priority_levels.size()){
-	// 	//sort in decreasing order of priority
-	// 	std::cout << "Processing... " << number_of_queues << "queues" << std::endl;
-	// 	std::sort(priority_levels.begin(), priority_levels.end(), std::greater<u_int32_t>()); 
-	// 	std::vector<uint32_t>::iterator iter = priority_levels.begin();
-	// 	//std::vector<Filter>::iterator filterIter = filters.begin();
-	// 	FilterElement* fe;
-	// 	Filter* filter;
-	// 	//insert in decreasing order of priority. 
-	// 	//Highest priority is the first queue in list, defualt queue is the last one in list
-    //     for (int i=0; i<(int)number_of_queues; i++){
-    //     TrafficClass* queue = new TrafficClass();   //traffic class represents our queue in this case	
-	// 	queue->filters.clear();	
-	// 	switch(i) {
-	// 		case 0:
-	// 		fe = (FilterElement*) new DestPortFilterElement(9999);
-	// 		//fe = new DestPortFilterElement(9999);
-	// 		filter = new Filter();
-	// 		filter->AddFilter(fe);
-	// 		queue->filters.push_back(filter);
-	// 		//std::cout << "Got Here..." << std::endl;
-	// 		//queue.filters.push_back(*filter);	
-	// 		case 1:
-	// 		fe = (FilterElement*) new DestPortFilterElement(1111);
-	// 		//fe = new DestPortFilterElement(1111);
-	// 		filter = new Filter();
-	// 		filter->AddFilter(fe);
-	// 		//queue.filters.push_back(*filter);	
-	// 		queue->filters.push_back(filter);
-	// 	}		
-    //     queue->SetPriorityLevel(*iter);
-    //     queue->SetDefault(false);
-	// 	//queue.filters.push_back(*filterIter);
-    //     q_class.push_back(queue);
-    //     std::advance(iter, 1);
-	// 	//std::advance(filterIter, 1);
-    //     }
-    //     //creating default queue, where packets not matching any filters go:
-    //     TrafficClass* default_queue = new TrafficClass();
-    //     default_queue->SetDefault(true);
-	// 	//default_queue.filters.push_back(filters.back());//add low priority filter to default queue. Low priority filter is the last one in list, based on this design
-    //     fe = (FilterElement*) new DestPortFilterElement(1111);
-	// 	//fe = new DestPortFilterElement(1111);
-	// 	filter = new Filter();
-	// 	filter->AddFilter(fe);
-	// 	//default_queue.filters.push_back(*filter);
-	// 	default_queue->filters.push_back(filter);
-	// 	q_class.push_back(default_queue);
-	// 	std::cout << "Exiting SPQ constructor..." << std::endl;
-    // }else{
-    //     NS_ABORT_MSG("'Number of Queues' doesn't match 'Priority levels' in Config file!");
-    // }
-    
+	CreateFilters();    
 }
 
 StrictPriorityQueue::~StrictPriorityQueue ()
@@ -143,9 +81,6 @@ StrictPriorityQueue::CreateFilters(){
 Ptr<Packet>
 StrictPriorityQueue::Dequeue (void)
 {
-	std::cout << "SPQ Dequeue Called" << std::endl;
-	//exit (0);
-	//return DoDequeue ();
 	return Schedule ();
 }
 
@@ -160,24 +95,12 @@ StrictPriorityQueue::Remove (void)
 {
 	return StrictPriorityQueue::DoRemove ();
 }
-
-// bool
-// StrictPriorityQueue::Enqueue (Ptr<Packet> p)
-// {
-// 	//std::cout << "DoEnqueue: SPQ" << std::endl;
-// 	// this needs actual logic from QOS class
-// 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
-//     q_class[queuePos]->Enqueue(p);
-// 	return true;
-// }
  
 bool
 StrictPriorityQueue::DoEnqueue (Ptr<Packet> p)
 {
 	//NS_LOG_FUNCTION (this);
-	std::cout << "DoEnqueue: SPQ" << std::endl;
-	// this needs actual logic from QOS class
-	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
+	uint32_t queuePos = Classify (p);
     q_class[queuePos]->Enqueue(p);
 	return true;    	
 }
@@ -186,21 +109,16 @@ Ptr<Packet>
 StrictPriorityQueue::DoDequeue ()
 {
 	//NS_LOG_FUNCTION (this);
-	std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
-	Ptr<Packet> packet;
 
+	Ptr<Packet> packet;
 	if (!q_class[0]->m_queue.empty() && q_class[0] -> GetPriorityLevel() == 2){
-		std::cout << "DoDequeue: entered 1"<<std::endl;
 			packet = q_class[0]->Dequeue();
 			return packet;
 	}else if (!q_class[1]->m_queue.empty() && q_class[1] -> GetPriorityLevel() == 1){
-			std::cout << "DoDequeue: entered 2"<<std::endl;
 			packet = q_class[1]->Dequeue();
 			return packet;
-	}else{
-			
-		}
-
+	}else{			
+	}
 	return NULL;
 }
 
@@ -223,10 +141,8 @@ StrictPriorityQueue::DoPeek () const
 
 	for (TrafficClass* tc : q_class) {
 		packet = tc->Peek ();
-		std::cout << "DoPeek || Checking queue of priority " << tc->GetPriorityLevel() << std::endl;
 			if (packet != NULL)
 				{
-					std::cout << "DoPeek || Returning packet from queue of priority " << tc->GetPriorityLevel() << std::endl;
 					return packet;
 				}
 	}
@@ -237,22 +153,18 @@ Ptr<Packet>
 StrictPriorityQueue::Schedule ()
 {
 	//NS_LOG_FUNCTION (this);
-	//std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
 	Ptr<Packet> packet;
 	if(q_class[0]->m_queue.empty()){
 		std::cout << "High is empty. Sending Low"<<std::endl;
 	}
 	if (!q_class[0]->m_queue.empty() && q_class[0] -> GetPriorityLevel() == 2){
-		//std::cout << "DoDequeue: entered 1"<<std::endl;
 			packet = q_class[0]->Dequeue();
 			return packet;
 	}else if (!q_class[1]->m_queue.empty() && q_class[1] -> GetPriorityLevel() == 1){
-			std::cout << "DoDequeue: entered 2"<<std::endl;
 			packet = q_class[1]->Dequeue();
 			return packet;
 	}else{
 		if(!q_class[2]->m_queue.empty()){
-			//std::cout << "DoDequeue: entered 3"<<std::endl;
 			packet = q_class[2]->Dequeue();
 			return packet;
 		}			
@@ -281,7 +193,6 @@ StrictPriorityQueue::ReadFromConfig(std::string config_file_name){
 					}
 					else
 					{
-						//priority_levels [i - 1] = std::stoi (line);
 						priority_levels.push_back(std::stoi (line));
 					}
 					i++;

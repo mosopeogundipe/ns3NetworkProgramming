@@ -18,18 +18,10 @@ namespace ns3 {
 DRR::DRR ()
 {
 //    NS_LOG_FUNCTION (this);	
-	//num_queues = 0;	
-	//configFile = "drr-config.txt";
-	//ReadFromConfig (configFile);
+	configFile = "drr-config.txt";
+	ReadFromConfig (configFile);
 	curr_queue_index = 0;
 	CreateFilters();
-	num_queues = 3;
-	quantum.push_back(300);
-	quantum.push_back(200);
-	quantum.push_back(100);
-	deficit.push_back(300);
-	deficit.push_back(200);
-	deficit.push_back(100);
 }
 
 void
@@ -43,10 +35,8 @@ DRR::CreateFilters(){
 	Filter* highPriority = new Filter();
 	highPriority -> AddFilter(destPortHigh); 
 	highqueue->filters.push_back(highPriority);
-	//highqueue->SetPriorityLevel(2);
-	//highpriorityqueue -> SetMaxPackets(1000);
     highqueue->SetDefault(false);
-	highqueue->SetWeight(300);
+	highqueue->SetWeight(quantum[0]);
 	q_class.push_back(highqueue);
 
 	FilterElement* destPortMiddle = new DestPortFilterElement(5555);
@@ -54,9 +44,8 @@ DRR::CreateFilters(){
 	Filter* middlePriority = new Filter();
 	middlePriority-> AddFilter(destPortMiddle); 
 	middlequeue->filters.push_back(middlePriority);
-	//defaultqueue -> SetMaxPackets(1000);
 	middlequeue->SetDefault(false);
-	middlequeue->SetWeight(200);
+	middlequeue->SetWeight(quantum[1]);
 	q_class.push_back(middlequeue);
 	
 	FilterElement* destPortLow = new DestPortFilterElement(1111);
@@ -64,10 +53,8 @@ DRR::CreateFilters(){
 	Filter* lowPriority = new Filter();
 	lowPriority-> AddFilter(destPortLow); 
 	lowqueue->filters.push_back(lowPriority);
-	//lowqueue->SetPriorityLevel(1);
-	//lowpriorityqueue -> SetMaxPackets(1000);
     lowqueue->SetDefault(false);
-	lowqueue->SetWeight(100);
+	lowqueue->SetWeight(quantum[2]);
 	q_class.push_back(lowqueue);
 
 }
@@ -88,20 +75,10 @@ DRR::GetTypeId (void)
 	return tid;
 }
 
-// bool
-// DRR::Enqueue (Ptr<Packet> p)
-// {
-// 	////std::cout << "DoEnqueue: SPQ" << std::endl;
-// 	// this needs actual logic from QOS class
-// 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
-//     q_class[queuePos]->Enqueue(p);
-// 	return true;
-// }
-
 bool
 DRR::DoEnqueue (Ptr<Packet> p)
 {
-	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
+	uint32_t queuePos = Classify (p);
     q_class[queuePos]->Enqueue(p);
 	return true;		
 }
@@ -115,7 +92,6 @@ DRR::Dequeue (void)
 Ptr<const Packet>
 DRR::Peek (void) const
 {
-	//std::cout << "drr peek" << std::endl;
 	return DoPeek();
 }
 
@@ -135,12 +111,10 @@ Ptr<const Packet>
 DRR::DoPeek (void) const
 {
 	//same logic as DoDequeue () but we don't remove the packet
-	//std::cout<<"DoPeek1"<< std::endl;
 	Ptr<const Packet> packet;
 	for (TrafficClass* tc : q_class) 
 		{
 			packet = tc->Peek ();
-			//std::cout<<"DoPeek2"<< std::endl;
 			if (packet != NULL)
 				{
 					return packet;
@@ -151,69 +125,66 @@ DRR::DoPeek (void) const
 
 Ptr<Packet>
 DRR::DoDequeue() {
-	//std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
-	uint16_t num_empty = 0;
-	while(true) {
-		//std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << " curr queue index: "<< int(curr_queue_index) << std::endl;
-		//exit (0);
-		if (curr_queue_index>num_queues-1){
-			curr_queue_index = 0;
-		}
-		////std::cout<<q_class[curr_queue_index]<<std::endl;
-		Ptr<const Packet>p = q_class[curr_queue_index]->Peek();
-		//std::cout << "packet size: " << p->GetSize() << std::endl;
-		if (p==NULL) {
+	if (curr_queue_index>num_queues-1){
+		curr_queue_index = 0;
+	}
+	return DoDequeueNewQueue(curr_queue_index);
+}
+
+Ptr<Packet>
+DRR::DoDequeueNewQueue(int index) {
+	//std::cout<<"==========================================="<<std::endl;
+	Ptr<const Packet>p = q_class[index]->Peek();
+	int size = 0;
+	int num_empty = 0;
+	//std::cout<<"Deficit in the beginning = "<<deficit[index]<<std::endl;
+	//std::cout<<"Queue index = "<<index<<std::endl;
+	if (p==NULL) {
 			num_empty++;
-			if (num_empty == num_queues) {
+			if ((unsigned)num_empty == num_queues) {
 				return NULL;
 			}
 			curr_queue_index++;
-			continue;
-		}
-		if (p->GetSize()<=deficit[curr_queue_index]) {
-			//std::cout << "Dequeueing at queue index:" << int(curr_queue_index) << std::endl;
-			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
-			return q_class[curr_queue_index]->Dequeue();
-		} else {
-			//std::cout << "queue index: " << int(curr_queue_index) << " weight: " << q_class[curr_queue_index]->GetWeight() << std::endl;
-			deficit[curr_queue_index]+=uint32_t(q_class[curr_queue_index]->GetWeight());
-			curr_queue_index++;
-		}
+			return DoDequeueNewQueue(index++);
+	} else if (p->GetSize() <= deficit[index]){
+		size = p->GetSize();
+		deficit[index] = deficit[index]-size;
+		//std::cout<<"Should send the packet with size = "<<size<<std::endl;
+		//std::cout<<"Deficit now is = "<<deficit[index]<<std::endl;
+		//std::cout<<"==========================================="<<std::endl;
+		return q_class[index]->Dequeue();;
+	} else {
+		deficit[index] = deficit[index] + q_class[curr_queue_index]->GetWeight();
+		//std::cout<<"Too big packet with size = "<<size<<std::endl;
+		//std::cout<<"Deficit now is = "<<deficit[index]<<std::endl;
+		//std::cout<<"==========================================="<<std::endl;
+		curr_queue_index = index++;
+		return DoDequeueNewQueue(index++);
 	}
 }
 
 Ptr<Packet>
 DRR::Schedule ()
 {
-	//std::cout << "Schedule || qclass size: " << q_class.size() << std::endl;
 	uint16_t num_empty = 0;
 	uint16_t num_of_loops = 10;
 	while(true) {		
-		//exit (0);
 		if (curr_queue_index>num_queues-1){
 			curr_queue_index = 0;
 		}
-		//std::cout << "deficit = " << unsigned(deficit[curr_queue_index]) << " curr queue index: "<< int(curr_queue_index) << std::endl;
-		////std::cout<<q_class[curr_queue_index]<<std::endl;
 		Ptr<const Packet>p = q_class[curr_queue_index]->Peek();		
 		if (p==NULL) {
-			//std::cout << "Dequeue: packet is NULL" << std::endl;
 			num_empty++;
 			if (num_empty == num_of_loops) {
-				//std::cout << "Dequeue: returning NULL packet" << std::endl;
 				return NULL;
 			}
 			curr_queue_index++;
 			continue;
 		}
-		//std::cout << "packet size: " << p->GetSize() << std::endl;
 		if (p->GetSize()<=deficit[curr_queue_index]) {
-			//std::cout << "Dequeueing at queue index:" << unsigned(curr_queue_index) << std::endl;
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
 			return q_class[curr_queue_index]->Dequeue();
 		} else {
-			//std::cout << "increasing size at queue index: " << unsigned(curr_queue_index) << " weight: " << q_class[curr_queue_index]->GetWeight() << std::endl;
-			//deficit[curr_queue_index]+=uint32_t(q_class[curr_queue_index]->GetWeight());
 			deficit[curr_queue_index]+= 300;
 			curr_queue_index++;
 		}
@@ -232,11 +203,12 @@ DRR::ReadFromConfig(std::string configFile) {
 				{
 					if ( i == 0 )
 					{
-						num_queues = std::stoi (line);
+						num_queues = std::stoi (line);;
 					}
 					else
 					{
-						quantum [i - 1] = std::stoi (line);
+						quantum.push_back(std::stoi (line));
+						deficit.push_back(std::stoi (line));
 					}
 					i++;
 				}
