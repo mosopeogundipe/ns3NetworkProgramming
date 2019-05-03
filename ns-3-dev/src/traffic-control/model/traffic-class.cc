@@ -158,7 +158,7 @@ bool
 TrafficClass::Enqueue (Ptr<ns3::Packet> p)
 {
 	NS_LOG_FUNCTION (this);
-	std::cout << "Entered Trafficclass enqueue" << std::endl;
+	//std::cout << "Entered Trafficclass enqueue" << std::endl;
 	// if this queue is already full, we can't add more
 	// if (bytes >= maxBytes || packets >= maxPackets)
 	// 	{
@@ -175,7 +175,7 @@ TrafficClass::Enqueue (Ptr<ns3::Packet> p)
 	// 	}
 	
 	// at this point we know that the packet can fit in the queue
-	std::cout << "Packet Size in enqueue: " << p->GetSize() << std::endl;
+	//std::cout << "Packet Size in enqueue: " << p->GetSize() << std::endl;
 	m_queue.push (p);
 
 	//bytes += packetBytes;
@@ -189,12 +189,12 @@ Ptr<ns3::Packet>
 TrafficClass::Dequeue ()
 {
 	NS_LOG_FUNCTION (this);
-	std::cout << "Entered Traffic class dequeue" << std::endl;
+	//std::cout << "Entered Traffic class dequeue" << std::endl;
 	//exit(0);
 	// if queue is empty return null
 	if (packets == 0)
 		{
-			std::cout << "Traffic class: packet size is 0" << std::endl;
+			//std::cout << "Traffic class: packet size is 0" << std::endl;
 			return NULL;
 		}
 
@@ -211,7 +211,7 @@ Ptr<const ns3::Packet>
 TrafficClass::Peek () const
 {
 	NS_LOG_FUNCTION (this);
-	std::cout << "Queue size is: " << m_queue.size() << std::endl;
+	//std::cout << "Queue size is: " << m_queue.size() << std::endl;
 	if (m_queue.size() > 0){
 		return m_queue.front();
 	}
@@ -225,7 +225,7 @@ TrafficClass::Match (ns3::Ptr<ns3::Packet> p)
 
 	// specification says ANY filter should match, so if only 1 does
 	// we should return true
-	std::cout << "trafiic_filters size: "<< filters.size() << std::endl;
+	//std::cout << "trafiic_filters size: "<< filters.size() << std::endl;
 	for (Filter* filter : filters)
 		{
 			if (filter->Match (p))

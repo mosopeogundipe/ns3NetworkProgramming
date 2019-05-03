@@ -91,7 +91,7 @@ DRR::GetTypeId (void)
 // bool
 // DRR::Enqueue (Ptr<Packet> p)
 // {
-// 	//std::cout << "DoEnqueue: SPQ" << std::endl;
+// 	////std::cout << "DoEnqueue: SPQ" << std::endl;
 // 	// this needs actual logic from QOS class
 // 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
 //     q_class[queuePos]->Enqueue(p);
@@ -115,7 +115,7 @@ DRR::Dequeue (void)
 Ptr<const Packet>
 DRR::Peek (void) const
 {
-	std::cout << "drr peek" << std::endl;
+	//std::cout << "drr peek" << std::endl;
 	return DoPeek();
 }
 
@@ -135,12 +135,12 @@ Ptr<const Packet>
 DRR::DoPeek (void) const
 {
 	//same logic as DoDequeue () but we don't remove the packet
-	std::cout<<"DoPeek1"<< std::endl;
+	//std::cout<<"DoPeek1"<< std::endl;
 	Ptr<const Packet> packet;
 	for (TrafficClass* tc : q_class) 
 		{
 			packet = tc->Peek ();
-			std::cout<<"DoPeek2"<< std::endl;
+			//std::cout<<"DoPeek2"<< std::endl;
 			if (packet != NULL)
 				{
 					return packet;
@@ -151,17 +151,17 @@ DRR::DoPeek (void) const
 
 Ptr<Packet>
 DRR::DoDequeue() {
-	std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
+	//std::cout << "DoDequeue || qclass size: " << q_class.size() << std::endl;
 	uint16_t num_empty = 0;
 	while(true) {
-		std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << " curr queue index: "<< int(curr_queue_index) << std::endl;
+		//std::cout << "Num queues = " << num_queues << " , deficit = " << deficit[curr_queue_index] << " curr queue index: "<< int(curr_queue_index) << std::endl;
 		//exit (0);
 		if (curr_queue_index>num_queues-1){
 			curr_queue_index = 0;
 		}
-		//std::cout<<q_class[curr_queue_index]<<std::endl;
+		////std::cout<<q_class[curr_queue_index]<<std::endl;
 		Ptr<const Packet>p = q_class[curr_queue_index]->Peek();
-		std::cout << "packet size: " << p->GetSize() << std::endl;
+		//std::cout << "packet size: " << p->GetSize() << std::endl;
 		if (p==NULL) {
 			num_empty++;
 			if (num_empty == num_queues) {
@@ -171,11 +171,11 @@ DRR::DoDequeue() {
 			continue;
 		}
 		if (p->GetSize()<=deficit[curr_queue_index]) {
-			std::cout << "Dequeueing at queue index:" << int(curr_queue_index) << std::endl;
+			//std::cout << "Dequeueing at queue index:" << int(curr_queue_index) << std::endl;
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
 			return q_class[curr_queue_index]->Dequeue();
 		} else {
-			std::cout << "queue index: " << int(curr_queue_index) << " weight: " << q_class[curr_queue_index]->GetWeight() << std::endl;
+			//std::cout << "queue index: " << int(curr_queue_index) << " weight: " << q_class[curr_queue_index]->GetWeight() << std::endl;
 			deficit[curr_queue_index]+=uint32_t(q_class[curr_queue_index]->GetWeight());
 			curr_queue_index++;
 		}
@@ -185,7 +185,7 @@ DRR::DoDequeue() {
 Ptr<Packet>
 DRR::Schedule ()
 {
-	std::cout << "Schedule || qclass size: " << q_class.size() << std::endl;
+	//std::cout << "Schedule || qclass size: " << q_class.size() << std::endl;
 	uint16_t num_empty = 0;
 	uint16_t num_of_loops = 10;
 	while(true) {		
@@ -193,26 +193,26 @@ DRR::Schedule ()
 		if (curr_queue_index>num_queues-1){
 			curr_queue_index = 0;
 		}
-		std::cout << "deficit = " << unsigned(deficit[curr_queue_index]) << " curr queue index: "<< int(curr_queue_index) << std::endl;
-		//std::cout<<q_class[curr_queue_index]<<std::endl;
+		//std::cout << "deficit = " << unsigned(deficit[curr_queue_index]) << " curr queue index: "<< int(curr_queue_index) << std::endl;
+		////std::cout<<q_class[curr_queue_index]<<std::endl;
 		Ptr<const Packet>p = q_class[curr_queue_index]->Peek();		
 		if (p==NULL) {
-			std::cout << "Dequeue: packet is NULL" << std::endl;
+			//std::cout << "Dequeue: packet is NULL" << std::endl;
 			num_empty++;
 			if (num_empty == num_of_loops) {
-				std::cout << "Dequeue: returning NULL packet" << std::endl;
+				//std::cout << "Dequeue: returning NULL packet" << std::endl;
 				return NULL;
 			}
 			curr_queue_index++;
 			continue;
 		}
-		std::cout << "packet size: " << p->GetSize() << std::endl;
+		//std::cout << "packet size: " << p->GetSize() << std::endl;
 		if (p->GetSize()<=deficit[curr_queue_index]) {
-			std::cout << "Dequeueing at queue index:" << unsigned(curr_queue_index) << std::endl;
+			//std::cout << "Dequeueing at queue index:" << unsigned(curr_queue_index) << std::endl;
 			deficit[curr_queue_index] = deficit[curr_queue_index] - p->GetSize();
 			return q_class[curr_queue_index]->Dequeue();
 		} else {
-			std::cout << "increasing size at queue index: " << unsigned(curr_queue_index) << " weight: " << q_class[curr_queue_index]->GetWeight() << std::endl;
+			//std::cout << "increasing size at queue index: " << unsigned(curr_queue_index) << " weight: " << q_class[curr_queue_index]->GetWeight() << std::endl;
 			//deficit[curr_queue_index]+=uint32_t(q_class[curr_queue_index]->GetWeight());
 			deficit[curr_queue_index]+= 300;
 			curr_queue_index++;

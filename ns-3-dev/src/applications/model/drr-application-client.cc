@@ -11,7 +11,7 @@
 		4/16/19
 
 	Todo:
-
+		Remove option for high entropy, and just send empty packets
 */
 
 
@@ -29,7 +29,6 @@
 
 #include "seq-ts-header.h"
 #include "drr-application-client.h"
-
 
 #include <cstdlib>
 #include <cstdio>
@@ -55,12 +54,12 @@ namespace ns3 {
 			//Any additional attributes needed?
 			.AddAttribute ("MaxPackets",
 							"The maximum number of packets the application will send",
-							UintegerValue (2000), //changed to 12000, for num of packets to send
+							UintegerValue (40000), //changed to 20000, for num of packets to send
 							MakeUintegerAccessor (&DrrApplicationClient::m_count),
 							MakeUintegerChecker<uint32_t> ())
 			.AddAttribute ("Interval",
 							"The time to wait between packets",
-							TimeValue (Seconds (0.001)), //0.00001 gives good results //should be 0, or very close to, as per faq
+							TimeValue (Seconds (0.001)), //0.00001 gives good results
 							MakeTimeAccessor (&DrrApplicationClient::m_interval),
 							MakeTimeChecker ())
 			.AddAttribute ("RemoteAddress",
@@ -173,15 +172,14 @@ namespace ns3 {
 		m_sendEvent = Simulator::Schedule (Seconds (0.0), &DrrApplicationClient::Send, this);
 }
 	 
-	void
-	DrrApplicationClient::StopApplication (void)
-	{
-		NS_LOG_FUNCTION (this);
-		Simulator::Cancel (m_sendEvent);
-	}
+void
+DrrApplicationClient::StopApplication (void)
+{
+	NS_LOG_FUNCTION (this);
+	Simulator::Cancel (m_sendEvent);
+}
 
-
-	void
+void
 DrrApplicationClient::Send (void)
 {
   //create packet
@@ -190,7 +188,7 @@ DrrApplicationClient::Send (void)
 
 	//create packet
   Ptr<Packet> p;
-  p = Create<Packet>(500);
+  p = Create<Packet>(150);
   
   p->AddHeader(seqTs);
 
@@ -226,99 +224,5 @@ DrrApplicationClient::Send (void)
       m_sendEvent = Simulator::Schedule (m_interval, &DrrApplicationClient::Send, this);
     }
 }
-
-	// //all we need to do is change it so we send a train of 6000
-	// 	//already send them empty, do we really need ro read fro /dev/nul?
-	// void
-	// DrrApplicationClient::SendEmptyTrain (void)
-	// {
-	// 	NS_LOG_FUNCTION (this);
-	// 	NS_ASSERT (m_sendTrain1.IsExpired ());
-	// 	SeqTsHeader seqTs;
-	// 	seqTs.SetSeq (m_sent);
-	// 	Ptr<Packet> p = Create<Packet> (m_size-(8+4)); // 8+4 : the size of the seqTs header
-	// 	p->AddHeader (seqTs);
-	 
-	// 	std::stringstream peerAddressStringStream;
-	// 	if (Ipv4Address::IsMatchingType (m_peerAddress))
-	// 		{
-	// 			peerAddressStringStream << Ipv4Address::ConvertFrom (m_peerAddress);
-	// 		}
-	// 	else if (Ipv6Address::IsMatchingType (m_peerAddress))
-	// 		{
-	// 			peerAddressStringStream << Ipv6Address::ConvertFrom (m_peerAddress);
-	// 		}
-	 
-	// 	if ((m_socket->Send (p)) >= 0)
-	// 		{
-	// 			++m_sent;
-	// 			NS_LOG_INFO ("  Sending empty packet: " << m_sent%6000);
-
-	// 		}
-	// 	else
-	// 		{
-	// 			NS_LOG_INFO ("Error while sending " << m_size << " bytes to "
-	// 													<< peerAddressStringStream.str ());
-	// 		}
-	 
-	//  	//since we send the empty packets first, we only send half of the max (only 1 train)
-	// 	if (m_sent < m_count/2)
-	// 		{
-	// 			m_sendTrain1 = Simulator::Schedule (m_interval, &DrrApplicationClient::SendEmptyTrain, this);
-	// 		}
-	// }
-
-	//all we need to do is change it so we send a train of 6000
-		//and read in 1100 bytes from /dev/random
-	// void
-	// DrrApplicationClient::SendRandomTrain (void)
-	// {
-	// 	//first, read 1100 bytes into the buffer
-	// 		//possible issues:
-	// 			//unsigned char is not the same as uint8_t
-	// 			//not const enough
-  //       unsigned char buffer[1100];
-	// 			std::fstream fs ("/dev/random", std::fstream::in | std::fstream::binary);
-  //       fs.read( (char*)&buffer[0], 1100);
-  //       fs.close();
-
-	// 	//uint8_t buffer;
-	// 	NS_LOG_FUNCTION (this);
-	// 	NS_ASSERT (m_sendTrain2.IsExpired ());
-	// 	SeqTsHeader seqTs;
-	// 	seqTs.SetSeq (m_sent);
-	// 	Ptr<Packet> p = Create<Packet> (&buffer[0], m_size-(8+4)); // 8+4 : the size of the seqTs header
-	// 	p->AddHeader (seqTs);
-	 
-	// 	std::stringstream peerAddressStringStream;
-	// 	if (Ipv4Address::IsMatchingType (m_peerAddress))
-	// 		{
-	// 			peerAddressStringStream << Ipv4Address::ConvertFrom (m_peerAddress);
-	// 		}
-	// 	else if (Ipv6Address::IsMatchingType (m_peerAddress))
-	// 		{
-	// 			peerAddressStringStream << Ipv6Address::ConvertFrom (m_peerAddress);
-	// 		}
-	 
-	// 	if ((m_socket->Send (p)) >= 0)
-	// 		{
-	// 			++m_sent;
-	// 			NS_LOG_INFO (" Sending random packet: " << m_sent%6000);
-	 
-	// 		}
-	// 	else
-	// 		{
-	// 			NS_LOG_INFO ("Error while sending " << m_size << " bytes to "
-	// 													<< peerAddressStringStream.str ());
-	// 		}
-	 
-	// 	//don't divide by 2 this time, because we're sending the remaining half
-	// 		//cleaner way might be:
-	// 		//m_sent%6000 == 0
-	// 	if (m_sent < m_count)
-	// 		{
-	// 			m_sendTrain2 = Simulator::Schedule (m_interval, &DrrApplicationClient::SendRandomTrain, this);
-	// 		}
-	// }
  
 } // Namespace ns3

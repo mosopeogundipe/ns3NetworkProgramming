@@ -17,7 +17,7 @@ NS_OBJECT_ENSURE_REGISTERED (DiffServ);
 TypeId
 DiffServ::GetTypeId (void)
 {
-	std::cout << "Entered DiffServ: GetTypeId" << std::endl;
+	//std::cout << "Entered DiffServ: GetTypeId" << std::endl;
   static TypeId tid = TypeId ("ns3::DiffServ")
     .SetParent<Queue<ns3::Packet>> ()
     .SetGroupName ("TrafficControl")
@@ -30,14 +30,14 @@ DiffServ::GetTypeId (void)
 bool
 DiffServ::Enqueue (Ptr<Packet> p)
 {
-	std::cout << "Enqueue in Diffserv" << std::endl;
+	//std::cout << "Enqueue in Diffserv" << std::endl;
 	return DoEnqueue (p);
 }
 
 Ptr<Packet>
 DiffServ::Dequeue (void)
 {
-	std::cout << "Dequeue in Diffserv" << std::endl;
+	//std::cout << "Dequeue in Diffserv" << std::endl;
 	exit (0);
 	return DoDequeue ();
 }
@@ -45,7 +45,7 @@ DiffServ::Dequeue (void)
 Ptr<const Packet>
 DiffServ::Peek (void) const
 {
-	std::cout << "diffserv Peek" << std::endl;
+	//std::cout << "diffserv Peek" << std::endl;
 	exit (0);
 	return DoPeek ();
 }
@@ -53,7 +53,7 @@ DiffServ::Peek (void) const
 Ptr<Packet>
 DiffServ::Remove (void)
 {
-	std::cout << "diffserv Remove" << std::endl;
+	//std::cout << "diffserv Remove" << std::endl;
 	exit (0);
 	return DoRemove ();
 }
@@ -70,10 +70,10 @@ bool
 DiffServ::DoEnqueue (Ptr<Packet> p)
 {
 	//NS_LOG_FUNCTION (this);
-	std::cout << "DoEnqueue: DiffServ" << std::endl;
+	//std::cout << "DoEnqueue: DiffServ" << std::endl;
 	// this needs actual logic from QOS class
 	uint32_t queuePos = Classify (p);	//HINT.SOPE: Should I override classify function to add logic to classify as high and low priority packets?
-    std::cout << "Diffserv classify: "<< queuePos << std::endl;
+    //std::cout << "Diffserv classify: "<< queuePos << std::endl;
 	TrafficClass* target;    
 
 	if (q_class.empty ())
@@ -97,17 +97,17 @@ DiffServ::DoEnqueue (Ptr<Packet> p)
 bool
 DiffServ::IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p){
     uint32_t pSize = p->GetSize ();
-	std::cout << "Packet size: " << pSize << "Queue Mode: "<< GetMode()<< std::endl;
-	std::cout << "GetPackets: " << queue->GetPackets () << "MaxPackets: " << queue->GetMaxPackets () <<std::endl;
+	//std::cout << "Packet size: " << pSize << "Queue Mode: "<< GetMode()<< std::endl;
+	//std::cout << "GetPackets: " << queue->GetPackets () << "MaxPackets: " << queue->GetMaxPackets () <<std::endl;
     if (GetMode () == packet && queue->GetPackets () < queue->GetMaxPackets () - 1)
 		{
-			std::cout << "Entered condition 1: DiffServ" << std::endl;
+			//std::cout << "Entered condition 1: DiffServ" << std::endl;
 			return queue->Enqueue (p);
 		}
 
 	if (GetMode () == byte && queue->GetBytes () + pSize < queue->GetMaxPackets ())
 		{
-			std::cout << "Entered condition 2: DiffServ" << std::endl;
+			//std::cout << "Entered condition 2: DiffServ" << std::endl;
 			return queue->Enqueue (p);
 		}
     return false;
@@ -116,7 +116,7 @@ DiffServ::IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p){
 Ptr<Packet>
 DiffServ::DoDequeue (void)
 {
-	std::cout << "DiffServ DoDequeue" << std::endl;
+	//std::cout << "DiffServ DoDequeue" << std::endl;
 	exit (0);
 	Ptr<Packet> packet;
 
@@ -134,7 +134,7 @@ DiffServ::DoDequeue (void)
 Ptr<Packet>
 DiffServ::DoRemove (void)
 {
-	std::cout << "diffserv DoRemove" << std::endl;
+	//std::cout << "diffserv DoRemove" << std::endl;
 	exit (0);
 	// Actual logic should be same as DoDequeue
 	return DoDequeue ();
@@ -143,7 +143,7 @@ DiffServ::DoRemove (void)
 Ptr<const Packet>
 DiffServ::DoPeek (void) const
 {
-	std::cout << "diffserv DoPeek" << std::endl;
+	//std::cout << "diffserv DoPeek" << std::endl;
 	exit (0);
 	//same logic as DoDequeue () but we don't remove the packet
 	Ptr<const Packet> packet;
@@ -172,7 +172,7 @@ DiffServ::GetMode (void)
 Ptr<Packet>
 DiffServ::Schedule (void)
 {
-	std::cout << "diffserv Schedule" << std::endl;
+	//std::cout << "diffserv Schedule" << std::endl;
 	exit (0);
 	// all we need to do here is call DoDequeue which should have QOS logic
 	return DoDequeue ();
@@ -185,13 +185,13 @@ DiffServ::Classify (Ptr<Packet> p)
 	uint32_t pos = NOCLASSIFY;
 	uint32_t i = 0;
 	//TrafficClass* target;
-	//std::cout << "q_class size: "<< q_class.size() << std::endl;
+	////std::cout << "q_class size: "<< q_class.size() << std::endl;
 	for (TrafficClass* tc : q_class) {
-		//std::cout << "classify i = " << i << std::endl;
+		////std::cout << "classify i = " << i << std::endl;
 		// we want the default class, otherwise, the first matching class
 		if (tc->Match (p) || tc->IsDefault ())
 			{
-				//std::cout << "matched with queue at: " << i << std::endl;
+				////std::cout << "matched with queue at: " << i << std::endl;
 				//exit (0);
 				pos = i;
 				break; // break out once matching queue class is found

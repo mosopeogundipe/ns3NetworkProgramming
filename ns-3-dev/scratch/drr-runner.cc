@@ -127,19 +127,16 @@ main (int argc, char *argv[])
   // two clients, one for high priority, one for low
     //note: not sure that's the correct way to get the destination address
   DrrClientHelper highClient(i12.GetAddress(1), portHigh);
-  highClient.SetAttribute("MaxPackets", UintegerValue(2000));
   appsHigh = highClient.Install (c.Get (0));
   appsHigh.Start (Seconds (0.0)); //all start at same time
   appsHigh.Stop (Seconds (200.0));
 
   DrrClientHelper MedClient(i12.GetAddress(1), portMed);
-  MedClient.SetAttribute("MaxPackets", UintegerValue(2000));
   appsMed = MedClient.Install (c.Get (0));
   appsMed.Start (Seconds (0.0)); //all start at same time
   appsMed.Stop (Seconds (200.0));
 
   DrrClientHelper lowClient(i12.GetAddress(1), portLow);
-  lowClient.SetAttribute("MaxPackets", UintegerValue(2000));
   appsLow = lowClient.Install (c.Get (0));
   appsLow.Start (Seconds (0.0)); //all start at same time
   appsLow.Stop (Seconds (200.0));
