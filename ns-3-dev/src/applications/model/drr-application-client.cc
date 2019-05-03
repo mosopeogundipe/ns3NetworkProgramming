@@ -190,7 +190,7 @@ DrrApplicationClient::Send (void)
 
 	//create packet
   Ptr<Packet> p;
-  p = Create<Packet>(500);
+  p = Create<Packet>(76);
   
   p->AddHeader(seqTs);
 
