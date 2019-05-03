@@ -61,14 +61,14 @@ main (int argc, char *argv[])
 
   // populate link 1 
   p2p.SetDeviceAttribute ("DataRate", StringValue ("4Mbps"));
-  p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("1ms"));
   NetDeviceContainer d01 = p2p.Install (c01);
   p2p.EnablePcap("pre_DRR", d01.Get(0), BooleanValue(false));
 
 
   //populate link 2
   p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
-  p2p.SetChannelAttribute ("Delay", StringValue ("2ms"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("1ms"));
 	//p2p.AddQueueToOne ("ns3::DRR<Packet>");
   NetDeviceContainer d12 = p2p.Install(c12);
   Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
