@@ -18,14 +18,12 @@ public:
   static TypeId GetTypeId (void);
 	DiffServ ();
 	~DiffServ ();
-
-
 	void SetMode (QueueMode mode);
 	QueueMode GetMode ();
 	uint32_t Classify (Ptr<Packet> p);
 	bool Enqueue (Ptr<Packet> p);
 
-	virtual Ptr<Packet> Schedule (void); //this only calls DoDequeue so....
+	virtual Ptr<Packet> Schedule (void);
 	Ptr<Packet> Dequeue (void);
 	virtual Ptr<const Packet> Peek (void) const;
 	virtual Ptr<Packet> Remove (void);
@@ -38,7 +36,7 @@ private:
 	bool IsEnqueuingSuccessful(TrafficClass* queue, Ptr<Packet> p);
 	virtual bool DoEnqueue (Ptr<Packet> p);
 	virtual Ptr<Packet> DoDequeue (void);
-	virtual Ptr<Packet> DoRemove (void); // why is this here? it's the same as DoDequeue
+	virtual Ptr<Packet> DoRemove (void);
 	virtual Ptr<const Packet> DoPeek (void) const; // same logic as DoDequeue but no removal
 protected:
 	std::vector<TrafficClass*> q_class;

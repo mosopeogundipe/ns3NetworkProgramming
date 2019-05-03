@@ -33,8 +33,6 @@ main (int argc, char *argv[])
   uint16_t portLow  = 1111;
 
 
-  //read command line argument
-    //in this case, only config file
   CommandLine cmd;
   cmd.AddValue ("config", "The path to the config file that will be read", configPath);
   cmd.Parse (argc, argv);
@@ -49,7 +47,6 @@ main (int argc, char *argv[])
 
   // We create the channels first without any IP addressing information
   PointToPointHelper p2p;
-  //std::string str;
 
   // Point-to-point links
   NodeContainer c01 = NodeContainer(c.Get (0), c.Get (1)); //link 1
@@ -65,7 +62,6 @@ main (int argc, char *argv[])
   //populate link 2
   p2p.SetDeviceAttribute ("DataRate", StringValue("1Mbps"));
   p2p.SetChannelAttribute ("Delay", StringValue ("1ms"));
-	//p2p.AddQueueToOne ("ns3::StrictPriorityQueue<Packet>");
   NetDeviceContainer d12 = p2p.Install(c12);
   Ptr<PointToPointNetDevice> net_device = DynamicCast<PointToPointNetDevice>(d12.Get(0));
   Ptr<StrictPriorityQueue> SPQ = new StrictPriorityQueue();
@@ -75,15 +71,6 @@ main (int argc, char *argv[])
 
   //not quite sure what this does, tbh
   p2p.SetCompress (BooleanValue (false));
-
-  //----------------------------------- add queue to middle node -----------------------------------
-  //todo:
-    //there's no way it's this easy
-    //this sets all queues to SPQ. Do we only want to set the middle?
-      //is there more that one queue?
-  //p2p.SetQueue(std::string("ns3::StrictPriorityQueue<Packet>"));
-  //p2p.SetQueue(std::string("ns3::DropTailQueue"));
-
 
   //----------------------------------- add to internet -----------------------------------
   InternetStackHelper internet;
@@ -112,14 +99,12 @@ main (int argc, char *argv[])
 
   SpqServerHelper lowServer(portLow);
   ApplicationContainer appsLow = lowServer.Install(c.Get (2));
-  //appsLow = lowServer.Install(c.Get (2));
   appsLow.Start(Seconds (0.0));
   appsLow.Stop(Seconds (40.0));
 
 
 
   // two clients, one for high priority, one for low
-    //note: not sure that's the correct way to get the destination address
   SpqClientHelper highClient(i12.GetAddress(1), portHigh);
   appsHigh = highClient.Install (c.Get (0));
   appsHigh.Start (Seconds (10.0)); //start sending at 12s
